@@ -1,6 +1,7 @@
 #include "view.h"
 #include <QApplication>
 #include <QKeyEvent>
+#include <QDebug>
 
 View::View(QWidget *parent) : QGLWidget(parent)
 {
@@ -15,10 +16,19 @@ View::View(QWidget *parent) : QGLWidget(parent)
 
     // The game loop is implemented using a timer
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
+
+    // create graphics object
+    m_g = new Graphics();
+
+    // create game application
+    m_app = new Application(NULL);
+
+    m_mouseDown = false;
 }
 
 View::~View()
 {
+    delete m_app;
 }
 
 void View::initializeGL()
@@ -48,15 +58,21 @@ void View::paintGL()
     renderText(10, 20, "FPS: " + QString::number((int) (fps)), this->font());
 
     // TODO: call your game rendering code here
+    m_app->onRender(m_g);
 }
 
 void View::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
+    m_app->onResize(w, h);
+
+    qDebug("w: %d, h: %d", w, h);
 }
 
 void View::mousePressEvent(QMouseEvent *event)
 {
+    m_mouseDown = true;
+    m_app->onMousePressed(event);
 }
 
 void View::mouseMoveEvent(QMouseEvent *event)
@@ -74,16 +90,21 @@ void View::mouseMoveEvent(QMouseEvent *event)
     QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
 
     // TODO: Handle mouse movements here
+    if (m_mouseDown)
+        m_app->onMouseDragged(event);
+    else
+        m_app->onMouseMoved(event);
 }
 
 void View::mouseReleaseEvent(QMouseEvent *event)
 {
-
+    m_mouseDown = false;
+    m_app->onMouseReleased(event);
 }
 
 void View::wheelEvent(QWheelEvent *event)
 {
-
+    m_app->onMouseWheel(event);
 }
 
 void View::keyPressEvent(QKeyEvent *event)
@@ -91,10 +112,12 @@ void View::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Escape) QApplication::quit();
 
     // TODO: Handle keyboard presses here
+    m_app->onKeyPressed(event);
 }
 
 void View::keyReleaseEvent(QKeyEvent *event)
 {
+    m_app->onKeyReleased(event);
 }
 
 void View::tick()
@@ -104,6 +127,7 @@ void View::tick()
     fps = .02f / seconds + .98f * fps;
 
     // TODO: Implement the game update here
+    m_app->onTick(seconds);
 
     // Flag this view for repainting (Qt will call paintGL() soon after)
     update();

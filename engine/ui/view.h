@@ -5,6 +5,7 @@
 #include <QTime>
 #include <QTimer>
 #include <glm.h>
+#include "application.h"
 
 class View : public QGLWidget
 {
@@ -34,6 +35,12 @@ private:
 
 private slots:
     void tick();
+
+private:
+    Application *m_app;
+    bool m_mouseDown;
+
+    Graphics *m_g;
 };
 
 #endif // VIEW_H
