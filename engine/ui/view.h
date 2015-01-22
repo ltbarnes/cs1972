@@ -1,6 +1,7 @@
 #ifndef VIEW_H
 #define VIEW_H
 
+#include <glu.h>
 #include <qgl.h>
 #include <QTime>
 #include <QTimer>
@@ -12,7 +13,7 @@ class View : public QGLWidget
     Q_OBJECT
 
 public:
-    View(QWidget *parent);
+    View(QGLFormat format, QWidget *parent);
     ~View();
 
 private:

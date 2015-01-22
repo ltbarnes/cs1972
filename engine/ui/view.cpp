@@ -1,9 +1,8 @@
 #include "view.h"
 #include <QApplication>
 #include <QKeyEvent>
-#include <QDebug>
 
-View::View(QWidget *parent) : QGLWidget(parent)
+View::View(QGLFormat format, QWidget *parent) : QGLWidget(format, parent)
 {
     // View needs all mouse move events, not just mouse drag events
     setMouseTracking(true);
@@ -37,10 +36,31 @@ void View::initializeGL()
     // method. Before this method is called, there is no active OpenGL
     // context and all OpenGL calls have no effect.
 
+    // init the Graphics object.
+    m_g->init();
+//    m_app->onResize(width(), height());
+
+    // Enable depth testing, so that objects are occluded based on depth instead of drawing order.
+    glEnable(GL_DEPTH_TEST);
+
+    // Move the polygons back a bit so lines are still drawn even though they are coplanar with the
+    // polygons they came from, which will be drawn before them.
+    glEnable(GL_POLYGON_OFFSET_LINE);
+    glPolygonOffset(-1, -1);
+
+    // Enable back-face culling, meaning only the front side of every face is rendered.
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
+    // Specify that the front face is represented by vertices in counterclockwise order (this is
+    // the default).
+    glFrontFace(GL_CCW);
+
     // Start a timer that will try to get 60 frames per second (the actual
     // frame rate depends on the operating system and other running programs)
     time.start();
     timer.start(1000 / 60);
+
 
     // Center the mouse, which is explained more in mouseMoveEvent() below.
     // This needs to be done here because the mouse may be initially outside
@@ -52,12 +72,15 @@ void View::initializeGL()
 
 void View::paintGL()
 {
+    glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glColor3f(1,1,1);
-    renderText(10, 20, "FPS: " + QString::number((int) (fps)), this->font());
+//    QPainter::beginNativePainting();
+//    renderText(10, 20, "FPS: " + QString::number((int) (fps)), this->font());
+//    QPainter::endNativePainting();
 
     // TODO: call your game rendering code here
+    m_g->setUniforms(NULL);
     m_app->onRender(m_g);
 }
 
@@ -65,8 +88,6 @@ void View::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
     m_app->onResize(w, h);
-
-    qDebug("w: %d, h: %d", w, h);
 }
 
 void View::mousePressEvent(QMouseEvent *event)
