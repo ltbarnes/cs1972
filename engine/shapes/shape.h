@@ -16,9 +16,9 @@ public:
     void cleanUp();
 
     virtual void calcVerts();
-    virtual void render();
     virtual bool animate();
 
+    void render();
     void transformAndRender(GLuint shader, glm::mat4 trans);
 
     float map(const float val, const float oldMin, const float oldMax, const float newMin, const float newMax);

@@ -1,9 +1,17 @@
 #include "camera.h"
 
+#define GLM_FORCE_RADIANS
+#include <glm/gtx/rotate_vector.hpp>
+
+#include <glm/ext.hpp>
+#include <iostream>
+using namespace std;
+
 Camera::Camera()
 {
     glm::vec4 eye = glm::vec4(0, 0, 5, 0);
-    glm::vec4 look = -eye;
+//    glm::vec4 look = -eye;
+    glm::vec4 look = glm::vec4(0, 0, -5, 0);
     glm::vec4 up = glm::vec4(0, 1, 0, 0);
     orientLook(eye, look, up);
 
@@ -29,10 +37,20 @@ glm::mat4 Camera::getViewMatrix()
     return m_view;
 }
 
+glm::vec4 Camera::getEye()
+{
+    return m_eye;
+}
+
 void Camera::setAspectRatio(float a)
 {
     m_aspectRatio = a;
     setProjectionMatrix();
+}
+
+void Camera::setEye(glm::vec4 &eye)
+{
+    orientLook(eye, m_look, m_up);
 }
 
 void Camera::orientLook(glm::vec4 &eye, glm::vec4 &look, glm::vec4 &up)
@@ -46,42 +64,53 @@ void Camera::orientLook(glm::vec4 &eye, glm::vec4 &look, glm::vec4 &up)
     setViewMatrix();
 }
 
+
+void Camera::moveForward(float dist)
+{
+    m_eye += glm::normalize(glm::vec4(m_look.x, 0, m_look.z, 0)) * dist;
+    setViewMatrix();
+}
+
+void Camera::moveBack(float dist)
+{
+    m_eye += glm::normalize(glm::vec4(-m_look.x, 0, -m_look.z, 0)) * dist;
+    setViewMatrix();
+}
+
+void Camera::moveLeft(float dist)
+{
+    m_eye += glm::normalize(glm::vec4(m_look.z, 0, -m_look.x, 0)) * dist;
+    setViewMatrix();
+}
+
+void Camera::moveRight(float dist)
+{
+    m_eye += glm::normalize(glm::vec4(-m_look.z, 0, m_look.x, 0)) * dist;
+    setViewMatrix();
+}
+
 void Camera::pitch(float degrees)
 {
-    float cosine = glm::cos(glm::radians(degrees));
-    float sine = glm::sin(glm::radians(degrees));
 
-    glm::vec4 oldv = m_v;
-    m_v = cosine * m_v + sine * m_w;
-    m_w = cosine * m_w - sine * oldv;
-    m_look = -m_w;
-    m_up = m_v;
+    m_look = glm::rotate(m_look, glm::radians(degrees), glm::cross(glm::vec3(m_up), glm::vec3(m_look)));
+    setCameraSpace();
     setViewMatrix();
 }
 
 void Camera::yaw(float degrees)
 {
-    float cosine = glm::cos(glm::radians(degrees));
-    float sine = glm::sin(glm::radians(degrees));
-
-    glm::vec4 oldw = m_w;
-    m_w = cosine * m_w + sine * m_u;
-    m_u = cosine * m_u - sine * oldw;
-    m_look = -m_w;
-    m_up = m_v;
+    float radians = glm::radians(degrees);
+    glm::vec3 vec = glm::vec3(0.f, -1.f, 0.f);
+    m_look = glm::rotate(m_look, radians, vec);
+    m_up = glm::rotate(m_up, radians, vec);
+    setCameraSpace();
     setViewMatrix();
 }
 
 void Camera::roll(float degrees)
 {
-    float cosine = glm::cos(glm::radians(degrees));
-    float sine = glm::sin(glm::radians(degrees));
-
-    glm::vec4 oldu = m_u;
-    m_u = cosine * m_u + sine * m_v;
-    m_v = cosine * m_v - sine * oldu;
-    m_look = -m_w;
-    m_up = m_v;
+    m_up = glm::rotate(m_up, glm::radians(degrees), glm::vec3(m_look));
+    setCameraSpace();
     setViewMatrix();
 }
 

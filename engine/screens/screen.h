@@ -5,12 +5,18 @@
 #include "graphics.h"
 #include "camera.h"
 
+#include <iostream>
+
+using namespace std;
+
+class Application;
+
 class Screen
 {
 public:
+
     Screen()
     {
-        // camera defaults set in Camera class
         m_camera = new Camera();
     }
 
@@ -19,16 +25,21 @@ public:
         delete m_camera;
     }
 
+    void setParent(Application *parent)
+    {
+        m_parentApp = parent;
+    }
+
     // update and render
     virtual void onTick(float secs) = 0;
     virtual void onRender(Graphics *g) = 0;
 
     // mouse events
     virtual void onMousePressed(QMouseEvent *e) = 0;
-    virtual void onMouseMoved(QMouseEvent *e) = 0;
+    virtual void onMouseMoved(QMouseEvent *e, float deltaX, float deltaY) = 0;
     virtual void onMouseReleased(QMouseEvent *e) = 0;
 
-    virtual void onMouseDragged(QMouseEvent *e) = 0;
+    virtual void onMouseDragged(QMouseEvent *e, float deltaX, float deltaY) = 0;
     virtual void onMouseWheel(QWheelEvent *e) = 0;
 
     // key events
@@ -45,10 +56,15 @@ public:
     virtual void onResize(int w, int h)
     {
         m_camera->setAspectRatio(w * 1.f / h);
+        m_center.setX(w / 2);
+        m_center.setY(h / 2);
     }
 
 protected:
     Camera *m_camera;
+    Application *m_parentApp;
+
+    QPoint m_center;
 };
 
 #endif // SCREEN_H

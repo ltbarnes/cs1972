@@ -1,13 +1,13 @@
-#ifndef MENUSCREEN_H
-#define MENUSCREEN_H
+#ifndef PLAYERSCREEN_H
+#define PLAYERSCREEN_H
 
 #include "screen.h"
 
-class MenuScreen : public Screen
+class PlayerScreen : public Screen
 {
 public:
-    MenuScreen();
-    virtual ~MenuScreen();
+    PlayerScreen();
+    ~PlayerScreen();
 
     // update and render
     virtual void onTick(float secs);
@@ -16,7 +16,7 @@ public:
     // mouse events
     virtual void onMousePressed(QMouseEvent *e);
     virtual void onMouseMoved(QMouseEvent *e, float deltaX, float deltaY);
-    virtual void onMouseReleased(QMouseEvent *);
+    virtual void onMouseReleased(QMouseEvent *e);
 
     virtual void onMouseDragged(QMouseEvent *e, float deltaX, float deltaY);
     virtual void onMouseWheel(QWheelEvent *e);
@@ -24,6 +24,11 @@ public:
     // key events
     virtual void onKeyPressed(QKeyEvent *e);
     virtual void onKeyReleased(QKeyEvent *e);
+
+private:
+    int m_movementDir;
+    float m_jumpVelocity;
+
 };
 
-#endif // MENUSCREEN_H
+#endif // PLAYERSCREEN_H

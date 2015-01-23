@@ -6,10 +6,10 @@
 class Application
 {
 public:
-    Application(Screen *initScreen);
+    Application();
     ~Application();
 
-    void init();
+    void init(Screen *initScreen);
 
     // set the current screen
     void addScreen(Screen *s);
@@ -21,10 +21,10 @@ public:
 
     // mouse events
     void onMousePressed(QMouseEvent *e);
-    void onMouseMoved(QMouseEvent *e);
+    void onMouseMoved(QMouseEvent *e, float deltaX, float deltaY);
     void onMouseReleased(QMouseEvent *e);
 
-    void onMouseDragged(QMouseEvent *e);
+    void onMouseDragged(QMouseEvent *e, float deltaX, float deltaY);
     void onMouseWheel(QWheelEvent *e);
 
     // key events
@@ -39,6 +39,8 @@ private:
     Screen *m_currentScreen;
 
     Graphics *m_g;
+
+    int m_width, m_height;
 
 };
 

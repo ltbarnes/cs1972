@@ -11,15 +11,22 @@ public:
 
     glm::mat4 getProjectionMatrix();
     glm::mat4 getViewMatrix();
+    glm::vec4 getEye();
 
     void setAspectRatio(float a);
+    void setEye(glm::vec4 &eye);
     void orientLook(glm::vec4 &eye, glm::vec4 &look, glm::vec4 &up);
 
-private:
+    void moveForward(float dist);
+    void moveBack(float dist);
+    void moveLeft(float dist);
+    void moveRight(float dist);
+
     void pitch(float degrees);
     void yaw(float degrees);
     void roll(float degrees);
 
+private:
     void setCameraSpace();
     void setViewMatrix();
     void setProjectionMatrix();

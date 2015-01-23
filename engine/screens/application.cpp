@@ -1,9 +1,8 @@
 #include "application.h"
 
-Application::Application(Screen *initScreen)
+Application::Application()
 {
-    m_currentScreen = initScreen;
-//    m_currentScreen = NULL;
+    m_currentScreen = NULL;
 
     // create graphics object
     m_g = new Graphics();
@@ -20,8 +19,10 @@ Application::~Application()
     delete m_g;
 }
 
-void Application::init()
+void Application::init(Screen *initScreen)
 {
+    m_currentScreen = initScreen;
+    m_currentScreen->setParent(this);
     m_g->init();
 }
 
@@ -31,6 +32,8 @@ void Application::addScreen(Screen *s)
         m_screens.append(m_currentScreen);
 
     m_currentScreen = s;
+    m_currentScreen->setParent(this);
+    m_currentScreen->onResize(m_width, m_height);
 }
 
 void Application::popScreen()
@@ -55,6 +58,7 @@ void Application::onRender()
     if (m_currentScreen)
     {
         m_g->setUniforms(m_currentScreen->getCamera());
+        m_g->setColor(0.f, 0.f, 0.f, 1.f);
         m_currentScreen->onRender(m_g);
     }
 }
@@ -65,10 +69,10 @@ void Application::onMousePressed(QMouseEvent *e)
         m_currentScreen->onMousePressed(e);
 }
 
-void Application::onMouseMoved(QMouseEvent *e)
+void Application::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
 {
     if (m_currentScreen)
-        m_currentScreen->onMouseMoved(e);
+        m_currentScreen->onMouseMoved(e, deltaX, deltaY);
 }
 
 void Application::onMouseReleased(QMouseEvent *e)
@@ -77,10 +81,10 @@ void Application::onMouseReleased(QMouseEvent *e)
         m_currentScreen->onMouseReleased(e);
 }
 
-void Application::onMouseDragged(QMouseEvent *e)
+void Application::onMouseDragged(QMouseEvent *e, float deltaX, float deltaY)
 {
     if (m_currentScreen)
-        m_currentScreen->onMouseDragged(e);
+        m_currentScreen->onMouseDragged(e, deltaX, deltaY);
 }
 
 void Application::onMouseWheel(QWheelEvent *e)
@@ -106,6 +110,9 @@ void Application::onResize(int w, int h)
 {
     if (m_currentScreen)
         m_currentScreen->onResize(w, h);
+
+    m_width = w;
+    m_height = h;
 }
 
 

@@ -18,7 +18,7 @@ View::View(QGLFormat format, QWidget *parent) : QGLWidget(format, parent)
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
 
     // create game application
-    m_app = new Application(new MenuScreen());
+    m_app = new Application();
 
     m_mouseDown = false;
 }
@@ -44,7 +44,7 @@ void View::initializeGL()
     }
 
     // init the Graphics object.
-    m_app->init();
+    m_app->init(new MenuScreen());
 //    m_app->onResize(width(), height());
 
     // Enable depth testing, so that objects are occluded based on depth instead of drawing order.
@@ -92,6 +92,7 @@ void View::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
     m_app->onResize(w, h);
+    QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
 }
 
 void View::mousePressEvent(QMouseEvent *event)
@@ -116,9 +117,9 @@ void View::mouseMoveEvent(QMouseEvent *event)
 
     // TODO: Handle mouse movements here
     if (m_mouseDown)
-        m_app->onMouseDragged(event);
+        m_app->onMouseDragged(event, deltaX, deltaY);
     else
-        m_app->onMouseMoved(event);
+        m_app->onMouseMoved(event, deltaX, deltaY);
 }
 
 void View::mouseReleaseEvent(QMouseEvent *event)
