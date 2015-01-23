@@ -1,12 +1,17 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#include <glu.h>
+#define GLM_FORCE_RADIANS
+#include "GL/glew.h"
+//#include <glu.h>
 #include <qgl.h>
 #include <QTime>
 #include <QTimer>
 #include <glm.h>
+#include <iostream>
 #include "application.h"
+
+using namespace std;
 
 class View : public QGLWidget
 {
@@ -39,9 +44,8 @@ private slots:
 
 private:
     Application *m_app;
-    bool m_mouseDown;
 
-    Graphics *m_g;
+    bool m_mouseDown;
 };
 
 #endif // VIEW_H

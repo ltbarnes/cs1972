@@ -8,7 +8,16 @@
 class Screen
 {
 public:
-    virtual ~Screen() = 0;
+    Screen()
+    {
+        // camera defaults set in Camera class
+        m_camera = new Camera();
+    }
+
+    virtual ~Screen()
+    {
+        delete m_camera;
+    }
 
     // update and render
     virtual void onTick(float secs) = 0;
@@ -26,8 +35,17 @@ public:
     virtual void onKeyPressed(QKeyEvent *e) = 0;
     virtual void onKeyReleased(QKeyEvent *e) = 0;
 
+    // return screen camera
+    Camera *getCamera()
+    {
+        return m_camera;
+    }
+
     // resize
-    virtual void onResize(int w, int h) = 0;
+    virtual void onResize(int w, int h)
+    {
+        m_camera->setAspectRatio(w * 1.f / h);
+    }
 
 protected:
     Camera *m_camera;

@@ -1,6 +1,7 @@
 #include "view.h"
 #include <QApplication>
 #include <QKeyEvent>
+#include "menuscreen.h"
 
 View::View(QGLFormat format, QWidget *parent) : QGLWidget(format, parent)
 {
@@ -16,11 +17,8 @@ View::View(QGLFormat format, QWidget *parent) : QGLWidget(format, parent)
     // The game loop is implemented using a timer
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
 
-    // create graphics object
-    m_g = new Graphics();
-
     // create game application
-    m_app = new Application(NULL);
+    m_app = new Application(new MenuScreen());
 
     m_mouseDown = false;
 }
@@ -36,8 +34,17 @@ void View::initializeGL()
     // method. Before this method is called, there is no active OpenGL
     // context and all OpenGL calls have no effect.
 
+    glewExperimental = GL_TRUE;
+    GLenum err = glewInit();
+    glGetError(); // Clear errors after call to glewInit
+    if (GLEW_OK != err)
+    {
+      // Problem: glewInit failed, something is seriously wrong.
+      fprintf(stderr, "Error initializing glew: %s\n", glewGetErrorString(err));
+    }
+
     // init the Graphics object.
-    m_g->init();
+    m_app->init();
 //    m_app->onResize(width(), height());
 
     // Enable depth testing, so that objects are occluded based on depth instead of drawing order.
@@ -75,13 +82,10 @@ void View::paintGL()
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//    QPainter::beginNativePainting();
 //    renderText(10, 20, "FPS: " + QString::number((int) (fps)), this->font());
-//    QPainter::endNativePainting();
 
     // TODO: call your game rendering code here
-    m_g->setUniforms(NULL);
-    m_app->onRender(m_g);
+    m_app->onRender();
 }
 
 void View::resizeGL(int w, int h)

@@ -3,6 +3,10 @@
 Application::Application(Screen *initScreen)
 {
     m_currentScreen = initScreen;
+//    m_currentScreen = NULL;
+
+    // create graphics object
+    m_g = new Graphics();
 }
 
 Application::~Application()
@@ -12,19 +16,28 @@ Application::~Application()
 
     foreach(Screen *s, m_screens)
         delete s;
+
+    delete m_g;
+}
+
+void Application::init()
+{
+    m_g->init();
 }
 
 void Application::addScreen(Screen *s)
 {
     if (m_currentScreen)
-        m_screens.append(s);
+        m_screens.append(m_currentScreen);
 
     m_currentScreen = s;
 }
 
 void Application::popScreen()
 {
-    delete m_currentScreen;
+    if (m_currentScreen)
+        delete m_currentScreen;
+
     if (!m_screens.isEmpty())
         m_currentScreen = m_screens.takeLast();
     else
@@ -37,10 +50,13 @@ void Application::onTick(float secs)
         m_currentScreen->onTick(secs);
 }
 
-void Application::onRender(Graphics *g)
+void Application::onRender()
 {
     if (m_currentScreen)
-        m_currentScreen->onRender(g);
+    {
+        m_g->setUniforms(m_currentScreen->getCamera());
+        m_currentScreen->onRender(m_g);
+    }
 }
 
 void Application::onMousePressed(QMouseEvent *e)

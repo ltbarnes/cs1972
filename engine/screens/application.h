@@ -2,7 +2,6 @@
 #define APPLICATION_H
 
 #include "screen.h"
-#include "graphics.h"
 
 class Application
 {
@@ -10,13 +9,15 @@ public:
     Application(Screen *initScreen);
     ~Application();
 
+    void init();
+
     // set the current screen
     void addScreen(Screen *s);
     void popScreen();
 
     // update and render
     void onTick(float secs);
-    void onRender(Graphics *g);
+    void onRender();
 
     // mouse events
     void onMousePressed(QMouseEvent *e);
@@ -36,6 +37,8 @@ public:
 private:
     QList<Screen *> m_screens;
     Screen *m_currentScreen;
+
+    Graphics *m_g;
 
 };
 
