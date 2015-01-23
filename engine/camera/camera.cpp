@@ -3,15 +3,10 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/rotate_vector.hpp>
 
-#include <glm/ext.hpp>
-#include <iostream>
-using namespace std;
-
 Camera::Camera()
 {
     glm::vec4 eye = glm::vec4(0, 0, 5, 0);
-//    glm::vec4 look = -eye;
-    glm::vec4 look = glm::vec4(0, 0, -5, 0);
+    glm::vec4 look = -eye;
     glm::vec4 up = glm::vec4(0, 1, 0, 0);
     orientLook(eye, look, up);
 

@@ -28,6 +28,8 @@ public:
 private:
     int m_movementDir;
     float m_jumpVelocity;
+    bool m_crouch;
+    bool m_walk;
 
 };
 
