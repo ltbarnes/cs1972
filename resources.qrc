@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/shaders">
+        <file alias="default.frag">shaders/shader.frag</file>
+        <file alias="default.vert">shaders/shader.vert</file>
+        <file alias="cubemap.vert">shaders/cubemap.vert</file>
+        <file alias="cubemap.frag">shaders/cubemap.frag</file>
+    </qresource>
+    <qresource prefix="/images">
+    	<file alias="grass.png">res/images/grass.png</file>
+    	<file alias="snow.jpg">res/images/snow.jpg</file>
+    </qresource>
+    <qresource prefix="/cubemap">
+    	<file alias="posx.jpg">res/cubemap/posx.jpg</file>
+    	<file alias="negx.jpg">res/cubemap/negx.jpg</file>
+    	<file alias="posy.jpg">res/cubemap/posy.jpg</file>
+    	<file alias="negy.jpg">res/cubemap/negy.jpg</file>
+    	<file alias="posz.jpg">res/cubemap/posz.jpg</file>
+    	<file alias="negz.jpg">res/cubemap/negz.jpg</file>
+    </qresource>
+</RCC>
