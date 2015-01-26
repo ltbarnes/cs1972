@@ -15,6 +15,8 @@ Graphics::Graphics()
 {
     m_quad = new Shape();
     m_cube = new Cube();
+
+    m_cubeMap = new CubeMap();
 }
 
 Graphics::~Graphics()
@@ -29,21 +31,33 @@ void Graphics::init()
                 ":/shaders/default.vert",
                 ":/shaders/default.frag");
 
-    m_uniformLocs["projection"] = glGetUniformLocation(m_defaultShader, "projection");
-    m_uniformLocs["view"] = glGetUniformLocation(m_defaultShader, "view");
-    m_uniformLocs["model"] = glGetUniformLocation(m_defaultShader, "model");
+    m_defaultLocs["projection"] = glGetUniformLocation(m_defaultShader, "projection");
+    m_defaultLocs["view"] = glGetUniformLocation(m_defaultShader, "view");
+    m_defaultLocs["model"] = glGetUniformLocation(m_defaultShader, "model");
 
-    m_uniformLocs["color"] = glGetUniformLocation(m_defaultShader, "color");
-    m_uniformLocs["tex"] = glGetUniformLocation(m_defaultShader, "tex");
-    m_uniformLocs["useTexture"] = glGetUniformLocation(m_defaultShader, "useTexture");
+    m_defaultLocs["color"] = glGetUniformLocation(m_defaultShader, "color");
+    m_defaultLocs["tex"] = glGetUniformLocation(m_defaultShader, "tex");
+    m_defaultLocs["useTexture"] = glGetUniformLocation(m_defaultShader, "useTexture");
 
-    m_uniformLocs["repeatU"] = glGetUniformLocation(m_defaultShader, "repeatU");
-    m_uniformLocs["repeatV"] = glGetUniformLocation(m_defaultShader, "repeatV");
+    m_defaultLocs["repeatU"] = glGetUniformLocation(m_defaultShader, "repeatU");
+    m_defaultLocs["repeatV"] = glGetUniformLocation(m_defaultShader, "repeatV");
+
+    m_cubeShader = Graphics::loadShaders(
+                ":/shaders/cubemap.vert",
+                ":/shaders/cubemap.frag");
+
+    m_cubeLocs["projection"] = glGetUniformLocation(m_cubeShader, "projection");
+    m_cubeLocs["view"] = glGetUniformLocation(m_cubeShader, "view");
+    m_cubeLocs["envMap"] = glGetUniformLocation(m_cubeShader, "envMap");
+
+    m_cubeMap->init();
 
     m_quad->init(m_defaultShader);
     m_cube->init(m_defaultShader);
-    loadTexture(":/images/grass.png", "grass");
+
+    loadTexturesFromDirectory();
 }
+
 
 void Graphics::setUniforms(Camera *camera)
 {
@@ -52,16 +66,18 @@ void Graphics::setUniforms(Camera *camera)
     glUseProgram(m_defaultShader);
 
     // Set scene uniforms.
-    glUniformMatrix4fv(m_uniformLocs["projection"], 1, GL_FALSE,
+    glUniformMatrix4fv(m_defaultLocs["projection"], 1, GL_FALSE,
             glm::value_ptr(camera->getProjectionMatrix()));
-    glUniformMatrix4fv(m_uniformLocs["view"], 1, GL_FALSE,
+    glUniformMatrix4fv(m_defaultLocs["view"], 1, GL_FALSE,
             glm::value_ptr(camera->getViewMatrix()));
+
+    m_useCubeMap = false;
 }
 
 
 void Graphics::setColor(float r, float g, float b, float a)
 {
-    glUniform4f(m_uniformLocs["color"], r, g, b, a);
+    glUniform4f(m_defaultLocs["color"], r, g, b, a);
 }
 
 
@@ -71,10 +87,10 @@ void Graphics::setTexture(const QString &key, float repeatU = 1.f, float repeatV
 
     if (tex)
     {
-        glUniform1i(m_uniformLocs["useTexture"], 1);
-        glUniform1i(m_uniformLocs["tex"], 1);
-        glUniform1f(m_uniformLocs["repeatU"], repeatU);
-        glUniform1f(m_uniformLocs["repeatV"], repeatV);
+        glUniform1i(m_defaultLocs["useTexture"], 1);
+        glUniform1i(m_defaultLocs["tex"], 1);
+        glUniform1f(m_defaultLocs["repeatU"], repeatU);
+        glUniform1f(m_defaultLocs["repeatV"], repeatV);
 
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, m_textures.value(key));
@@ -82,8 +98,37 @@ void Graphics::setTexture(const QString &key, float repeatU = 1.f, float repeatV
     }
     else
     {
-        glUniform1i(m_uniformLocs["useTexture"], 0);
+        glUniform1i(m_defaultLocs["useTexture"], 0);
     }
+}
+
+
+void Graphics::useCubeMap(bool use)
+{
+    m_useCubeMap = use;
+}
+
+
+bool Graphics::cubeMapIsActive()
+{
+    return m_useCubeMap;
+}
+
+
+void Graphics::drawCubeMap(Camera *camera)
+{
+    glUseProgram(m_cubeShader);
+    glDepthMask(GL_FALSE);
+
+    glUniformMatrix4fv(m_cubeLocs["projection"], 1, GL_FALSE,
+            glm::value_ptr(camera->getProjectionMatrix()));
+    glUniformMatrix4fv(m_cubeLocs["view"], 1, GL_FALSE,
+            glm::value_ptr(camera->getViewMatrix()));
+    glUniform1i(glGetUniformLocation(m_cubeShader, "envMap"), 1);
+
+    m_cubeMap->render();
+
+    glDepthMask(GL_TRUE);
 }
 
 
@@ -99,9 +144,19 @@ void Graphics::drawCube(glm::mat4 trans)
 }
 
 
-void Graphics::loadTexturesFromDirectory(const QString &dirname)
+void Graphics::loadTexturesFromDirectory()
 {
-    QDir dir(dirname);
+    QDir imageDir(":/images");
+    QFileInfoList fileList = imageDir.entryInfoList();
+
+//    cout << "size: " << fileList.size() << endl;
+    cout << "Loaded images:" << endl;
+    foreach (QFileInfo fileInfo, fileList)
+    {
+        QString filename = fileInfo.fileName();
+        cout << filename.toStdString() << endl;
+        loadTexture(":/images/" + filename, filename);
+    }
 }
 
 

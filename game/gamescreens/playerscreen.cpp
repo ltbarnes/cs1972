@@ -77,8 +77,12 @@ void PlayerScreen::onTick(float secs)
 
 void PlayerScreen::onRender(Graphics *g)
 {
-    g->setColor(0.f, 1.f, 0.f, 1.f);
-    g->setTexture("grass", 15.f, 15.f);
+    g->useCubeMap(true);
+
+    g->setColor(1.f, 1.f, 1.f, 1.f);
+    g->setTexture("snow.jpg", 5.f, 5.f);
+//    g->setColor(0.f, 1.f, 0.f, 1.f);
+//    g->setTexture("grass.png", 15.f, 15.f);
     glm::mat4 trans = glm::rotate(glm::mat4(), glm::radians(-90.f), glm::vec3(1.f, 0.f, 0.f));
     trans = glm::scale(trans, glm::vec3(50.f, 50.f, 0.f));
     g->drawQuad(trans);

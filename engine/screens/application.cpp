@@ -60,6 +60,9 @@ void Application::onRender()
         m_g->setUniforms(m_currentScreen->getCamera());
         m_g->setColor(0.f, 0.f, 0.f, 1.f);
         m_currentScreen->onRender(m_g);
+
+        if (m_g->cubeMapIsActive())
+            m_g->drawCubeMap(m_currentScreen->getCamera());
     }
 }
 

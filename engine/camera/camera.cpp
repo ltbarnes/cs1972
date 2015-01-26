@@ -14,7 +14,7 @@ Camera::Camera()
     m_heightDegrees = 60;
     m_aspectRatio = 1.0;
     m_near = 1.0;
-    m_far = 50.0;
+    m_far = 150.0;
     setProjectionMatrix();
 }
 
