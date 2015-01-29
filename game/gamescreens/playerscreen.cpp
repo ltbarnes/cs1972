@@ -3,10 +3,12 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
 
-#include <iostream>
-using namespace std;
+#include "printing.h"
 
 float eyeHeight = 2.f;
+
+bool up;
+bool down;
 
 PlayerScreen::PlayerScreen()
 {
@@ -19,6 +21,9 @@ PlayerScreen::PlayerScreen()
     m_jumpVelocity = 0;
     m_crouch = false;
     m_walk = false;
+
+    up = false;
+    down = false;
 }
 
 PlayerScreen::~PlayerScreen()
@@ -28,12 +33,16 @@ PlayerScreen::~PlayerScreen()
 void PlayerScreen::onTick(float secs)
 {
 
+//    float movementAmount = 0.5f;
     float movementAmount = 0.05f;
     if (m_walk)
         movementAmount = 0.02f;
 
     glm::vec4 eye = m_camera->getEye();
-
+    if (up)
+        eye.y += 0.5f;
+    if (down)
+        eye.y -= 0.5f;
     // feet are on the ground
     if (eye.y <= eyeHeight)
     {
@@ -78,19 +87,31 @@ void PlayerScreen::onTick(float secs)
 void PlayerScreen::onRender(Graphics *g)
 {
     g->useCubeMap(true);
+    g->setWorldColor(0.2f, 0.2f, 0.2f);
 
-    g->setColor(1.f, 1.f, 1.f, 1.f);
-    g->setTexture("snow.jpg", 5.f, 5.f);
-//    g->setColor(0.f, 1.f, 0.f, 1.f);
-//    g->setTexture("grass.png", 15.f, 15.f);
+    Light *light = new Light();
+    light->id = 0;
+    light->color = glm::vec3(1.f, 0.8f, 0.6f);
+    light->pos = glm::vec3(5.f, -1.f, 1.f); // actually dir
+
+    g->addLight(*light);
+
+
+    g->setColor(0.75f, 0.8f, 0.9f, 128.f);
+    g->setTexture("snow.jpg", 15.f, 15.f);
+
     glm::mat4 trans = glm::rotate(glm::mat4(), glm::radians(-90.f), glm::vec3(1.f, 0.f, 0.f));
-    trans = glm::scale(trans, glm::vec3(50.f, 50.f, 0.f));
+    trans = glm::scale(trans, glm::vec3(50.f, 50.f, 1.f));
     g->drawQuad(trans);
 
-    g->setTexture(NULL, 15.f, 15.f);
-    g->setColor(0.f, 0.f, 1.f, 1.f);
+
+    g->setTexture(NULL);
+//    g->setTexture("grass.png", 5.f, 5.f);
+    g->setColor(.5f, .7f, 1.f, 64.f);
     trans = glm::translate(glm::mat4(), glm::vec3(0, 2, 0));
     g->drawCube(trans);
+
+    delete light;
 }
 
 void PlayerScreen::onMousePressed(QMouseEvent *)
@@ -119,8 +140,6 @@ void PlayerScreen::onMouseWheel(QWheelEvent *)
 
 void PlayerScreen::onKeyPressed(QKeyEvent *e)
 {
-    glm::vec4 eye;
-
     switch (e->key())
     {
     case Qt::Key_W:
@@ -143,6 +162,12 @@ void PlayerScreen::onKeyPressed(QKeyEvent *e)
         break;
     case Qt::Key_Shift:
         m_walk = true;
+        break;
+    case Qt::Key_Q:
+        down = true;
+        break;
+    case Qt::Key_E:
+        up = true;
         break;
     default:
         break;
@@ -170,6 +195,12 @@ void PlayerScreen::onKeyReleased(QKeyEvent *e)
         break;
     case Qt::Key_Shift:
         m_walk = false;
+        break;
+    case Qt::Key_Q:
+        down = false;
+        break;
+    case Qt::Key_E:
+        up = false;
         break;
     default:
         break;

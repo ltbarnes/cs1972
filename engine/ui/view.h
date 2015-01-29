@@ -3,6 +3,7 @@
 
 #define GLM_FORCE_RADIANS
 #include "GL/glew.h"
+#include <OpenGL/gl.h>
 #include <qgl.h>
 #include <QTime>
 #include <QTimer>

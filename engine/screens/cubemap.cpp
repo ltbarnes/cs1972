@@ -30,7 +30,7 @@ CubeMap::~CubeMap()
 
 void CubeMap::init()
 {
-    setCube(50.f);
+    setCube(100.f);
     setTextures();
 }
 

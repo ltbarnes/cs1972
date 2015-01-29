@@ -11,10 +11,10 @@ Camera::Camera()
     orientLook(eye, look, up);
 
     // Projection Defaults
-    m_heightDegrees = 60;
-    m_aspectRatio = 1.0;
-    m_near = 1.0;
-    m_far = 150.0;
+    m_heightDegrees = 60.f;
+    m_aspectRatio = 1.0f;
+    m_near = 0.1f;
+    m_far = 200.0f;
     setProjectionMatrix();
 }
 

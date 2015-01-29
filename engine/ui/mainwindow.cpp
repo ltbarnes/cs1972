@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     QGLFormat qglFormat;
-    qglFormat.setVersion(3, 2);
+    qglFormat.setVersion(3, 3);
     qglFormat.setProfile(QGLFormat::CoreProfile);
     qglFormat.setSampleBuffers(true);
 

@@ -6,10 +6,13 @@
 class Cube : public Shape
 {
 public:
-    Cube();
+    Cube(int complexity);
     ~Cube();
 
     virtual void calcVerts();
+
+private:
+    void makeSide(int *index, glm::vec3 norm, double spacing, bool first, bool last);
 };
 
 #endif // CUBE_H
