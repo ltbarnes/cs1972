@@ -17,12 +17,12 @@ macx {
 INCLUDEPATH += glm engine game shaders \
                engine/ui engine/screens engine/scene \
                engine/camera engine/shapes \
-               game/gamescreens game/world \
+               game/gamescreens game/world game/entities \
                res/images res/images/cubemap
 DEPENDPATH +=  glm engine game shaders \
                engine/ui engine/screens engine/scene \
                engine/camera engine/shapes \
-               game/gamescreens game/world \
+               game/gamescreens game/world game/entities \
                res/images res/images/cubemap
 DEFINES += TIXML_USE_STL
 OTHER_FILES += shaders/shader.frag shaders/shader.vert res/images/grass.png
@@ -39,7 +39,9 @@ SOURCES += engine/main.cpp \
     game/gamescreens/playerscreen.cpp \
     engine/shapes/cube.cpp \
     game/world/world.cpp \
-    engine/screens/cubemap.cpp
+    engine/screens/cubemap.cpp \
+    game/entities/player.cpp \
+    engine/camera/actioncamera.cpp
 
 HEADERS += engine/ui/mainwindow.h \
     engine/ui/view.h \
@@ -54,7 +56,9 @@ HEADERS += engine/ui/mainwindow.h \
     engine/shapes/cube.h \
     game/world/world.h \
     engine/screens/cubemap.h \
-    engine/printing.h
+    engine/printing.h \
+    game/entities/player.h \
+    engine/camera/actioncamera.h
 #    engine/vector/vector.h
 
 FORMS += engine/ui/mainwindow.ui

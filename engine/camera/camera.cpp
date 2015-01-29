@@ -2,6 +2,7 @@
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 Camera::Camera()
 {
@@ -16,6 +17,8 @@ Camera::Camera()
     m_near = 0.1f;
     m_far = 200.0f;
     setProjectionMatrix();
+
+    m_thirdDist = 0.f;
 }
 
 Camera::~Camera()
@@ -37,6 +40,11 @@ glm::vec4 Camera::getEye()
     return m_eye;
 }
 
+float Camera::getThirdPersonDistance()
+{
+    return m_thirdDist;
+}
+
 void Camera::setAspectRatio(float a)
 {
     m_aspectRatio = a;
@@ -46,6 +54,11 @@ void Camera::setAspectRatio(float a)
 void Camera::setEye(glm::vec4 &eye)
 {
     orientLook(eye, m_look, m_up);
+}
+
+void Camera::setThirdPersonDistance(float dist)
+{
+    m_thirdDist = dist;
 }
 
 void Camera::orientLook(glm::vec4 &eye, glm::vec4 &look, glm::vec4 &up)
@@ -86,9 +99,14 @@ void Camera::moveRight(float dist)
 
 void Camera::pitch(float degrees)
 {
-
+    glm::vec4 oldLook = m_look;
     m_look = glm::rotate(m_look, glm::radians(degrees), glm::cross(glm::vec3(m_up), glm::vec3(m_look)));
     setCameraSpace();
+    if (m_up.y < 0)
+    {
+        m_look = oldLook;
+        setCameraSpace();
+    }
     setViewMatrix();
 }
 

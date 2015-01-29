@@ -1,0 +1,31 @@
+Project: Warmup1
+Student: Logan Barnes (ltbarnes)
+
+Global Reqs:
+
+	First person camera support:
+		Can be verified by running the game. The code is in the game/gamescreens/Playerscreen class and the engine/camera/Camera class.
+
+	Screen Management:
+		Virtual Screen is engine/screens/screen.h and game/gamescreens/playerscreen and game/gamescreens/menuscreen are the two gamescreens.
+
+	Custom Graphics object:
+		The engine/screens/Graphics object is handled by the engine/screens/Application class and passed to all onDraw methods.
+		Most OpenGL Render methods are contained in the Graphics class
+
+
+Game Reqs:
+	
+		Most of these can be verified by playing the game. Press "Enter" to advance passed the white box screen (hopefully a menu screen at some point).
+
+		Most game logic is handled in the game/gamescreens/playerscreen class.
+
+
+Issues:
+	
+	Text won't render when using the OpenGL core profile so the fps doesn't show up anymore :/ I'll try and find a library or something to render text if the QGL methods won't work.
+
+	Some of the warmup 2 classes like Player, World, and ActionCamera are floating around but they aren't actually being used yet. Just adding to the clutter.
+
+	The grass is reflective because it will actually be snow when the grass requirement is lifted.
+

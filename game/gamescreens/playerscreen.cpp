@@ -1,9 +1,10 @@
 #include "playerscreen.h"
+#include <QTime>
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
 
-#include "printing.h"
+//#include "printing.h"
 
 float eyeHeight = 2.f;
 
@@ -12,6 +13,13 @@ bool down;
 
 PlayerScreen::PlayerScreen()
 {
+//    Camera *cam = new ActionCamera();
+//    m_player = new Player(cam);
+//    m_world = new World();
+//    m_world->addEntity(m_player);
+
+//    this->setCamera(m_player->getCamera());
+
     // each bit represents a movement:
     // jump, forward, back, left, right
     m_movementDir = 0b00000;
@@ -21,6 +29,7 @@ PlayerScreen::PlayerScreen()
     m_jumpVelocity = 0;
     m_crouch = false;
     m_walk = false;
+    m_sprint = false;
 
     up = false;
     down = false;
@@ -28,6 +37,8 @@ PlayerScreen::PlayerScreen()
 
 PlayerScreen::~PlayerScreen()
 {
+//    delete m_player;
+//    delete m_world;
 }
 
 void PlayerScreen::onTick(float secs)
@@ -37,6 +48,8 @@ void PlayerScreen::onTick(float secs)
     float movementAmount = 0.05f;
     if (m_walk)
         movementAmount = 0.02f;
+    if (m_sprint && 0b01000 & m_movementDir)
+        movementAmount = 0.08f;
 
     glm::vec4 eye = m_camera->getEye();
     if (up)
@@ -87,7 +100,7 @@ void PlayerScreen::onTick(float secs)
 void PlayerScreen::onRender(Graphics *g)
 {
     g->useCubeMap(true);
-    g->setWorldColor(0.2f, 0.2f, 0.2f);
+    g->setWorldColor(0.3f, 0.35f, 0.4f);
 
     Light *light = new Light();
     light->id = 0;
@@ -98,7 +111,8 @@ void PlayerScreen::onRender(Graphics *g)
 
 
     g->setColor(0.75f, 0.8f, 0.9f, 128.f);
-    g->setTexture("snow.jpg", 15.f, 15.f);
+//    g->setTexture("snow.jpg", 15.f, 15.f);
+    g->setTexture("grass.png", 50.f, 50.f);
 
     glm::mat4 trans = glm::rotate(glm::mat4(), glm::radians(-90.f), glm::vec3(1.f, 0.f, 0.f));
     trans = glm::scale(trans, glm::vec3(50.f, 50.f, 1.f));
@@ -106,7 +120,6 @@ void PlayerScreen::onRender(Graphics *g)
 
 
     g->setTexture(NULL);
-//    g->setTexture("grass.png", 5.f, 5.f);
     g->setColor(.5f, .7f, 1.f, 64.f);
     trans = glm::translate(glm::mat4(), glm::vec3(0, 2, 0));
     g->drawCube(trans);
@@ -120,8 +133,8 @@ void PlayerScreen::onMousePressed(QMouseEvent *)
 
 void PlayerScreen::onMouseMoved(QMouseEvent *, float deltaX, float deltaY)
 {
-    m_camera->yaw(deltaX / 5.f);
-    m_camera->pitch(deltaY / 5.f);
+    m_camera->yaw(deltaX / 10.f);
+    m_camera->pitch(deltaY / 10.f);
 }
 
 void PlayerScreen::onMouseReleased(QMouseEvent *)
@@ -161,13 +174,16 @@ void PlayerScreen::onKeyPressed(QKeyEvent *e)
         m_crouch = !m_crouch;
         break;
     case Qt::Key_Shift:
+        m_sprint = true;
+        break;
+    case Qt::Key_CapsLock:
         m_walk = true;
         break;
     case Qt::Key_Q:
-        down = true;
+//        down = true;
         break;
     case Qt::Key_E:
-        up = true;
+//        up = true;
         break;
     default:
         break;
@@ -194,6 +210,9 @@ void PlayerScreen::onKeyReleased(QKeyEvent *e)
         m_movementDir &= 0b01111;
         break;
     case Qt::Key_Shift:
+        m_sprint = false;
+        break;
+    case Qt::Key_CapsLock:
         m_walk = false;
         break;
     case Qt::Key_Q:

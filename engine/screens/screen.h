@@ -47,9 +47,15 @@ public:
     virtual void onKeyReleased(QKeyEvent *e) = 0;
 
     // return screen camera
-    Camera *getCamera()
+    Camera *getCamera() const
     {
         return m_camera;
+    }
+
+    void setCamera(Camera *camera)
+    {
+        delete m_camera;
+        m_camera = camera;
     }
 
     // resize

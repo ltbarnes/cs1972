@@ -10,7 +10,9 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
 
-#include "printing.h"
+//#include "printing.h"
+#include <iostream>
+using namespace std;
 
 #define MAX_NUM_LIGHTS 10
 
@@ -59,7 +61,7 @@ void Graphics::init()
     m_cubeMap->init();
 
     m_quad->init(m_defaultShader);
-    m_cube->init(m_defaultShader);
+    m_cube->init(m_defaultShader);//    cout << "size: " << fileList.size() << endl;
 
     loadTexturesFromDirectory();
 }
@@ -210,7 +212,6 @@ void Graphics::loadTexturesFromDirectory()
     QDir imageDir(":/images");
     QFileInfoList fileList = imageDir.entryInfoList();
 
-//    cout << "size: " << fileList.size() << endl;
     cout << "Loaded images:" << endl;
     foreach (QFileInfo fileInfo, fileList)
     {
