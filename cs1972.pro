@@ -53,7 +53,8 @@ HEADERS += engine/ui/mainwindow.h \
     game/gamescreens/playerscreen.h \
     engine/shapes/cube.h \
     game/world/world.h \
-    engine/screens/cubemap.h
+    engine/screens/cubemap.h \
+    engine/printing.h
 #    engine/vector/vector.h
 
 FORMS += engine/ui/mainwindow.ui

@@ -52,8 +52,8 @@ void View::initializeGL()
 
     // Move the polygons back a bit so lines are still drawn even though they are coplanar with the
     // polygons they came from, which will be drawn before them.
-    glEnable(GL_POLYGON_OFFSET_LINE);
-    glPolygonOffset(-1, -1);
+//    glEnable(GL_POLYGON_OFFSET_LINE);
+//    glPolygonOffset(-1, -1);
 
     // Enable back-face culling, meaning only the front side of every face is rendered.
     glEnable(GL_CULL_FACE);
@@ -82,10 +82,14 @@ void View::paintGL()
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//    renderText(10, 20, "FPS: " + QString::number((int) (fps)), this->font());
-
     // TODO: call your game rendering code here
     m_app->onRender();
+
+//    // Can't use Core profile with this
+//    glUseProgram(0);
+//    glColor3f(1.f, 1.f, 1.f);
+//    renderText(10, 20, "FPS: " + QString::number((int) (fps)));
+
 }
 
 void View::resizeGL(int w, int h)

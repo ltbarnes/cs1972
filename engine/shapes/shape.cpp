@@ -6,12 +6,17 @@
 #include <iostream>
 using namespace std;
 
-Shape::Shape()
+Shape::Shape(int complexity)
 {
-    m_numVerts = 4;
+//    m_numVerts = 4;
+    int c = max(complexity, 3);
+    m_p1 = c;
+    m_p2 = c;
     m_vertexData = NULL;
     m_vaoID = 0;
     m_vboID = 0;
+
+    m_halfWidth = 0.5f;
 }
 
 Shape::~Shape()
@@ -34,16 +39,52 @@ void Shape::init(GLuint shader)
 
 void Shape::calcVerts()
 {
+    int w = m_p1 + 1;
+    m_numVerts = ((2 * w + 2) * m_p1) - 2;
     int size = m_numVerts * 8;
     m_vertexData = new GLfloat[size];
+
+    double spacing = m_halfWidth * 2.0 / m_p1;
 
     int index = 0;
     glm::vec3 norm = glm::vec3(0, 0, 1);
 
-    addVertexT(&index, glm::vec3(-.5f, -.5f, 0), norm, glm::vec2(0.f, 1.f));
-    addVertexT(&index, glm::vec3(.5f, -.5f, 0), norm, glm::vec2(1.f, 1.f));
-    addVertexT(&index, glm::vec3(-.5, .5, 0), norm, glm::vec2(0.f, 0.f));
-    addVertexT(&index, glm::vec3(.5, .5, 0), norm, glm::vec2(1.f, 0.f));
+    glm::vec2 omin = glm::vec2(0, 0);
+    glm::vec2 omax = glm::vec2(m_p1, m_p1);
+
+    glm::vec2 nmin = glm::vec2(1.f, 1.f);
+    glm::vec2 nmax = glm::vec2(0.f, 0.f);
+
+    glm::vec3 v1, v2;
+    glm::vec2 t1, t2; // texture coords
+
+    // set z
+    v1.z = 0;
+
+    for (int i = 0; i < m_p1; i++) {
+
+        v1.x = m_halfWidth;
+        v1.y = (i * spacing - m_halfWidth);
+
+        // double the first point if it isn't the start of the cube
+        if (i != 0)
+            addVertex(&index, v1, norm);
+
+        for (int j = 0; j <= m_p1; j++) {
+            v1.x = (j * spacing - m_halfWidth) * -1.f;
+            v2 = v1;
+            v2.y = v1.y + spacing;
+
+            t1 = mapPoints(glm::vec2(j, i), omin, omax, nmin, nmax);
+            t2 = mapPoints(glm::vec2(j, i+1), omin, omax, nmin, nmax);
+
+            addVertexT(&index, v1, norm, t1);
+            addVertexT(&index, v2, norm, t2);
+        }
+        // double the last point if it isn't the end of the cube
+        if (i != m_p1 - 1)
+            addVertex(&index, v2, norm);
+    }
 }
 
 
@@ -125,6 +166,12 @@ void Shape::transformAndRender(GLuint shader, glm::mat4 trans)
     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, glm::value_ptr(trans));
     glDrawArrays(GL_TRIANGLE_STRIP, 0, m_numVerts);
     glBindVertexArray(0);
+
+    glUniform3f(glGetUniformLocation(shader, "allBlack"), 0, 0, 0);
+    glBindVertexArray(m_vaoID);
+    glDrawArrays(GL_LINE_STRIP, 0, m_numVerts);
+    glBindVertexArray(0);
+    glUniform3f(glGetUniformLocation(shader, "allBlack"), 1, 1, 1);
 }
 
 

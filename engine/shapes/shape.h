@@ -7,7 +7,7 @@
 class Shape
 {
 public:
-    Shape();
+    Shape(int complexity);
     virtual ~Shape();
 
     void init(GLuint shader);
@@ -39,6 +39,7 @@ protected:
     float m_p3;
 
     int m_numVerts;
+    float m_halfWidth;
 };
 
 #endif // SHAPE_H

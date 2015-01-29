@@ -4,17 +4,20 @@
 #include <QImage>
 #include <QDir>
 #include <QGLWidget>
+#include <string>
+#include <sstream>
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
 
-#include <iostream>
-using namespace std;
+#include "printing.h"
+
+#define MAX_NUM_LIGHTS 10
 
 Graphics::Graphics()
 {
-    m_quad = new Shape();
-    m_cube = new Cube();
+    m_quad = new Shape(100);
+    m_cube = new Cube(10);
 
     m_cubeMap = new CubeMap();
 }
@@ -35,9 +38,12 @@ void Graphics::init()
     m_defaultLocs["view"] = glGetUniformLocation(m_defaultShader, "view");
     m_defaultLocs["model"] = glGetUniformLocation(m_defaultShader, "model");
 
-    m_defaultLocs["color"] = glGetUniformLocation(m_defaultShader, "color");
-    m_defaultLocs["tex"] = glGetUniformLocation(m_defaultShader, "tex");
+    m_defaultLocs["diffuse_color"] = glGetUniformLocation(m_defaultShader, "diffuse_color");
+    m_defaultLocs["world_color"] = glGetUniformLocation(m_defaultShader, "world_color");
+
+    m_defaultLocs["shininess"] = glGetUniformLocation(m_defaultShader, "shininess");
     m_defaultLocs["useTexture"] = glGetUniformLocation(m_defaultShader, "useTexture");
+    m_defaultLocs["tex"] = glGetUniformLocation(m_defaultShader, "tex");
 
     m_defaultLocs["repeatU"] = glGetUniformLocation(m_defaultShader, "repeatU");
     m_defaultLocs["repeatV"] = glGetUniformLocation(m_defaultShader, "repeatV");
@@ -72,20 +78,39 @@ void Graphics::setUniforms(Camera *camera)
             glm::value_ptr(camera->getViewMatrix()));
 
     m_useCubeMap = false;
+    clearLights();
 }
 
 
-void Graphics::setColor(float r, float g, float b, float a)
+void Graphics::clearLights()
 {
-    glUniform4f(m_defaultLocs["color"], r, g, b, a);
+    for (int i = 0; i < MAX_NUM_LIGHTS; i++) {
+        std::ostringstream os;
+        os << i;
+        std::string indexString = "[" + os.str() + "]"; // e.g. [0], [1], etc.
+        glUniform3f(glGetUniformLocation(m_defaultShader, ("lightColors" + indexString).c_str()), 0, 0, 0);
+    }
 }
 
 
-void Graphics::setTexture(const QString &key, float repeatU = 1.f, float repeatV = 1.f)
+void Graphics::setWorldColor(float r, float g, float b)
+{
+    glUniform3f(m_defaultLocs["world_color"], r, g, b);
+}
+
+
+void Graphics::setColor(float r, float g, float b, float shininess)
+{
+    glUniform3f(m_defaultLocs["diffuse_color"], r, g, b);
+    glUniform1f(m_defaultLocs["shininess"], shininess);
+}
+
+
+void Graphics::setTexture(const QString &key, float repeatU, float repeatV)
 {
     GLint tex = m_textures.value(key);
 
-    if (tex)
+    if (tex && key != NULL)
     {
         glUniform1i(m_defaultLocs["useTexture"], 1);
         glUniform1i(m_defaultLocs["tex"], 1);
@@ -132,6 +157,30 @@ void Graphics::drawCubeMap(Camera *camera)
 }
 
 
+
+
+
+
+
+
+
+
+
+void Graphics::addLight(const Light &light)
+{
+    std::ostringstream os;
+    os << light.id;
+    std::string indexString = "[" + os.str() + "]"; // e.g. [0], [1], etc.
+
+    glUniform3fv(glGetUniformLocation(m_defaultShader, ("lightPositions" + indexString).c_str()), 1,
+            glm::value_ptr(light.pos));
+    glUniform3fv(glGetUniformLocation(m_defaultShader, ("lightColors" + indexString).c_str()), 1,
+                glm::value_ptr(light.color));
+    glUniform3fv(glGetUniformLocation(m_defaultShader, ("lightAttenuations" + indexString).c_str()), 1,
+            glm::value_ptr(light.function));
+}
+
+
 void Graphics::drawQuad(glm::mat4 trans)
 {
     m_quad->transformAndRender(m_defaultShader, trans);
@@ -142,6 +191,18 @@ void Graphics::drawCube(glm::mat4 trans)
 {
     m_cube->transformAndRender(m_defaultShader, trans);
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void Graphics::loadTexturesFromDirectory()

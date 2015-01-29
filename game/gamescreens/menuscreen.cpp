@@ -25,6 +25,7 @@ void MenuScreen::onTick(float) {}
 void MenuScreen::onRender(Graphics *g)
 {
     g->setColor(1.f, 1.f, 1.f, 1.f);
+    g->setWorldColor(1.f, 1.f, 1.f);
     g->drawQuad(glm::scale(glm::mat4(), glm::vec3(2, 1, 0)));
 }
 
