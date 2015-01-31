@@ -1,12 +1,33 @@
 #include "player.h"
 
-#define EYE_HEIGHT 2.f
+#define EYE_HEIGHT 1.f
 
-Player::Player(ActionCamera *camera)
+#include "printing.h"
+
+Player::Player(ActionCamera *camera, glm::vec3 pos)
+    : MovableEntity(pos)
 {
     m_camera = camera;
+    m_eye = m_pos + glm::vec3(0.f, EYE_HEIGHT, 0.f);
+    m_camera->setCenter(m_eye);
+
     m_goalVel = glm::vec4(0.f);
+
     m_jump = false;
+    m_crouch = false;
+    m_walk = false;
+    m_sprint = false;
+
+    RenderShape *rs = new RenderShape();
+    rs->type = CYLINDER;
+    rs->color = glm::vec3(0, 1, 0);
+    rs->shininess = 32.f;
+    rs->trans = glm::scale(glm::mat4(), glm::vec3(1.f, 2.f, 1.f));
+    rs->texture = "";
+    rs->repeatU = 1.f;
+    rs->repeatV = 1.f;
+
+    addRenderShape(rs);
 }
 
 
@@ -17,62 +38,87 @@ Player::~Player()
 
 void Player::onTick(float secs)
 {
-//    float movementAmount = 0.5f;
-    float movementAmount = 0.05f;
-    if (m_walk)
-        movementAmount = 0.02f;
-    if (m_sprint && m_goalVel.x > 0.5f)
-        movementAmount = 0.08f;
+    MovableEntity::onTick(secs);
 
-    float y = m_camera->getEye().y;
+    float eyeY = EYE_HEIGHT;
+    float movementAmount = 5.f;
+
+    if (m_walk)
+        movementAmount = 2.f;
+    if (m_sprint && m_goalVel.x > 0.5f)
+        movementAmount = 8.f;
+    if (m_crouch && m_pos.y <= 1.f)
+    {
+        movementAmount = 2.f;
+        eyeY = 0.f;
+    }
+
+    // get camera look vector
+    glm::vec4 look = m_camera->getLook();
+
+    // set goal velocity
+    glm::vec3 goal = glm::vec3(look.x, 0.f, look.z) * (m_goalVel.x + m_goalVel.y);
+    goal += glm::vec3(-look.z, 0.f, look.x) * (m_goalVel.z + m_goalVel.w);
+
+    // normalize if not zero vec
+    float mag = glm::distance(goal, glm::vec3(0.f));
+    if (mag > 0.f)
+        goal *= movementAmount / mag;
+
+    // calculate new velocity and apply force
+    glm::vec3 vel = 10.0f * (goal - m_vel);
+    vel.y = 0.f;
+
+    applyForce(vel);
+
 
     // feet are on the ground
-    if (y <= EYE_HEIGHT)
+    if (m_pos.y <= 1.f)
     {
         // jump
         if (m_jump)
         {
-            y = EYE_HEIGHT + 0.001f;
-            m_jumpVelocity = 7.f;
-            m_crouch = false;
+//            m_pos.y = 1.001f;
+//            m_currVel.y = 7.f;
+//            m_crouch = false;
+            applyImpulse(glm::vec3(0.f, 7.f, 0.f));
         }
         // crouch
         else if (m_crouch)
         {
-            y = EYE_HEIGHT / 2.f;
+            eyeY = 0.f;
             movementAmount = 0.02f;
         }
         // plant feet on ground
         else
         {
-        y = EYE_HEIGHT;
-        m_jumpVelocity = 0.f;
+            m_pos.y = 1.f;
+            m_vel.y = 0.f;
         }
     }
     else
     {
-        m_jumpVelocity -= 10.f * secs;
-        y += m_jumpVelocity * secs;
+//        m_currVel.y -= 10.f * secs;
+//        m_pos.y += m_currVel.y * secs;
     }
 
-    m_currVel.z = secs * 0.1f * ((m_goalVel.x + m_goalVel.y) - m_currVel.z) * movementAmount;
-    m_currVel.x = secs * 0.1f * ((m_goalVel.z + m_goalVel.w) - m_currVel.x) * movementAmount;
-
-
-
-    m_camera->moveRelativeToLook(glm::vec3(0, y, 0));
+    m_eye = m_pos + glm::vec3(0, eyeY, 0);
+    m_camera->setCenter(m_eye);
 }
 
 
-void Player::onDraw(Graphics *)
+void Player::onDraw(Graphics *g)
 {
-    if (m_camera->getThirdPersonDistance() <= 0.0000001f)
+    if (m_camera->getOffset() <= 0.001f)
         return;
+    Entity::onDraw(g);
 }
 
 
 void Player::onKeyPressed(QKeyEvent *e)
 {
+    float offset;
+
     switch (e->key())
     {
     case Qt::Key_W:
@@ -99,11 +145,21 @@ void Player::onKeyPressed(QKeyEvent *e)
     case Qt::Key_CapsLock:
         m_walk = true;
         break;
-    case Qt::Key_Q:
-//        down = true;
+    case Qt::Key_Minus:
+    case Qt::Key_Underscore:
+        offset = m_camera->getOffset();
+        offset += 1.f;
+        if (offset > 10.f)
+            offset = 10.f;
+        m_camera->setOffset(offset);
         break;
-    case Qt::Key_E:
-//        up = true;
+    case Qt::Key_Plus:
+    case Qt::Key_Equal:
+        offset = m_camera->getOffset();
+        offset -= 1.f;
+        if (offset < 0.f)
+            offset = 0.f;
+        m_camera->setOffset(offset);
         break;
     default:
         break;
@@ -135,12 +191,6 @@ void Player::onKeyReleased(QKeyEvent *e)
         break;
     case Qt::Key_CapsLock:
         m_walk = false;
-        break;
-    case Qt::Key_Q:
-//        down = false;
-        break;
-    case Qt::Key_E:
-//        up = false;
         break;
     default:
         break;

@@ -167,11 +167,11 @@ void Shape::transformAndRender(GLuint shader, glm::mat4 trans)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, m_numVerts);
     glBindVertexArray(0);
 
-    glUniform3f(glGetUniformLocation(shader, "allBlack"), 0, 0, 0);
-    glBindVertexArray(m_vaoID);
-    glDrawArrays(GL_LINE_STRIP, 0, m_numVerts);
-    glBindVertexArray(0);
-    glUniform3f(glGetUniformLocation(shader, "allBlack"), 1, 1, 1);
+//    glUniform3f(glGetUniformLocation(shader, "allBlack"), 0, 0, 0);
+//    glBindVertexArray(m_vaoID);
+//    glDrawArrays(GL_LINE_STRIP, 0, m_numVerts);
+//    glBindVertexArray(0);
+//    glUniform3f(glGetUniformLocation(shader, "allBlack"), 1, 1, 1);
 }
 
 

@@ -16,18 +16,19 @@ macx {
 # If you add your own folders, add them to INCLUDEPATH and DEPENDPATH, e.g.
 INCLUDEPATH += glm engine game shaders \
                engine/ui engine/screens engine/scene \
-               engine/camera engine/shapes \
+               engine/camera engine/shapes engine/world \
                game/gamescreens game/world game/entities \
                res/images res/images/cubemap
 DEPENDPATH +=  glm engine game shaders \
                engine/ui engine/screens engine/scene \
-               engine/camera engine/shapes \
+               engine/camera engine/shapes engine/world \
                game/gamescreens game/world game/entities \
                res/images res/images/cubemap
 DEFINES += TIXML_USE_STL
 OTHER_FILES += shaders/shader.frag shaders/shader.vert res/images/grass.png
 
-SOURCES += engine/main.cpp \
+SOURCES += \
+    engine/main.cpp \
     engine/ui/mainwindow.cpp \
     engine/ui/view.cpp \
     engine/screens/application.cpp \
@@ -38,12 +39,19 @@ SOURCES += engine/main.cpp \
     game/gamescreens/menuscreen.cpp \
     game/gamescreens/playerscreen.cpp \
     engine/shapes/cube.cpp \
-    game/world/world.cpp \
     engine/screens/cubemap.cpp \
     game/entities/player.cpp \
-    engine/camera/actioncamera.cpp
+    engine/camera/actioncamera.cpp \
+    engine/world/world.cpp \
+    engine/world/entity.cpp \
+    engine/world/movableentity.cpp \
+    game/world/gameworld.cpp \
+    engine/shapes/cylinder.cpp \
+    engine/shapes/sphere.cpp \
+    engine/shapes/collisioncylinder.cpp
 
-HEADERS += engine/ui/mainwindow.h \
+HEADERS += \
+    engine/ui/mainwindow.h \
     engine/ui/view.h \
     engine/screens/application.h \
     engine/screens/graphics.h \
@@ -54,11 +62,18 @@ HEADERS += engine/ui/mainwindow.h \
     game/gamescreens/menuscreen.h \
     game/gamescreens/playerscreen.h \
     engine/shapes/cube.h \
-    game/world/world.h \
     engine/screens/cubemap.h \
     engine/printing.h \
     game/entities/player.h \
-    engine/camera/actioncamera.h
+    engine/camera/actioncamera.h \
+    engine/world/world.h \
+    engine/world/entity.h \
+    engine/world/movableentity.h \
+    game/world/gameworld.h \
+    engine/shapes/cylinder.h \
+    engine/shapes/sphere.h \
+    engine/shapes/collisionshape.h \
+    engine/shapes/collisioncylinder.h
 #    engine/vector/vector.h
 
 FORMS += engine/ui/mainwindow.ui

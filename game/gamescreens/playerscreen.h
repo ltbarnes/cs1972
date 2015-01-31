@@ -3,7 +3,7 @@
 
 #include "screen.h"
 #include "player.h"
-#include "world.h"
+#include "gameworld.h"
 
 class PlayerScreen : public Screen
 {
@@ -29,13 +29,7 @@ public:
 
 private:
     Player *m_player;
-    World *m_world;
-
-    int m_movementDir;
-    float m_jumpVelocity;
-    bool m_crouch;
-    bool m_walk;
-    bool m_sprint;
+    GameWorld *m_world;
 
 };
 

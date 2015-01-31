@@ -9,7 +9,16 @@ public:
     ActionCamera();
     ~ActionCamera();
 
-    void moveRelativeToLook(glm::vec3 move);
+    float getOffset();
+
+    void setCenter(glm::vec3 pos);
+    void setOffset(float offset);
+
+    void moveRelativeToLook(glm::vec3 dir);
+
+private:
+    glm::vec4 m_pos;//, m_offsetVec;
+    float m_offset;
 };
 
 #endif // ACTIONCAMERA_H

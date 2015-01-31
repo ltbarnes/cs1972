@@ -39,7 +39,7 @@ void main(){
 
     gl_Position = projection * position_cameraSpace;
 
-    color = world_color.xyz; // Add ambient component
+    color = world_color * diffuse_color; // Add ambient component
 
     for (int i = 0; i < MAX_LIGHTS; i++) {
         // Point Light

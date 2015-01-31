@@ -9,6 +9,7 @@
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
 
 //#include "printing.h"
 #include <iostream>
@@ -20,6 +21,8 @@ Graphics::Graphics()
 {
     m_quad = new Shape(100);
     m_cube = new Cube(10);
+    m_cyl = new Cylinder(50);
+    m_sphere = new Sphere(50);
 
     m_cubeMap = new CubeMap();
 }
@@ -28,6 +31,8 @@ Graphics::~Graphics()
 {
     delete m_quad;
     delete m_cube;
+    delete m_cyl;
+    delete m_sphere;
 }
 
 void Graphics::init()
@@ -61,7 +66,9 @@ void Graphics::init()
     m_cubeMap->init();
 
     m_quad->init(m_defaultShader);
-    m_cube->init(m_defaultShader);//    cout << "size: " << fileList.size() << endl;
+    m_cube->init(m_defaultShader);
+    m_cyl->init(m_defaultShader);
+    m_sphere->init(m_defaultShader);
 
     loadTexturesFromDirectory();
 }
@@ -112,7 +119,7 @@ void Graphics::setTexture(const QString &key, float repeatU, float repeatV)
 {
     GLint tex = m_textures.value(key);
 
-    if (tex && key != NULL)
+    if (tex && key.length() > 0)
     {
         glUniform1i(m_defaultLocs["useTexture"], 1);
         glUniform1i(m_defaultLocs["tex"], 1);
@@ -192,6 +199,18 @@ void Graphics::drawQuad(glm::mat4 trans)
 void Graphics::drawCube(glm::mat4 trans)
 {
     m_cube->transformAndRender(m_defaultShader, trans);
+}
+
+
+void Graphics::drawCyl(glm::mat4 trans)
+{
+    m_cyl->transformAndRender(m_defaultShader, trans);
+}
+
+
+void Graphics::drawSphere(glm::mat4 trans)
+{
+    m_sphere->transformAndRender(m_defaultShader, trans);
 }
 
 

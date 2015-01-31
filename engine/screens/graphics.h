@@ -8,6 +8,24 @@
 #include "cubemap.h"
 #include "shape.h"
 #include "cube.h"
+#include "cylinder.h"
+#include "sphere.h"
+
+
+enum ShapeType
+{
+    QUAD, CUBE, CYLINDER, SPHERE
+};
+
+struct RenderShape
+{
+    ShapeType type;
+    glm::vec3 color;
+    float shininess;
+    glm::mat4 trans;
+    QString texture;
+    float repeatU, repeatV;
+};
 
 // Data for a single light
 struct Light
@@ -18,7 +36,6 @@ struct Light
    glm::vec3 pos;       // Not applicable to directional lights
 
    glm::vec3 function;  // Attenuation function
-
 };
 
 class Graphics
@@ -38,11 +55,12 @@ public:
     bool cubeMapIsActive();
     void drawCubeMap(Camera *camera);
 
-    void setLightPosition(glm::vec3 pos);
-
     void addLight(const Light &light);
+
     void drawQuad(glm::mat4 trans);
     void drawCube(glm::mat4 trans);
+    void drawCyl(glm::mat4 trans);
+    void drawSphere(glm::mat4 trans);
 
     static GLuint loadShaders(const char *vertex_file_path, const char *fragment_file_path);
 
@@ -66,6 +84,8 @@ private:
 
     Shape *m_quad;
     Shape *m_cube;
+    Shape *m_cyl;
+    Shape *m_sphere;
 
     bool m_useCubeMap;
 

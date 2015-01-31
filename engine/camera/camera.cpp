@@ -35,15 +35,20 @@ glm::mat4 Camera::getViewMatrix()
     return m_view;
 }
 
-glm::vec4 Camera::getEye()
+glm::vec4 Camera::getLook()
 {
-    return m_eye;
+    return m_look;
 }
 
-float Camera::getThirdPersonDistance()
-{
-    return m_thirdDist;
-}
+//glm::vec4 Camera::getEye()
+//{
+//    return m_eye;
+//}
+
+//float Camera::getThirdPersonDistance()
+//{
+//    return m_thirdDist;
+//}
 
 void Camera::setAspectRatio(float a)
 {
@@ -51,10 +56,10 @@ void Camera::setAspectRatio(float a)
     setProjectionMatrix();
 }
 
-void Camera::setEye(glm::vec4 &eye)
-{
-    orientLook(eye, m_look, m_up);
-}
+//void Camera::setEye(glm::vec4 &eye)
+//{
+//    orientLook(eye, m_look, m_up);
+//}
 
 void Camera::setThirdPersonDistance(float dist)
 {
@@ -72,28 +77,27 @@ void Camera::orientLook(glm::vec4 &eye, glm::vec4 &look, glm::vec4 &up)
     setViewMatrix();
 }
 
-
-void Camera::moveForward(float dist)
+void Camera::moveHorizontal(glm::vec2 dir)
 {
-    m_eye += glm::normalize(glm::vec4(m_look.x, 0, m_look.z, 0)) * dist;
+    m_eye += glm::normalize(glm::vec4(m_look.x, 0.f, m_look.z, 0.f)) * dir.x;
+    m_eye += glm::normalize(glm::vec4(-m_look.z, 0.f, m_look.x, 0.f)) * dir.y;
+}
+
+void Camera::moveAlongU(float mag)
+{
+    m_eye += m_u * mag;
     setViewMatrix();
 }
 
-void Camera::moveBack(float dist)
+void Camera::moveAlongUp(float mag)
 {
-    m_eye += glm::normalize(glm::vec4(-m_look.x, 0, -m_look.z, 0)) * dist;
+    m_eye += m_up * mag;
     setViewMatrix();
 }
 
-void Camera::moveLeft(float dist)
+void Camera::moveAlongLook(float mag)
 {
-    m_eye += glm::normalize(glm::vec4(m_look.z, 0, -m_look.x, 0)) * dist;
-    setViewMatrix();
-}
-
-void Camera::moveRight(float dist)
-{
-    m_eye += glm::normalize(glm::vec4(-m_look.z, 0, m_look.x, 0)) * dist;
+    m_eye += m_look * mag;
     setViewMatrix();
 }
 

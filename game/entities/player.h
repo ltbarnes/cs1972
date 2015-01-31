@@ -2,13 +2,13 @@
 #define PLAYER_H
 
 #include <QKeyEvent>
-#include "graphics.h"
+#include "movableentity.h"
 #include "actioncamera.h"
 
-class Player //: public Entity
+class Player : public MovableEntity
 {
 public:
-    Player(ActionCamera *camera);
+    Player(ActionCamera *camera, glm::vec3 pos);
     ~Player();
 
     virtual void onTick(float secs);
@@ -21,10 +21,10 @@ public:
 private:
     ActionCamera *m_camera;
 
-    glm::vec4 m_goalVel;
-    glm::vec3 m_currVel;
+    glm::vec3 m_eye;
 
-    float m_jumpVelocity;
+    glm::vec4 m_goalVel;
+
     bool m_jump;
     bool m_crouch;
     bool m_walk;
