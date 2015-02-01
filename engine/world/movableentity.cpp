@@ -2,8 +2,8 @@
 
 #include "printing.h"
 
-MovableEntity::MovableEntity(glm::vec3 pos, glm::vec3 dim, float mass)
-    : Entity(pos, dim)
+MovableEntity::MovableEntity(glm::vec3 pos, float mass)
+    : Entity(pos)
 {
     m_mass = mass;
     m_vel = glm::vec3();
@@ -32,15 +32,16 @@ void MovableEntity::setMass(float mass)
 void MovableEntity::onTick(float secs)
 {
     m_vel += (m_force * secs / m_mass) + m_impulse * 1.f / m_mass;
-    m_pos += m_vel * secs;
+    setPosition(getPosition() + m_vel * secs);
 
     m_force = glm::vec3(0.f);
     m_impulse = glm::vec3(0.f);
 }
 
-void MovableEntity::handleCollision(Entity *other, glm::vec3 mtv, glm::vec3 impulse)
+void MovableEntity::handleCollision(Entity *, glm::vec3 mtv, glm::vec3 impulse)
 {
-
+    bump(mtv * .5f);
+    applyImpulse(impulse);
 }
 
 void MovableEntity::applyImpulse(glm::vec3 impulse)

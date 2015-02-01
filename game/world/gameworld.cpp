@@ -22,7 +22,7 @@ void GameWorld::onTick(float secs)
 {
     World::onTick(secs);
     // gravity
-    foreach(MovableEntity *e, m_movableEntities) // f = ma (a = g)
+    foreach(MovableEntity *e, m_movableEntities) // f = mg
         e->applyForce(glm::vec3(0.f, -10.f, 0.f) * e->getMass());
 
 }
@@ -35,29 +35,29 @@ void GameWorld::onDraw(Graphics *g)
 
     g->addLight(*m_light);
 
-    g->setColor(0.75f, 0.8f, 0.9f, 128.f);
-    g->setTexture("snow.jpg", 15.f, 15.f);
+//    g->setColor(0.75f, 0.8f, 0.9f, 128.f);
+//    g->setTexture("snow.jpg", 15.f, 15.f);
 
-    // draw ground
-    glm::mat4 trans = glm::translate(glm::mat4(), glm::vec3(0.f, -.5f, 0.f));
-    trans = glm::scale(trans, glm::vec3(50.f, 1.f, 50.f));
-    g->drawCyl(trans);
+//    // draw ground
+//    glm::mat4 trans = glm::translate(glm::mat4(), glm::vec3(0.f, -.5f, 0.f));
+//    trans = glm::scale(trans, glm::vec3(50.f, 1.f, 50.f));
+//    g->drawCyl(trans);
 
-    // draw cube
-    g->setTexture("");
-    g->setColor(.5f, .7f, 1.f, 64.f);
-    trans = glm::translate(glm::mat4(), glm::vec3(0, 2, 0));
-    g->drawCube(trans);
+//    // draw cube
+//    g->setTexture("");
+//    g->setColor(.5f, .7f, 1.f, 64.f);
+//    trans = glm::translate(glm::mat4(), glm::vec3(0, 2, 0));
+//    g->drawCube(trans);
 
-    // draw cylinder
-    g->setColor(1.f, .5f, .7f, 128.f);
-    trans = glm::translate(glm::mat4(), glm::vec3(2, 2, -1));
-    g->drawCyl(trans);
+//    // draw cylinder
+//    g->setColor(1.f, .5f, .7f, 128.f);
+//    trans = glm::translate(glm::mat4(), glm::vec3(2, 2, -1));
+//    g->drawCyl(trans);
 
-    // draw sphere
-    g->setColor(.7f, 1.f, .5f, 256.f);
-    trans = glm::translate(glm::mat4(), glm::vec3(2, 1, 1));
-    g->drawSphere(trans);
+//    // draw sphere
+//    g->setColor(.7f, 1.f, .5f, 256.f);
+//    trans = glm::translate(glm::mat4(), glm::vec3(2, 1, 1));
+//    g->drawSphere(trans);
 
     World::onDraw(g);
 

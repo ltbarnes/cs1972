@@ -7,7 +7,7 @@ class GameWorld : public World
 {
 public:
     GameWorld();
-    ~GameWorld();
+    virtual ~GameWorld();
 
     virtual void onTick(float secs);
     virtual void onDraw(Graphics *g);

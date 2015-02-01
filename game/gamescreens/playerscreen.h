@@ -3,13 +3,14 @@
 
 #include "screen.h"
 #include "player.h"
+#include "ufo.h"
 #include "gameworld.h"
 
 class PlayerScreen : public Screen
 {
 public:
     PlayerScreen();
-    ~PlayerScreen();
+    virtual ~PlayerScreen();
 
     // update and render
     virtual void onTick(float secs);
@@ -29,6 +30,7 @@ public:
 
 private:
     Player *m_player;
+    UFO *m_ufo;
     GameWorld *m_world;
 
 };

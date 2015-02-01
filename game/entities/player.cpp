@@ -1,4 +1,5 @@
 #include "player.h"
+#include "collisioncylinder.h"
 
 #define EYE_HEIGHT 1.f
 
@@ -8,15 +9,19 @@ Player::Player(ActionCamera *camera, glm::vec3 pos)
     : MovableEntity(pos)
 {
     m_camera = camera;
-    m_eye = m_pos + glm::vec3(0.f, EYE_HEIGHT, 0.f);
-    m_camera->setCenter(m_eye);
+    m_eyeHeight = EYE_HEIGHT;
+    m_camera->setCenter(getPosition() + glm::vec3(0.f, m_eyeHeight, 0.f));
 
     m_goalVel = glm::vec4(0.f);
 
+    m_canJump = false;
     m_jump = false;
     m_crouch = false;
     m_walk = false;
     m_sprint = false;
+
+    CollisionShape *cs = new CollisionCylinder(glm::vec3(), glm::vec3(1.f, 2.f, 1.f));
+    addCollisionShape(cs);
 
     RenderShape *rs = new RenderShape();
     rs->type = CYLINDER;
@@ -38,19 +43,25 @@ Player::~Player()
 
 void Player::onTick(float secs)
 {
+    if (m_jump && m_canJump)
+    {
+        applyImpulse(glm::vec3(0.f, 7.f, 0.f));
+    }
+    m_canJump = false;
+
     MovableEntity::onTick(secs);
 
-    float eyeY = EYE_HEIGHT;
+    m_eyeHeight = EYE_HEIGHT;
     float movementAmount = 5.f;
 
     if (m_walk)
         movementAmount = 2.f;
     if (m_sprint && m_goalVel.x > 0.5f)
         movementAmount = 8.f;
-    if (m_crouch && m_pos.y <= 1.f)
+    if (m_crouch)
     {
         movementAmount = 2.f;
-        eyeY = 0.f;
+        m_eyeHeight = 0.f;
     }
 
     // get camera look vector
@@ -70,40 +81,20 @@ void Player::onTick(float secs)
     vel.y = 0.f;
 
     applyForce(vel);
+}
 
 
-    // feet are on the ground
-    if (m_pos.y <= 1.f)
-    {
-        // jump
-        if (m_jump)
-        {
-//            m_pos.y = 1.001f;
-//            m_currVel.y = 7.f;
-//            m_crouch = false;
-            applyImpulse(glm::vec3(0.f, 7.f, 0.f));
-        }
-        // crouch
-        else if (m_crouch)
-        {
-            eyeY = 0.f;
-            movementAmount = 0.02f;
-        }
-        // plant feet on ground
-        else
-        {
-            m_pos.y = 1.f;
-            m_vel.y = 0.f;
-        }
-    }
-    else
-    {
-//        m_currVel.y -= 10.f * secs;
-//        m_pos.y += m_currVel.y * secs;
-    }
+void Player::handleCollision(Entity *other, glm::vec3 mtv, glm::vec3 impulse)
+{
+    MovableEntity::handleCollision(other, mtv, impulse);
+    if (mtv.y > 0.f)
+        m_canJump = true;
+}
 
-    m_eye = m_pos + glm::vec3(0, eyeY, 0);
-    m_camera->setCenter(m_eye);
+
+void Player::setCameraPos()
+{
+    m_camera->setCenter(getPosition() + glm::vec3(0.f, m_eyeHeight, 0.f));
 }
 
 
@@ -112,6 +103,13 @@ void Player::onDraw(Graphics *g)
     if (m_camera->getOffset() <= 0.001f)
         return;
     Entity::onDraw(g);
+}
+
+
+void Player::onMouseMoved(QMouseEvent *, float deltaX, float deltaY)
+{
+    m_camera->yaw(deltaX / 10.f);
+    m_camera->pitch(deltaY / 10.f);
 }
 
 

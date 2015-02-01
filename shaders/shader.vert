@@ -50,10 +50,13 @@ void main(){
         color += max(vec3(0), lightColors[i] * diffuse_color * diffuseIntensity);
 
         // Add specular component
-        vec4 lightReflection = normalize(-reflect(vertexToLight, normal_cameraSpace));
-        vec4 eyeDirection = normalize(vec4(0,0,0,1) - position_cameraSpace);
-        float specIntensity = pow(max(0.0, dot(eyeDirection, lightReflection)), shininess);
-        color += max (vec3(0), lightColors[i] * specular_color * specIntensity);
+        if (abs(shininess) > 0.001)
+        {
+            vec4 lightReflection = normalize(-reflect(vertexToLight, normal_cameraSpace));
+            vec4 eyeDirection = normalize(vec4(0,0,0,1) - position_cameraSpace);
+            float specIntensity = pow(max(0.0, dot(eyeDirection, lightReflection)), shininess);
+            color += max (vec3(0), lightColors[i] * specular_color * specIntensity);
+        }
     }
     color = clamp(color, 0.0, 1.0) * allBlack;
 //    color = vec3(0.5);

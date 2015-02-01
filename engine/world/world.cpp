@@ -1,7 +1,11 @@
 #include "world.h"
 
+#include "printing.h"
+
 World::World()
 {
+    m_staticEntities.clear();
+    m_movableEntities.clear();
 }
 
 World::~World()
@@ -10,6 +14,8 @@ World::~World()
         delete e;
     foreach(Entity *e, m_movableEntities)
         delete e;
+    foreach(Collision *c, m_collisions)
+        delete c;
 }
 
 void World::addMovableEntity(MovableEntity *me)
@@ -17,15 +23,20 @@ void World::addMovableEntity(MovableEntity *me)
     m_movableEntities.append(me);
 }
 
+void World::addStaticEntity(StaticEntity *se)
+{
+    m_staticEntities.append(se);
+}
+
 void World::removeMovableEntity(MovableEntity *me)
 {
     m_movableEntities.removeOne(me);
 }
 
-//void World::removeStaticEntity(StaticEntity *se)
-//{
-//    m_staticEntities.removeOne(e);
-//}
+void World::removeStaticEntity(StaticEntity *se)
+{
+    m_staticEntities.removeOne(se);
+}
 
 void World::onTick(float secs)
 {
@@ -36,14 +47,17 @@ void World::onTick(float secs)
     }
 
     // collisions
-    QList<Collision *> collisions = detectCollisions();
-    handleCollisions(collisions);
+    detectCollisions();
+    handleCollisions();
 }
 
-QList<Collision *> World::detectCollisions()
+void World::detectCollisions()
 {
+    foreach(Collision *c, m_collisions)
+        delete c;
+    m_collisions.clear();
+
     Collision *collision;
-    QList<Collision *> collisions;
     Entity *e1, *e2;
 
     int moveSize = m_movableEntities.size();
@@ -56,28 +70,26 @@ QList<Collision *> World::detectCollisions()
         {
             collision = e1->collides(es);
             if (collision)
-                collisions.append(collision);
+                m_collisions.append(collision);
         }
 
         // check other movable entities
-        for (int j = i; j < moveSize; j++)
+        for (int j = i + 1; j < moveSize; j++)
         {
             e2 = m_movableEntities.value(j);
             collision = e1->collides(e2);
             if (collision)
-                collisions.append(collision);
+                m_collisions.append(collision);
         }
     }
-    return collisions;
 }
 
-void World::handleCollisions(QList<Collision *> collisions)
+void World::handleCollisions()
 {
-    foreach(Collision *col, collisions)
+    foreach(Collision *col, m_collisions)
     {
         col->e1->handleCollision(col->e2, col->mtv, col->impulse);
         col->e2->handleCollision(col->e1, col->mtv * -1.f, col->impulse * -1.f);
-        delete col;
     }
 
 }

@@ -48,7 +48,11 @@ SOURCES += \
     game/world/gameworld.cpp \
     engine/shapes/cylinder.cpp \
     engine/shapes/sphere.cpp \
-    engine/shapes/collisioncylinder.cpp
+    engine/shapes/collisioncylinder.cpp \
+    game/entities/item.cpp \
+    engine/world/staticentity.cpp \
+    game/entities/ground.cpp \
+    game/entities/ufo.cpp
 
 HEADERS += \
     engine/ui/mainwindow.h \
@@ -73,7 +77,11 @@ HEADERS += \
     engine/shapes/cylinder.h \
     engine/shapes/sphere.h \
     engine/shapes/collisionshape.h \
-    engine/shapes/collisioncylinder.h
+    engine/shapes/collisioncylinder.h \
+    game/entities/item.h \
+    engine/world/staticentity.h \
+    game/entities/ground.h \
+    game/entities/ufo.h
 #    engine/vector/vector.h
 
 FORMS += engine/ui/mainwindow.ui

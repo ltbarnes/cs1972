@@ -3,29 +3,31 @@
 
 #include "entity.h"
 #include "movableentity.h"
+#include "staticentity.h"
 #include <QList>
 
 class World
 {
 public:
     World();
-    ~World();
+    virtual ~World();
 
     void addMovableEntity(MovableEntity *me);
     void removeMovableEntity(MovableEntity *me);
-//    void addStaticEntity(StaticEntity *se);
-//    void removeStaticEntity(StaticEntity *se);
+    void addStaticEntity(StaticEntity *se);
+    void removeStaticEntity(StaticEntity *se);
 
     virtual void onTick(float secs);
     virtual void onDraw(Graphics *g);
 
 protected:
-//    virtual void updateCamera(Graphics *g) = 0;
-    virtual QList<Collision *> detectCollisions();
-    virtual void handleCollisions(QList<Collision *> collisions);
+    virtual void detectCollisions();
+    virtual void handleCollisions();
 
-    QList<Entity *> m_staticEntities;
+    QList<StaticEntity *> m_staticEntities;
     QList<MovableEntity *> m_movableEntities;
+
+    QList<Collision *> m_collisions;
 
 
 };

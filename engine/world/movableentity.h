@@ -7,16 +7,15 @@ class MovableEntity : public Entity
 {
 public:
     MovableEntity(glm::vec3 pos = glm::vec3(0.f),
-                  glm::vec3 dim = glm::vec3(1.f),
                   float mass = 1.f);
-    ~MovableEntity();
+    virtual ~MovableEntity();
 
     virtual void onTick(float secs);
 
     virtual void handleCollision(Entity *other, glm::vec3 mtv, glm::vec3 impulse);
 
-    float getMass();
-    glm::vec3 getVelocity();
+    virtual float getMass();
+    virtual glm::vec3 getVelocity();
 
     void setMass(float mass);
     void applyImpulse(glm::vec3 impulse);
