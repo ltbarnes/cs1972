@@ -33,6 +33,8 @@ private:
     UFO *m_ufo;
     GameWorld *m_world;
 
+    bool m_inShip;
+
 };
 
 #endif // PLAYERSCREEN_H

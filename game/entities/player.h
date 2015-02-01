@@ -11,6 +11,8 @@ public:
     Player(ActionCamera *camera, glm::vec3 pos);
     virtual ~Player();
 
+    void reset();
+
     virtual void onTick(float secs);
     virtual void onDraw(Graphics *g);
 

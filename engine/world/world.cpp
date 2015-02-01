@@ -28,14 +28,14 @@ void World::addStaticEntity(StaticEntity *se)
     m_staticEntities.append(se);
 }
 
-void World::removeMovableEntity(MovableEntity *me)
+bool World::removeMovableEntity(MovableEntity *me)
 {
-    m_movableEntities.removeOne(me);
+    return m_movableEntities.removeOne(me);
 }
 
-void World::removeStaticEntity(StaticEntity *se)
+bool World::removeStaticEntity(StaticEntity *se)
 {
-    m_staticEntities.removeOne(se);
+    return m_staticEntities.removeOne(se);
 }
 
 void World::onTick(float secs)
