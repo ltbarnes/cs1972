@@ -1,16 +1,23 @@
 #include "ufo.h"
 #include "collisioncylinder.h"
 
+#include "printing.h"
+
 UFO::UFO(ActionCamera *camera, glm::vec3 pos)
     : MovableEntity(pos, 100.f)
 {
     m_camera = camera;
 
+    m_wsad = 0b0000;
+    m_up = false;
+    m_down = false;
+    m_beam = false;
+
+    // saucer
     CollisionShape *cs;
     cs = new CollisionCylinder(glm::vec3(), glm::vec3(16.f, 1.5f, 16.f));
     addCollisionShape(cs);
 
-    // saucer
     RenderShape *rs;
     rs = new RenderShape();
     rs->type = SPHERE;
@@ -23,6 +30,9 @@ UFO::UFO(ActionCamera *camera, glm::vec3 pos)
     addRenderShape(rs);
 
     // dome
+    cs = new CollisionCylinder(glm::vec3(0, .8f, 0), glm::vec3(6, 3, 6));
+    addCollisionShape(cs);
+
     rs = new RenderShape();
     rs->type = SPHERE;
     rs->color = glm::vec3(.7f, .7f, .9f);
@@ -44,7 +54,30 @@ UFO::~UFO()
 void UFO::onTick(float secs)
 {
     applyForce(glm::vec3(0.f, 9.95f, 0.f) * getMass());
+
     MovableEntity::onTick(secs);
+
+    glm::vec3 force = glm::vec3(0.f);
+    if (m_wsad & 0b1000)
+        force.z += 100.f;
+    if (m_wsad & 0b0100)
+        force.z -= 100.f;
+    if (m_wsad & 0b0010)
+        force.x -= 100.f;
+    if (m_wsad & 0b0001)
+        force.x += 100.f;
+    if (m_up)
+        force.y += 100.f;
+    if (m_down)
+        force.y -= 100.f;
+
+    glm::vec4 look = m_camera->getLook();
+
+    glm::vec3 thrust = glm::normalize(glm::vec3(look.x, 0.f, look.z)) * force.z;
+    thrust += glm::normalize(glm::vec3(-look.z, 0.f, look.x)) * force.x;
+    thrust.y = force.y;
+
+    applyForce((thrust - m_vel) * 100.f);
 }
 
 
@@ -79,35 +112,31 @@ void UFO::onKeyPressed(QKeyEvent *e)
     switch (e->key())
     {
     case Qt::Key_W:
-//        m_goalVel.x = 1.f;
+        m_wsad |= 0b1000;
         break;
     case Qt::Key_S:
-//        m_goalVel.y = -1.f;
+        m_wsad |= 0b0100;
         break;
     case Qt::Key_A:
-//        m_goalVel.z = -1.f;
+        m_wsad |= 0b0010;
         break;
     case Qt::Key_D:
-//        m_goalVel.w = 1.f;
+        m_wsad |= 0b0001;
+        break;
+    case Qt::Key_E:
+        m_up = true;
+        break;
+    case Qt::Key_Q:
+        m_down = true;
         break;
     case Qt::Key_Space:
-//        m_jump = true;
-        break;
-    case Qt::Key_C:
-//        m_crouch = !m_crouch;
-        break;
-    case Qt::Key_Shift:
-//        m_sprint = true;
-        break;
-    case Qt::Key_CapsLock:
-//        m_walk = true;
         break;
     case Qt::Key_Minus:
     case Qt::Key_Underscore:
         offset = m_camera->getOffset();
         offset += 1.f;
-        if (offset > 10.f)
-            offset = 10.f;
+        if (offset > 25.f)
+            offset = 25.f;
         m_camera->setOffset(offset);
         break;
     case Qt::Key_Plus:
@@ -129,25 +158,24 @@ void UFO::onKeyReleased(QKeyEvent *e)
     switch (e->key())
     {
     case Qt::Key_W:
-//        m_goalVel.x = 0.f;
+        m_wsad &= 0b0111;
         break;
     case Qt::Key_S:
-//        m_goalVel.y = 0.f;
+        m_wsad &= 0b1011;
         break;
     case Qt::Key_A:
-//        m_goalVel.z = 0.f;
+        m_wsad &= 0b1101;
         break;
     case Qt::Key_D:
-//        m_goalVel.w = 0.f;
+        m_wsad &= 0b1110;
+        break;
+    case Qt::Key_E:
+        m_up = false;
+        break;
+    case Qt::Key_Q:
+        m_down = false;
         break;
     case Qt::Key_Space:
-//        m_jump = false;
-        break;
-    case Qt::Key_Shift:
-//        m_sprint = false;
-        break;
-    case Qt::Key_CapsLock:
-//        m_walk = false;
         break;
     default:
         break;

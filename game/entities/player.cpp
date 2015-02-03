@@ -12,13 +12,7 @@ Player::Player(ActionCamera *camera, glm::vec3 pos)
     m_eyeHeight = EYE_HEIGHT;
     m_camera->setCenter(getPosition() + glm::vec3(0.f, m_eyeHeight, 0.f));
 
-    m_goalVel = glm::vec4(0.f);
-
-    m_canJump = false;
-    m_jump = false;
-    m_crouch = false;
-    m_walk = false;
-    m_sprint = false;
+    reset();
 
     CollisionShape *cs = new CollisionCylinder(glm::vec3(), glm::vec3(1.f, 2.f, 1.f));
     addCollisionShape(cs);
@@ -38,6 +32,18 @@ Player::Player(ActionCamera *camera, glm::vec3 pos)
 
 Player::~Player()
 {
+}
+
+
+void Player::reset()
+{
+    m_goalVel = glm::vec4(0.f);
+
+    m_canJump = false;
+    m_jump = false;
+    m_crouch = false;
+    m_walk = false;
+    m_sprint = false;
 }
 
 

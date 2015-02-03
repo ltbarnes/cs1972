@@ -13,9 +13,9 @@ public:
     virtual ~World();
 
     void addMovableEntity(MovableEntity *me);
-    void removeMovableEntity(MovableEntity *me);
     void addStaticEntity(StaticEntity *se);
-    void removeStaticEntity(StaticEntity *se);
+    bool removeMovableEntity(MovableEntity *me);
+    bool removeStaticEntity(StaticEntity *se);
 
     virtual void onTick(float secs);
     virtual void onDraw(Graphics *g);
