@@ -13,10 +13,11 @@ Ground::Ground(glm::vec3 pos)
     rs->type = CYLINDER;
     rs->color = glm::vec3(0.75f, 0.8f, 0.9f);
     rs->shininess = 128.f;
+    rs->transparency = 1.f;
     rs->trans = glm::scale(glm::mat4(), glm::vec3(500, 2, 500));
     rs->texture = "snow.jpg";
-    rs->repeatU = 15.f;
-    rs->repeatV = 15.f;
+    rs->repeatU = 25.f;
+    rs->repeatV = 25.f;
     addRenderShape(rs);
 }
 

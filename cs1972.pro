@@ -52,7 +52,8 @@ SOURCES += \
     game/entities/item.cpp \
     engine/world/staticentity.cpp \
     game/entities/ground.cpp \
-    game/entities/ufo.cpp
+    game/entities/ufo.cpp \
+    engine/shapes/cone.cpp
 
 HEADERS += \
     engine/ui/mainwindow.h \
@@ -81,7 +82,8 @@ HEADERS += \
     game/entities/item.h \
     engine/world/staticentity.h \
     game/entities/ground.h \
-    game/entities/ufo.h
+    game/entities/ufo.h \
+    engine/shapes/cone.h
 #    engine/vector/vector.h
 
 FORMS += engine/ui/mainwindow.ui

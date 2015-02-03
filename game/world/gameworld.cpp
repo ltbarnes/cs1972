@@ -8,7 +8,7 @@ GameWorld::GameWorld()
     m_light = new Light();
     m_light->id = 0;
     m_light->color = glm::vec3(1.f, 0.8f, 0.6f);
-    m_light->pos = glm::vec3(5.f, -1.f, 1.f); // actually dir
+    m_light->pos = glm::vec3(5.f, -1.f, -5.7f); // actually dir
 }
 
 

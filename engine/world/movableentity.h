@@ -18,6 +18,7 @@ public:
     virtual glm::vec3 getVelocity();
 
     void setMass(float mass);
+    void setVelocity(glm::vec3 vel);
     void applyImpulse(glm::vec3 impulse);
     void applyForce(glm::vec3 force);
 

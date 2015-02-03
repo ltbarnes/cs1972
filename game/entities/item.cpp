@@ -13,6 +13,7 @@ Item::Item(glm::vec3 pos)
     rs->type = CYLINDER;
     rs->color = glm::vec3(.5f, .8f, .5f);
     rs->shininess = 0.f;
+    rs->transparency = 1.f;
     rs->trans = glm::mat4();
     rs->texture = "";
     rs->repeatU = 1.f;

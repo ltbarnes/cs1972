@@ -13,6 +13,8 @@ struct Collision
 {
     Entity *e1;
     Entity *e2;
+    CollisionShape *c1;
+    CollisionShape *c2;
     glm::vec3 mtv;
     glm::vec3 impulse;
 };
@@ -31,12 +33,14 @@ public:
     void addCollisionShape(CollisionShape *cs);
 
     virtual void onTick(float secs);
-    virtual void onDraw(Graphics *g);
+    virtual void onDrawOpaque(Graphics *g);
+    virtual void onDrawTransparent(Graphics *g);
+    void drawFromList(Graphics *g, QList<RenderShape *> shapes, glm::mat4 posMat);
 
     virtual glm::vec3 getVelocity();
     virtual float getMass();
 
-    virtual Collision *collides(Entity *e);
+    virtual QList<Collision *> collides(Entity *e);
     virtual void handleCollision(Entity *other, glm::vec3 mtv, glm::vec3 impulse) = 0;
 
     void bump(glm::vec3 amount);
@@ -45,6 +49,7 @@ private:
     glm::vec3 m_pos;
 
     QList<RenderShape *> m_renderShapes;
+    QList<RenderShape *> m_transparentShapes;
     QList<CollisionShape *> m_collisionShapes;
 
 };

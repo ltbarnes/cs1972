@@ -29,6 +29,11 @@ void MovableEntity::setMass(float mass)
     m_mass = mass;
 }
 
+void MovableEntity::setVelocity(glm::vec3 vel)
+{
+    m_vel = vel;
+}
+
 void MovableEntity::onTick(float secs)
 {
     m_vel += (m_force * secs / m_mass) + m_impulse * 1.f / m_mass;

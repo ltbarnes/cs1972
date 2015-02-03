@@ -14,7 +14,7 @@ public:
     void reset();
 
     virtual void onTick(float secs);
-    virtual void onDraw(Graphics *g);
+    virtual void onDrawOpaque(Graphics *g);
 
     void setCameraPos();
 

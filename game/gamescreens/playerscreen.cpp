@@ -86,13 +86,15 @@ void PlayerScreen::onKeyPressed(QKeyEvent *e)
         if (m_inShip)
         {
             m_inShip = false;
-            m_player->setPosition(m_ufo->getPosition() + glm::vec3(0.f, 20.f, 0.f));
             m_player->reset();
+            m_player->setPosition(m_ufo->getPosition() + glm::vec3(0.f, 5.f, 0.f));
+            m_player->setVelocity(m_ufo->getVelocity());
             m_world->addMovableEntity(m_player);
         }
         else if (glm::distance(m_player->getPosition(), m_ufo->getPosition()) < 5.f)
         {
             m_inShip = true;
+            m_ufo->reset();
             m_world->removeMovableEntity(m_player);
         }
     }

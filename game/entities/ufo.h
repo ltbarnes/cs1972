@@ -11,8 +11,11 @@ public:
     UFO(ActionCamera *camera, glm::vec3 pos);
     virtual ~UFO();
 
+    void reset();
+
     virtual void onTick(float secs);
-    virtual void onDraw(Graphics *g);
+    virtual void onDrawOpaque(Graphics *g);
+    virtual void onDrawTransparent(Graphics *g);
 
     void setCameraPos();
 

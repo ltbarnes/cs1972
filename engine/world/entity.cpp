@@ -9,11 +9,16 @@
 Entity::Entity(glm::vec3 pos)
 {
     m_pos = pos;
+    m_renderShapes.clear();
+    m_transparentShapes.clear();
+    m_collisionShapes.clear();
 }
 
 Entity::~Entity()
 {
     foreach(RenderShape *rs, m_renderShapes)
+        delete rs;
+    foreach(RenderShape *rs, m_transparentShapes)
         delete rs;
     foreach(CollisionShape *cs, m_collisionShapes)
         delete cs;
@@ -49,7 +54,10 @@ QList<CollisionShape *> Entity::getCollisionShapes()
 
 void Entity::addRenderShape(RenderShape *rs)
 {
-    m_renderShapes.append(rs);
+    if (rs->transparency < 1.f)
+        m_transparentShapes.append(rs);
+    else
+        m_renderShapes.append(rs);
 }
 
 void Entity::addCollisionShape(CollisionShape *cs)
@@ -62,15 +70,32 @@ void Entity::onTick(float)
 {
 }
 
-void Entity::onDraw(Graphics *g)
+void Entity::onDrawOpaque(Graphics *g)
 {
     glm::mat4 posMat = glm::translate(glm::mat4(), m_pos);
 
-    foreach(RenderShape *rs, m_renderShapes)
+    drawFromList(g, m_renderShapes, posMat);
+}
+
+void Entity::onDrawTransparent(Graphics *g)
+{
+    glm::mat4 posMat = glm::translate(glm::mat4(), m_pos);
+
+    if (m_transparentShapes.size() > 0)
     {
-//        cout << rs->texture.toStdString() << endl;
+        g->setTransparentMode(true);
+        drawFromList(g, m_transparentShapes, posMat);
+        g->setTransparentMode(false);
+    }
+}
+
+void Entity::drawFromList(Graphics *g, QList<RenderShape *> shapes, glm::mat4 posMat)
+{
+
+    foreach(RenderShape *rs, shapes)
+    {
         g->setTexture(rs->texture, rs->repeatU, rs->repeatV);
-        g->setColor(rs->color.r, rs->color.g, rs->color.b, rs->shininess);
+        g->setColor(rs->color.r, rs->color.g, rs->color.b, rs->transparency, rs->shininess);
         glm::mat4 trans = posMat * rs->trans;
 
         switch (rs->type)
@@ -96,42 +121,38 @@ void Entity::bump(glm::vec3 amount)
     setPosition(getPosition() + amount);
 }
 
-Collision *Entity::collides(Entity *e)
+QList<Collision *> Entity::collides(Entity *e)
 {
     QList<CollisionShape *> cshapes = e->getCollisionShapes();
-    glm::vec4 mtv;
-    glm::vec4 mintv = glm::vec4(0, 0, 0, std::numeric_limits<float>::infinity());
+    QList<Collision *> cols;
+    Collision *col;
 
     foreach(CollisionShape *cs1, m_collisionShapes)
     {
         foreach(CollisionShape *cs2, cshapes)
         {
-            mtv = cs1->collides(cs2);
-            if (mtv.w < mintv.w)
-                mintv = mtv;
+            col = cs1->collides(cs2);
+            if (col)
+            {
+               col->e1 = this;
+               col->e2 = e;
+               float m1 = this->getMass();
+               float m2 = e->getMass();
+               glm::vec3 v1 = this->getVelocity();
+               glm::vec3 v2 = e->getVelocity();
+               float mag2 = glm::dot(col->mtv, col->mtv);
+               if (mag2 < 0.0001)
+                   col->impulse = glm::vec3(0.f);
+               else
+               {
+                   col->impulse = (v2 - v1) * ((m1 * m2 /**(1+cor)*/) / (m1 + m2));
+                   col->impulse = (glm::dot(col->impulse, col->mtv) / mag2) * col->mtv;
+               }
+               cols.append(col);
+            }
         }
     }
-    Collision *col = NULL;
 
-    if (mintv.w < std::numeric_limits<float>::infinity())
-    {
-        col = new Collision();
-        col->e1 = this;
-        col->e2 = e;
-        col->mtv = glm::vec3(mintv);
-        float m1 = this->getMass();
-        float m2 = e->getMass();
-        glm::vec3 v1 = this->getVelocity();
-        glm::vec3 v2 = e->getVelocity();
-        float mag2 = glm::dot(col->mtv, col->mtv);
-        if (mag2 < 0.0001)
-            col->impulse = glm::vec3(0.f);
-        else
-        {
-            col->impulse = (v2 - v1) * ((m1 * m2 /**(1+cor)*/) / (m1 + m2));
-            col->impulse = (glm::dot(col->impulse, col->mtv) / mag2) * col->mtv;
-        }
-    }
-    return col;
+    return cols;
 }
 

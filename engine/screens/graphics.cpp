@@ -48,6 +48,7 @@ void Graphics::init()
     m_defaultLocs["diffuse_color"] = glGetUniformLocation(m_defaultShader, "diffuse_color");
     m_defaultLocs["world_color"] = glGetUniformLocation(m_defaultShader, "world_color");
 
+    m_defaultLocs["transparency"] = glGetUniformLocation(m_defaultShader, "transparency");
     m_defaultLocs["shininess"] = glGetUniformLocation(m_defaultShader, "shininess");
     m_defaultLocs["useTexture"] = glGetUniformLocation(m_defaultShader, "useTexture");
     m_defaultLocs["tex"] = glGetUniformLocation(m_defaultShader, "tex");
@@ -108,9 +109,10 @@ void Graphics::setWorldColor(float r, float g, float b)
 }
 
 
-void Graphics::setColor(float r, float g, float b, float shininess)
+void Graphics::setColor(float r, float g, float b, float transparency, float shininess)
 {
     glUniform3f(m_defaultLocs["diffuse_color"], r, g, b);
+    glUniform1f(m_defaultLocs["transparency"], transparency);
     glUniform1f(m_defaultLocs["shininess"], shininess);
 }
 
@@ -134,6 +136,18 @@ void Graphics::setTexture(const QString &key, float repeatU, float repeatV)
     {
         glUniform1i(m_defaultLocs["useTexture"], 0);
     }
+}
+
+
+void Graphics::setTransparentMode(bool on)
+{
+    if (on)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    else
+        glDisable(GL_BLEND);
 }
 
 

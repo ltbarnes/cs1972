@@ -12,12 +12,12 @@ CollisionCylinder::~CollisionCylinder()
 {
 }
 
-glm::vec4 CollisionCylinder::collides(CollisionShape *cs)
+Collision *CollisionCylinder::collides(CollisionShape *cs)
 {
     return cs->collidesCylinder(this);
 }
 
-glm::vec4 CollisionCylinder::collidesCylinder(CollisionCylinder *cc)
+Collision *CollisionCylinder::collidesCylinder(CollisionCylinder *cc)
 {
     glm::vec3 pos = cc->getPos();
     glm::vec3 dim = cc->getDim();
@@ -29,7 +29,7 @@ glm::vec4 CollisionCylinder::collidesCylinder(CollisionCylinder *cc)
     float otherAbove = (m_pos.y + m_dim.y / 2.f) - (pos.y - dim.y / 2.f);
 
     if (otherBelow < 0.f || otherAbove < 0.f)
-        return mtv;
+        return NULL;
     else if (otherBelow < otherAbove)
     {
         mtv.w = otherBelow;
@@ -63,8 +63,14 @@ glm::vec4 CollisionCylinder::collidesCylinder(CollisionCylinder *cc)
             mtv = glm::vec4(glm::normalize(one2Two) * dist, dist);
     }
     else
-        return glm::vec4(0, 0, 0, std::numeric_limits<float>::infinity());
+        return NULL;
 
-    return mtv;
+    Collision *col;
+    col = new Collision();
+    col->c1 = cc;
+    col->c2 = this;
+    col->mtv = glm::vec3(mtv);
+
+    return col;
 }
 

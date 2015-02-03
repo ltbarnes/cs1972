@@ -57,7 +57,7 @@ void World::detectCollisions()
         delete c;
     m_collisions.clear();
 
-    Collision *collision;
+    QList<Collision *> collisions;
     Entity *e1, *e2;
 
     int moveSize = m_movableEntities.size();
@@ -68,18 +68,18 @@ void World::detectCollisions()
         // check static entities
         foreach(Entity *es, m_staticEntities)
         {
-            collision = e1->collides(es);
-            if (collision)
-                m_collisions.append(collision);
+            collisions = e1->collides(es);
+            if (collisions.size() > 0)
+                m_collisions.append(collisions);
         }
 
         // check other movable entities
         for (int j = i + 1; j < moveSize; j++)
         {
             e2 = m_movableEntities.value(j);
-            collision = e1->collides(e2);
-            if (collision)
-                m_collisions.append(collision);
+            collisions = e1->collides(e2);
+            if (collisions.size() > 0)
+                m_collisions.append(collisions);
         }
     }
 }
@@ -97,9 +97,15 @@ void World::handleCollisions()
 void World::onDraw(Graphics *g)
 {
     foreach(Entity *e, m_staticEntities)
-        e->onDraw(g);
+        e->onDrawOpaque(g);
 
     foreach(Entity *e, m_movableEntities)
-        e->onDraw(g);
+        e->onDrawOpaque(g);
+
+    foreach(Entity *e, m_staticEntities)
+        e->onDrawTransparent(g);
+
+    foreach(Entity *e, m_movableEntities)
+        e->onDrawTransparent(g);
 }
 

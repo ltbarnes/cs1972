@@ -10,8 +10,8 @@ public:
     CollisionCylinder(glm::vec3 pos, glm::vec3 dim);
     virtual ~CollisionCylinder();
 
-    virtual glm::vec4 collides(CollisionShape *cs);
-    virtual glm::vec4 collidesCylinder(CollisionCylinder *cc);
+    virtual Collision *collides(CollisionShape *cs);
+    virtual Collision *collidesCylinder(CollisionCylinder *cc);
 };
 
 #endif // COLLISIONCYLINDER_H

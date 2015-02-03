@@ -22,6 +22,7 @@ uniform vec3 diffuse_color;
 uniform vec3 world_color = vec3(0.2);
 uniform vec3 specular_color = vec3(1.0);
 uniform float shininess = 1.0;
+uniform float transparency = 1.0;
 
 uniform float repeatU = 1.0;
 uniform float repeatV = 1.0;
@@ -45,19 +46,23 @@ void main(){
         // Point Light
         vec4 vertexToLight = normalize(view * vec4(-lightPositions[i], 0));// - position_cameraSpace);
 
-        // Add diffuse component
-        float diffuseIntensity = max(0.0, dot(vertexToLight, normal_cameraSpace));
-        color += max(vec3(0), lightColors[i] * diffuse_color * diffuseIntensity);
-
-        // Add specular component
-        if (abs(shininess) > 0.001)
+        if (transparency < 1.0)
+            color = diffuse_color;
+        else
         {
-            vec4 lightReflection = normalize(-reflect(vertexToLight, normal_cameraSpace));
-            vec4 eyeDirection = normalize(vec4(0,0,0,1) - position_cameraSpace);
-            float specIntensity = pow(max(0.0, dot(eyeDirection, lightReflection)), shininess);
-            color += max (vec3(0), lightColors[i] * specular_color * specIntensity);
+            // Add diffuse component
+            float diffuseIntensity = max(0.0, dot(vertexToLight, normal_cameraSpace));
+            color += max(vec3(0), lightColors[i] * diffuse_color * diffuseIntensity);
+
+            // Add specular component
+            if (abs(shininess) > 0.001)
+            {
+                vec4 lightReflection = normalize(-reflect(vertexToLight, normal_cameraSpace));
+                vec4 eyeDirection = normalize(vec4(0,0,0,1) - position_cameraSpace);
+                float specIntensity = pow(max(0.0, dot(eyeDirection, lightReflection)), shininess);
+                color += max (vec3(0), lightColors[i] * specular_color * specIntensity);
+            }
         }
     }
     color = clamp(color, 0.0, 1.0) * allBlack;
-//    color = vec3(0.5);
 }

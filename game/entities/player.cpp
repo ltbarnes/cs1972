@@ -21,6 +21,7 @@ Player::Player(ActionCamera *camera, glm::vec3 pos)
     rs->type = CYLINDER;
     rs->color = glm::vec3(0, 1, 0);
     rs->shininess = 32.f;
+    rs->transparency = 1.f;
     rs->trans = glm::scale(glm::mat4(), glm::vec3(1.f, 2.f, 1.f));
     rs->texture = "";
     rs->repeatU = 1.f;
@@ -103,11 +104,11 @@ void Player::setCameraPos()
     m_camera->setCenter(getPosition() + glm::vec3(0.f, m_eyeHeight, 0.f));
 }
 
-void Player::onDraw(Graphics *g)
+void Player::onDrawOpaque(Graphics *g)
 {
     if (m_camera->getOffset() <= 0.001f)
         return;
-    Entity::onDraw(g);
+    Entity::onDrawOpaque(g);
 }
 
 

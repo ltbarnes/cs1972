@@ -8,10 +8,7 @@ UFO::UFO(ActionCamera *camera, glm::vec3 pos)
 {
     m_camera = camera;
 
-    m_wsad = 0b0000;
-    m_up = false;
-    m_down = false;
-    m_beam = false;
+    reset();
 
     // saucer
     CollisionShape *cs;
@@ -23,6 +20,7 @@ UFO::UFO(ActionCamera *camera, glm::vec3 pos)
     rs->type = SPHERE;
     rs->color = glm::vec3(.5f);
     rs->shininess = 2048.f;
+    rs->transparency = 1.f;
     rs->trans = glm::scale(glm::mat4(), glm::vec3(16.f, 1.6f, 16.f));
     rs->texture = "";
     rs->repeatU = 1.f;
@@ -37,8 +35,21 @@ UFO::UFO(ActionCamera *camera, glm::vec3 pos)
     rs->type = SPHERE;
     rs->color = glm::vec3(.7f, .7f, .9f);
     rs->shininess = 512.f;
+    rs->transparency = 1.f;
     rs->trans = glm::translate(glm::mat4(), glm::vec3(0, .8, 0));
     rs->trans = glm::scale(rs->trans, glm::vec3(6.f, 3.f, 6.f));
+    rs->texture = "";
+    rs->repeatU = 1.f;
+    rs->repeatV = 1.f;
+    addRenderShape(rs);
+
+    rs = new RenderShape();
+    rs->type = CYLINDER;
+    rs->color = glm::vec3(1.f, .3f, 0.f);
+    rs->shininess = 0.f;
+    rs->transparency = 0.3f;
+    rs->trans = glm::translate(glm::mat4(), glm::vec3(0, -20.f, 0));
+    rs->trans = glm::scale(rs->trans, glm::vec3(2.5f, 40.f, 2.5f));
     rs->texture = "";
     rs->repeatU = 1.f;
     rs->repeatV = 1.f;
@@ -50,12 +61,23 @@ UFO::~UFO()
 {
 }
 
+void UFO::reset()
+{
+    m_wsad = 0b0000;
+    m_up = false;
+    m_down = false;
+    m_beam = false;
+}
+
 
 void UFO::onTick(float secs)
 {
     applyForce(glm::vec3(0.f, 9.95f, 0.f) * getMass());
 
     MovableEntity::onTick(secs);
+
+    if (getPosition().y > 40.f)
+        m_beam = false;
 
     glm::vec3 force = glm::vec3(0.f);
     if (m_wsad & 0b1000)
@@ -81,9 +103,17 @@ void UFO::onTick(float secs)
 }
 
 
-void UFO::onDraw(Graphics *g)
+void UFO::onDrawOpaque(Graphics *g)
 {
-    Entity::onDraw(g);
+    Entity::onDrawOpaque(g);
+}
+
+void UFO::onDrawTransparent(Graphics *g)
+{
+    if (m_beam)
+    {
+        Entity::onDrawTransparent(g);
+    }
 }
 
 
@@ -130,6 +160,8 @@ void UFO::onKeyPressed(QKeyEvent *e)
         m_down = true;
         break;
     case Qt::Key_Space:
+        if (getPosition().y < 40.f || m_beam)
+            m_beam = !m_beam;
         break;
     case Qt::Key_Minus:
     case Qt::Key_Underscore:

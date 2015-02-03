@@ -14,7 +14,7 @@
 
 enum ShapeType
 {
-    QUAD, CUBE, CYLINDER, SPHERE
+    QUAD, CUBE, CYLINDER, SPHERE, CONE
 };
 
 struct RenderShape
@@ -22,6 +22,7 @@ struct RenderShape
     ShapeType type;
     glm::vec3 color;
     float shininess;
+    float transparency;
     glm::mat4 trans;
     QString texture;
     float repeatU, repeatV;
@@ -48,8 +49,9 @@ public:
     void setUniforms(Camera *camera);
 
     void setWorldColor(float r, float g, float b);
-    void setColor(float r, float g, float b, float shininess);
+    void setColor(float r, float g, float b, float transparency, float shininess);
     void setTexture(const QString &key, float repeatU = 1.f, float repeatV = 1.f);
+    void setTransparentMode(bool on);
 
     void useCubeMap(bool use);
     bool cubeMapIsActive();
