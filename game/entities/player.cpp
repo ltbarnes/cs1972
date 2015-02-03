@@ -97,7 +97,6 @@ void Player::setCameraPos()
     m_camera->setCenter(getPosition() + glm::vec3(0.f, m_eyeHeight, 0.f));
 }
 
-
 void Player::onDraw(Graphics *g)
 {
     if (m_camera->getOffset() <= 0.001f)
@@ -163,7 +162,6 @@ void Player::onKeyPressed(QKeyEvent *e)
         break;
     }
 }
-
 
 void Player::onKeyReleased(QKeyEvent *e)
 {
