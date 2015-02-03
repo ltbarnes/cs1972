@@ -19,7 +19,8 @@ using namespace std;
 
 Graphics::Graphics()
 {
-    m_quad = new Shape(100);
+    m_quad = new Shape(10);
+    m_cone = new Cone(50);
     m_cube = new Cube(10);
     m_cyl = new Cylinder(50);
     m_sphere = new Sphere(50);
@@ -30,6 +31,7 @@ Graphics::Graphics()
 Graphics::~Graphics()
 {
     delete m_quad;
+    delete m_cone;
     delete m_cube;
     delete m_cyl;
     delete m_sphere;
@@ -67,6 +69,7 @@ void Graphics::init()
     m_cubeMap->init();
 
     m_quad->init(m_defaultShader);
+    m_cone->init(m_defaultShader);
     m_cube->init(m_defaultShader);
     m_cyl->init(m_defaultShader);
     m_sphere->init(m_defaultShader);
@@ -207,6 +210,12 @@ void Graphics::addLight(const Light &light)
 void Graphics::drawQuad(glm::mat4 trans)
 {
     m_quad->transformAndRender(m_defaultShader, trans);
+}
+
+
+void Graphics::drawCone(glm::mat4 trans)
+{
+    m_cone->transformAndRender(m_defaultShader, trans);
 }
 
 

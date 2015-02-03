@@ -9,6 +9,8 @@
 Entity::Entity(glm::vec3 pos)
 {
     m_pos = pos;
+    m_rotation = glm::mat4();
+
     m_renderShapes.clear();
     m_transparentShapes.clear();
     m_collisionShapes.clear();
@@ -72,7 +74,7 @@ void Entity::onTick(float)
 
 void Entity::onDrawOpaque(Graphics *g)
 {
-    glm::mat4 posMat = glm::translate(glm::mat4(), m_pos);
+    glm::mat4 posMat = glm::translate(glm::mat4(), m_pos) * m_rotation;
 
     drawFromList(g, m_renderShapes, posMat);
 }
@@ -102,6 +104,9 @@ void Entity::drawFromList(Graphics *g, QList<RenderShape *> shapes, glm::mat4 po
         {
         case QUAD:
             g->drawQuad(trans);
+            break;
+        case CONE:
+            g->drawCone(trans);
             break;
         case CUBE:
             g->drawCube(trans);

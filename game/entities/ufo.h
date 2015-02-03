@@ -26,6 +26,9 @@ public:
     virtual void onKeyPressed(QKeyEvent *e);
     virtual void onKeyReleased(QKeyEvent *e);
 
+protected:
+    glm::mat4 m_rotation;
+
 private:
     ActionCamera *m_camera;
 

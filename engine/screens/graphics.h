@@ -7,6 +7,7 @@
 #include "camera.h"
 #include "cubemap.h"
 #include "shape.h"
+#include "cone.h"
 #include "cube.h"
 #include "cylinder.h"
 #include "sphere.h"
@@ -60,6 +61,7 @@ public:
     void addLight(const Light &light);
 
     void drawQuad(glm::mat4 trans);
+    void drawCone(glm::mat4 trans);
     void drawCube(glm::mat4 trans);
     void drawCyl(glm::mat4 trans);
     void drawSphere(glm::mat4 trans);
@@ -85,6 +87,7 @@ private:
     CubeMap *m_cubeMap;
 
     Shape *m_quad;
+    Shape *m_cone;
     Shape *m_cube;
     Shape *m_cyl;
     Shape *m_sphere;

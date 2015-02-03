@@ -45,6 +45,9 @@ public:
 
     void bump(glm::vec3 amount);
 
+protected:
+    glm::mat4 m_rotation;
+
 private:
     glm::vec3 m_pos;
 

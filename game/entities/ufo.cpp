@@ -44,12 +44,12 @@ UFO::UFO(ActionCamera *camera, glm::vec3 pos)
     addRenderShape(rs);
 
     rs = new RenderShape();
-    rs->type = CYLINDER;
+    rs->type = CONE;
     rs->color = glm::vec3(1.f, .3f, 0.f);
     rs->shininess = 0.f;
     rs->transparency = 0.3f;
     rs->trans = glm::translate(glm::mat4(), glm::vec3(0, -20.f, 0));
-    rs->trans = glm::scale(rs->trans, glm::vec3(2.5f, 40.f, 2.5f));
+    rs->trans = glm::scale(rs->trans, glm::vec3(5.f, 40.f, 5.f));
     rs->texture = "";
     rs->repeatU = 1.f;
     rs->repeatV = 1.f;
