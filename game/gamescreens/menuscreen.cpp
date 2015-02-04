@@ -10,7 +10,8 @@
 
 using namespace std;
 
-MenuScreen::MenuScreen()
+MenuScreen::MenuScreen(Application *parent)
+    : Screen(parent)
 {
 }
 
@@ -26,6 +27,7 @@ void MenuScreen::onRender(Graphics *g)
 {
     g->setColor(1.f, 1.f, 1.f, 1.f, 1.f);
     g->setWorldColor(1.f, 1.f, 1.f);
+//    g->setTexture();
     g->drawQuad(glm::scale(glm::mat4(), glm::vec3(2, 1, 0)));
 }
 
@@ -35,7 +37,7 @@ void MenuScreen::onKeyPressed(QKeyEvent *e)
     switch(e->key())
     {
     case Qt::Key_Return:
-        m_parentApp->addScreen(new PlayerScreen());
+        m_parentApp->addScreen(new PlayerScreen(m_parentApp));
         break;
     default:
         break;

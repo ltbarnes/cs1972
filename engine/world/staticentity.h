@@ -9,7 +9,7 @@ public:
     StaticEntity(glm::vec3 pos = glm::vec3(0.f));
     virtual ~StaticEntity();
 
-    virtual void handleCollision(Entity *other, glm::vec3 mtv, glm::vec3 impulse);
+    virtual void handleCollision(Collision *col);
 };
 
 #endif // STATICENTITY_H

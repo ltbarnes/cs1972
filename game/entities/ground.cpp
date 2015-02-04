@@ -5,7 +5,7 @@ Ground::Ground(glm::vec3 pos)
     : StaticEntity(pos)
 {
     CollisionShape *cs;
-    cs = new CollisionCylinder(glm::vec3(), glm::vec3(500, 2, 500));
+    cs = new CollisionCylinder(glm::vec3(), glm::vec3(500, 2, 500), "ground");
     addCollisionShape(cs);
 
     RenderShape *rs;

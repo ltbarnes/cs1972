@@ -22,7 +22,6 @@ Application::~Application()
 void Application::init(Screen *initScreen)
 {
     m_currentScreen = initScreen;
-    m_currentScreen->setParent(this);
     m_g->init();
 }
 
@@ -32,7 +31,6 @@ void Application::addScreen(Screen *s)
         m_screens.append(m_currentScreen);
 
     m_currentScreen = s;
-    m_currentScreen->setParent(this);
     m_currentScreen->onResize(m_width, m_height);
 }
 
@@ -57,13 +55,19 @@ void Application::onRender()
 {
     if (m_currentScreen)
     {
+        if (m_g->cubeMapIsActive())
+            m_g->drawCubeMap(m_currentScreen->getCamera());
+
         m_g->setUniforms(m_currentScreen->getCamera());
         m_g->setColor(0.f, 0.f, 0.f, 1.f, 1.f);
         m_currentScreen->onRender(m_g);
 
-        if (m_g->cubeMapIsActive())
-            m_g->drawCubeMap(m_currentScreen->getCamera());
     }
+}
+
+void Application::setUseCubeMap(bool use)
+{
+    m_g->useCubeMap(use);
 }
 
 void Application::onMousePressed(QMouseEvent *e)

@@ -1,11 +1,13 @@
 #include "item.h"
 #include "collisioncylinder.h"
 
-Item::Item(glm::vec3 pos)
+Item::Item(glm::vec3 pos, Player *player)
     : MovableEntity(pos)
 {
+    m_player = player;
+
     CollisionShape *cs;
-    cs = new CollisionCylinder(glm::vec3(), glm::vec3(1.f, 1.f, 1.f));
+    cs = new CollisionCylinder(glm::vec3(), glm::vec3(1.f, 1.f, 1.f), "item");
     addCollisionShape(cs);
 
     RenderShape *rs;
@@ -27,14 +29,9 @@ Item::~Item()
 }
 
 
-//void Item::onTick(float secs)
-//{
-//    MovableEntity::onTick(secs);
+void Item::onTick(float secs)
+{
+    MovableEntity::onTick(secs);
 
-//    glm::vec3 pos = getPosition();
-
-//    if (pos.y < 0.5f)
-//        pos.y = 0.5f;
-
-//    setPosition(pos);
-//}
+    applyForce(glm::vec3(-m_vel.x, 0.f, -m_vel.z) * 3.f); // "friction"
+}

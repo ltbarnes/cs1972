@@ -30,7 +30,6 @@ void GameWorld::onTick(float secs)
 
 void GameWorld::onDraw(Graphics *g)
 {
-    g->useCubeMap(true);
     g->setWorldColor(0.3f, 0.35f, 0.4f);
 
     g->addLight(*m_light);

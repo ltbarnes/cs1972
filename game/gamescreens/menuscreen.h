@@ -6,7 +6,7 @@
 class MenuScreen : public Screen
 {
 public:
-    MenuScreen();
+    MenuScreen(Application *parent);
     virtual ~MenuScreen();
 
     // update and render

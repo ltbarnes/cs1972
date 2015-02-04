@@ -1,11 +1,12 @@
 #include "movableentity.h"
+#include "collisionshape.h"
 
 #include "printing.h"
 
-MovableEntity::MovableEntity(glm::vec3 pos, float mass)
+MovableEntity::MovableEntity(glm::vec3 pos)
     : Entity(pos)
 {
-    m_mass = mass;
+    m_mass = 0.f;
     m_vel = glm::vec3();
 
     m_force = glm::vec3();
@@ -17,6 +18,12 @@ MovableEntity::~MovableEntity() {}
 float MovableEntity::getMass()
 {
     return m_mass;
+}
+
+void MovableEntity::addCollisionShape(CollisionShape *cs)
+{
+    Entity::addCollisionShape(cs);
+    m_mass += cs->getMass();
 }
 
 glm::vec3 MovableEntity::getVelocity()
@@ -43,10 +50,12 @@ void MovableEntity::onTick(float secs)
     m_impulse = glm::vec3(0.f);
 }
 
-void MovableEntity::handleCollision(Entity *, glm::vec3 mtv, glm::vec3 impulse)
+void MovableEntity::handleCollision(Collision *col)
 {
-    bump(mtv * .5f);
-    applyImpulse(impulse);
+    if (!col->c1->isReactable() || !col->c2->isReactable())
+        return;
+    bump(col->mtv * .5f);
+    applyImpulse(col->impulse);
 }
 
 void MovableEntity::applyImpulse(glm::vec3 impulse)

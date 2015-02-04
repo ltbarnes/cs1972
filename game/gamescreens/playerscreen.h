@@ -9,7 +9,7 @@
 class PlayerScreen : public Screen
 {
 public:
-    PlayerScreen();
+    PlayerScreen(Application *parent);
     virtual ~PlayerScreen();
 
     // update and render

@@ -15,19 +15,15 @@ class Screen
 {
 public:
 
-    Screen()
+    Screen(Application *parent)
     {
+        m_parentApp = parent;
         m_camera = new Camera();
     }
 
     virtual ~Screen()
     {
         delete m_camera;
-    }
-
-    void setParent(Application *parent)
-    {
-        m_parentApp = parent;
     }
 
     // update and render

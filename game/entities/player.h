@@ -18,7 +18,7 @@ public:
 
     void setCameraPos();
 
-    virtual void handleCollision(Entity *other, glm::vec3 mtv, glm::vec3 impulse);
+    virtual void handleCollision(Collision *col);
 
     // mouse events
     virtual void onMouseMoved(QMouseEvent *e, float deltaX, float deltaY);
@@ -38,6 +38,8 @@ private:
     bool m_crouch;
     bool m_walk;
     bool m_sprint;
+
+    float m_offset;
 };
 
 #endif // PLAYER_H

@@ -34,6 +34,8 @@ public:
     // resize
     void onResize(int w, int h);
 
+    void setUseCubeMap(bool use);
+
 private:
     QList<Screen *> m_screens;
     Screen *m_currentScreen;
