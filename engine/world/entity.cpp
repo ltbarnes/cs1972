@@ -4,8 +4,6 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
 
-#include "printing.h"
-
 Entity::Entity(glm::vec3 pos)
 {
     m_pos = pos;

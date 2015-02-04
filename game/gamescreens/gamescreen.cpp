@@ -1,33 +1,32 @@
-#include "playerscreen.h"
+#include "gamescreen.h"
 #include "item.h"
 #include "ground.h"
 #include "application.h"
-
-#include "printing.h"
+#include "endgamescreen.h"
 
 float eyeHeight = 2.f;
 
 bool up;
 bool down;
 
-PlayerScreen::PlayerScreen(Application *parent)
+GameScreen::GameScreen(Application *parent)
     : Screen(parent)
 {
     ActionCamera *cam = new ActionCamera();
 
     m_world = new GameWorld();
 
-    m_ufo = new UFO(cam, glm::vec3(0.f, 5.f, 5.f), m_world);
+    m_ufo = new UFO(cam, glm::vec3(25.f, 25.f, -25.f), m_world);
     m_player = new Player(cam, glm::vec3(0.f));
 
     m_world->addMovableEntity(m_player);
     m_world->addMovableEntity(m_ufo);
 
     float angle;
-    for (int i = 0; i < 15; i++)
+    for (int i = 0; i < 10; i++)
     {
-        angle = 6.283f * i / 15.f;
-        m_world->addMovableEntity(new Item(5.f * glm::vec3(glm::cos(angle), 0.f, glm::sin(angle)), m_player));
+        angle = 6.283f * i / 14.f;
+        m_world->addMovableEntity(new Item(5.f * glm::vec3(glm::cos(angle), 0.f, glm::sin(angle)), m_player, m_parentApp));
     }
     m_world->addStaticEntity(new Ground(glm::vec3(0, -1, 0)));
 
@@ -37,18 +36,24 @@ PlayerScreen::PlayerScreen(Application *parent)
     m_inShip = false;
 }
 
-PlayerScreen::~PlayerScreen()
+GameScreen::~GameScreen()
 {
-//    delete m_player; // world deletes player
+    if (m_inShip)
+        delete m_player; // world deletes player otherwise
     delete m_world;
 }
 
-void PlayerScreen::onTick(float secs)
+void GameScreen::onTick(float secs)
 {
+    if (m_ufo->getNumRemoved() >= 10)
+        m_parentApp->addScreen(new EndGameScreen(m_parentApp, true));
      m_world->onTick(secs);
 
      if (m_inShip)
+     {
          m_ufo->setCameraPos();
+         m_player->setPosition(m_ufo->getPosition());
+     }
      else
          m_player->setCameraPos();
 
@@ -56,16 +61,16 @@ void PlayerScreen::onTick(float secs)
 //    m_player->onTick(secs);
 }
 
-void PlayerScreen::onRender(Graphics *g)
+void GameScreen::onRender(Graphics *g)
 {
      m_world->onDraw(g);
 }
 
-void PlayerScreen::onMousePressed(QMouseEvent *)
+void GameScreen::onMousePressed(QMouseEvent *)
 {
 }
 
-void PlayerScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
+void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
 {
     if (m_inShip)
         m_ufo->onMouseMoved(e, deltaX, deltaY);
@@ -73,21 +78,21 @@ void PlayerScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
         m_player->onMouseMoved(e, deltaX, deltaY);
 }
 
-void PlayerScreen::onMouseReleased(QMouseEvent *)
+void GameScreen::onMouseReleased(QMouseEvent *)
 {
 
 }
 
-void PlayerScreen::onMouseDragged(QMouseEvent *, float, float)
+void GameScreen::onMouseDragged(QMouseEvent *, float, float)
 {
 }
 
-void PlayerScreen::onMouseWheel(QWheelEvent *)
+void GameScreen::onMouseWheel(QWheelEvent *)
 {
 
 }
 
-void PlayerScreen::onKeyPressed(QKeyEvent *e)
+void GameScreen::onKeyPressed(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_F)
     {
@@ -112,7 +117,7 @@ void PlayerScreen::onKeyPressed(QKeyEvent *e)
         m_player->onKeyPressed(e);
 }
 
-void PlayerScreen::onKeyReleased(QKeyEvent *e)
+void GameScreen::onKeyReleased(QKeyEvent *e)
 {
     if (m_inShip)
         m_ufo->onKeyReleased(e);

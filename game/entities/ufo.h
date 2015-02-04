@@ -28,6 +28,8 @@ public:
     virtual void onKeyPressed(QKeyEvent *e);
     virtual void onKeyReleased(QKeyEvent *e);
 
+    int getNumRemoved();
+
 private:
     ActionCamera *m_camera;
 
@@ -36,6 +38,8 @@ private:
 
     float m_offset;
     World *m_world;
+
+    int m_numRemoved;
 };
 
 #endif // UFO_H

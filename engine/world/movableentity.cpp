@@ -1,8 +1,6 @@
 #include "movableentity.h"
 #include "collisionshape.h"
 
-#include "printing.h"
-
 MovableEntity::MovableEntity(glm::vec3 pos)
     : Entity(pos)
 {

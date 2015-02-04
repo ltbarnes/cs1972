@@ -34,15 +34,21 @@ void Application::addScreen(Screen *s)
     m_currentScreen->onResize(m_width, m_height);
 }
 
-void Application::popScreen()
+void Application::popScreens(int num)
 {
-    if (m_currentScreen)
-        delete m_currentScreen;
+    while (num-- > 0)
+    {
+        if (m_currentScreen)
+            delete m_currentScreen;
 
-    if (!m_screens.isEmpty())
-        m_currentScreen = m_screens.takeLast();
-    else
-        m_currentScreen = NULL;
+        if (!m_screens.isEmpty())
+            m_currentScreen = m_screens.takeLast();
+        else
+        {
+            m_currentScreen = NULL;
+            break;
+        }
+    }
 }
 
 void Application::onTick(float secs)

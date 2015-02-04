@@ -26,6 +26,7 @@ Graphics::Graphics()
     m_sphere = new Sphere(50);
 
     m_cubeMap = new CubeMap();
+    m_useCubeMap = false;
 }
 
 Graphics::~Graphics()

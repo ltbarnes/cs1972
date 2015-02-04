@@ -1,8 +1,6 @@
 #include "ufo.h"
 #include "collisioncylinder.h"
 
-#include "printing.h"
-
 UFO::UFO(ActionCamera *camera, glm::vec3 pos, World *world)
     : MovableEntity(pos)
 {
@@ -10,7 +8,8 @@ UFO::UFO(ActionCamera *camera, glm::vec3 pos, World *world)
     m_world = world;
 
     m_offset = 30.f;
-    m_beam = false;
+    m_beam = true;
+    m_numRemoved = 0;
     reset();
 
     // saucer
@@ -114,7 +113,6 @@ void UFO::onTick(float secs)
 
     m_rotation = glm::rotate(glm::mat4(), (std::abs(force.z) - glm::length(glm::vec2(m_vel.x, m_vel.z))) * force.z / -70000.f, glm::vec3(-look.z, 0, look.x));
     m_rotation = glm::rotate(m_rotation, (std::abs(force.x) - glm::length(glm::vec2(m_vel.x, m_vel.z))) * force.x / 70000.f, glm::vec3(look.x, 0, look.z));
-//    cout << (std::abs(force.z) - )
 }
 
 
@@ -148,17 +146,26 @@ void UFO::handleCollision(Collision *col)
         glm::vec3 pos = getPosition();
         glm::vec3 force = glm::vec3(pos.x, 0, pos.z) - glm::vec3(itemPos.x, 0, itemPos.z);
         float len = glm::length(force);
-        float mag = max(0.f, (100.f - len * len) / 4.f);
+        float mag = glm::max(0.f, (100.f - len * len) / 4.f);
         item->applyForce(glm::normalize(force) * mag);
 
         if (len < 5.f)
-            item->applyForce(glm::vec3(0, (50.f - (pos.y - itemPos.y)) * .5f, 0));
+            item->applyForce(glm::vec3(0, (50.f - (pos.y - itemPos.y)) * .75f, 0));
     }
     if (m_beam && col->c1->getID() == "hull" && col->c2->getID() == "item")
     {
-        m_world->setToDeleteMovable(dynamic_cast<MovableEntity  *>(col->e2));
+        if (col->mtv.y > 0.001)
+        {
+            m_world->setToDeleteMovable(dynamic_cast<MovableEntity  *>(col->e2));
+            m_numRemoved++;
+        }
     }
+}
 
+
+int UFO::getNumRemoved()
+{
+    return m_numRemoved;
 }
 
 
@@ -208,10 +215,12 @@ void UFO::onKeyPressed(QKeyEvent *e)
             m_offset = 0.f;
         m_camera->setOffset(m_offset);
         break;
+    case Qt::Key_ParenRight:
     case Qt::Key_0:
         m_offset = 0.f;
         m_camera->setOffset(m_offset);
         break;
+    case Qt::Key_ParenLeft:
     case Qt::Key_9:
         m_offset = 30.f;
         m_camera->setOffset(m_offset);

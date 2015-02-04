@@ -1,10 +1,12 @@
 #include "item.h"
 #include "collisioncylinder.h"
+#include "endgamescreen.h"
 
-Item::Item(glm::vec3 pos, Player *player)
+Item::Item(glm::vec3 pos, Player *player, Application *app)
     : MovableEntity(pos)
 {
     m_player = player;
+    m_app = app;
 
     CollisionShape *cs;
     cs = new CollisionCylinder(glm::vec3(), glm::vec3(1.f, 1.f, 1.f), "item");
@@ -31,7 +33,17 @@ Item::~Item()
 
 void Item::onTick(float secs)
 {
+    glm::vec3 pos = getPosition();
+
+    if (pos.y < -25.f)
+        m_app->addScreen(new EndGameScreen(m_app, false));
+
     MovableEntity::onTick(secs);
 
+    glm::vec3 playerPos = m_player->getPosition();
+
+    glm::vec3 force = pos - playerPos;
+    force.y = 0;
+    applyForce(glm::normalize(force) * 10.f);
     applyForce(glm::vec3(-m_vel.x, 0.f, -m_vel.z) * 3.f); // "friction"
 }

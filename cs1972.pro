@@ -25,7 +25,7 @@ DEPENDPATH +=  glm engine game shaders \
                game/gamescreens game/world game/entities \
                res/images res/images/cubemap
 DEFINES += TIXML_USE_STL
-OTHER_FILES += shaders/shader.frag shaders/shader.vert res/images/grass.png
+OTHER_FILES += shaders/shader.frag shaders/shader.vert
 
 SOURCES += \
     engine/main.cpp \
@@ -37,7 +37,6 @@ SOURCES += \
     engine/screens/openglscreen.cpp \
     engine/shapes/shape.cpp \
     game/gamescreens/menuscreen.cpp \
-    game/gamescreens/playerscreen.cpp \
     engine/shapes/cube.cpp \
     engine/screens/cubemap.cpp \
     game/entities/player.cpp \
@@ -54,7 +53,8 @@ SOURCES += \
     game/entities/ground.cpp \
     game/entities/ufo.cpp \
     engine/shapes/cone.cpp \
-    game/entities/beam.cpp
+    game/gamescreens/endgamescreen.cpp \
+    game/gamescreens/gamescreen.cpp
 
 HEADERS += \
     engine/ui/mainwindow.h \
@@ -66,10 +66,8 @@ HEADERS += \
     engine/screens/openglscreen.h \
     engine/shapes/shape.h \
     game/gamescreens/menuscreen.h \
-    game/gamescreens/playerscreen.h \
     engine/shapes/cube.h \
     engine/screens/cubemap.h \
-    engine/printing.h \
     game/entities/player.h \
     engine/camera/actioncamera.h \
     engine/world/world.h \
@@ -85,8 +83,8 @@ HEADERS += \
     game/entities/ground.h \
     game/entities/ufo.h \
     engine/shapes/cone.h \
-    game/entities/beam.h
-#    engine/vector/vector.h
+    game/gamescreens/endgamescreen.h \
+    game/gamescreens/gamescreen.h
 
 FORMS += engine/ui/mainwindow.ui
 

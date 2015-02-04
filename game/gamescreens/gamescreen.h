@@ -1,16 +1,16 @@
-#ifndef PLAYERSCREEN_H
-#define PLAYERSCREEN_H
+#ifndef GAMESCREEN_H
+#define GAMESCREEN_H
 
 #include "screen.h"
 #include "player.h"
 #include "ufo.h"
 #include "gameworld.h"
 
-class PlayerScreen : public Screen
+class GameScreen : public Screen
 {
 public:
-    PlayerScreen(Application *parent);
-    virtual ~PlayerScreen();
+    GameScreen(Application *parent);
+    virtual ~GameScreen();
 
     // update and render
     virtual void onTick(float secs);
@@ -37,4 +37,4 @@ private:
 
 };
 
-#endif // PLAYERSCREEN_H
+#endif // GAMESCREEN_H

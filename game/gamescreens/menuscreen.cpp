@@ -1,7 +1,7 @@
 #include "menuscreen.h"
 #include "camera.h"
 #include "application.h"
-#include "playerscreen.h"
+#include "gamescreen.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
@@ -27,8 +27,8 @@ void MenuScreen::onRender(Graphics *g)
 {
     g->setColor(1.f, 1.f, 1.f, 1.f, 1.f);
     g->setWorldColor(1.f, 1.f, 1.f);
-//    g->setTexture();
-    g->drawQuad(glm::scale(glm::mat4(), glm::vec3(2, 1, 0)));
+    g->setTexture("enter.jpg");
+    g->drawQuad(glm::scale(glm::mat4(), glm::vec3(2, 1.5f, 0)));
 }
 
 // key events
@@ -37,7 +37,7 @@ void MenuScreen::onKeyPressed(QKeyEvent *e)
     switch(e->key())
     {
     case Qt::Key_Return:
-        m_parentApp->addScreen(new PlayerScreen(m_parentApp));
+        m_parentApp->addScreen(new GameScreen(m_parentApp));
         break;
     default:
         break;

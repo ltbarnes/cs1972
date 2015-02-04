@@ -13,7 +13,7 @@ public:
 
     // set the current screen
     void addScreen(Screen *s);
-    void popScreen();
+    void popScreens(int num);
 
     // update and render
     void onTick(float secs);

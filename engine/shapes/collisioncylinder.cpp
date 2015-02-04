@@ -1,8 +1,6 @@
 #include "collisioncylinder.h"
 #include <glm/common.hpp>
 
-#include "printing.h"
-
 CollisionCylinder::CollisionCylinder(glm::vec3 pos, glm::vec3 dim, QString id)
     : CollisionShape(pos, dim, id)
 {

@@ -1,7 +1,5 @@
 #include "world.h"
 
-#include "printing.h"
-
 World::World()
 {
     m_staticEntities.clear();

@@ -3,8 +3,6 @@
 
 #define EYE_HEIGHT 1.f
 
-#include "printing.h"
-
 Player::Player(ActionCamera *camera, glm::vec3 pos)
     : MovableEntity(pos)
 {
@@ -163,10 +161,12 @@ void Player::onKeyPressed(QKeyEvent *e)
             m_offset = 0.f;
         m_camera->setOffset(m_offset);
         break;
+    case Qt::Key_ParenRight:
     case Qt::Key_0:
         m_offset = 0.f;
         m_camera->setOffset(m_offset);
         break;
+    case Qt::Key_ParenLeft:
     case Qt::Key_9:
         m_offset = 25.f;
         m_camera->setOffset(m_offset);

@@ -1,31 +1,77 @@
-Project: Warmup1
+Project: Warmup2
 Student: Logan Barnes (ltbarnes)
 
-Global Reqs:
 
-	First person camera support:
-		Can be verified by running the game. The code is in the game/gamescreens/Playerscreen class and the engine/camera/Camera class.
-
-	Screen Management:
-		Virtual Screen is engine/screens/screen.h and game/gamescreens/playerscreen and game/gamescreens/menuscreen are the two gamescreens.
-
-	Custom Graphics object:
-		The engine/screens/Graphics object is handled by the engine/screens/Application class and passed to all onDraw methods.
-		Most OpenGL Render methods are contained in the Graphics class
-
-
-Game Reqs:
+Common Engine Requirements
+========================================
+[ ] Third person support built into your camera, with the ability to toggle between the two cameras
 	
-		Most of these can be verified by playing the game. Press "Enter" to advance passed the white box screen (hopefully a menu screen at some point).
+	### engine/camera/ActionCamera contains an offset parameter that can be set by other classes. Use the '+' and '-' keys in game for finer adjustments and '9' and '0' as third/first person toggles
 
-		Most game logic is handled in the game/gamescreens/playerscreen class.
+[ ] Entity/World hierarchy
+	[ ] Virtual Entity class representing a single logical game object with (minimally) the following contract:
+	
+	###	engine/world/Entity is the basic entity class capable of rendering ticking and storing both render and collision shapes. engine/world/MovableEntity is capable of moving via forces and impulses and handles collisions based on momentum. engine/world/StaticEntity is static and handles collisions accordingly.
+		
+		[ ] Timed updates (tick)
+		[ ] Render events (draw)
+		[ ] Creation of a collision shape (for now, getCylinder)
+		[ ] Instance variables for position, velocity, and an acceleration accumulator
+	[ ] Virtual World class representing a collection of Entities with (minimally) the following contract:
+
+	### engine/world/World is the base world class that handles updating entities, staging them for removal (and removing them), drawing entities, and dealing with collisions.
+
+		[ ] Timed updates (tick)
+		[ ] Render events (draw)
+		[ ] Entity management (add/remove an Entity)
+[ ] Cylinder-cylinder collision detection, resolution, and generation of a response callback
+	
+	### engine/shapes/CollisionShape is the base class for all collision shapes. engine/shapes/CollisionCylinder is implemented on this base class and contains the collidesCylinder function for dealing with cylinder on cylinder collisions.
+	The World class initiates and keeps track of collision detection and resolution the passes the collision data to the appropriate entity via a Collision struct (in the Entity header). Note: each entity can have multiple collision shapes to build more complex entities.
+
+	[ ] Detection - determine that two cylinders are overlapping
+	[ ] Resolution - translate the cylinders out of detection using the MTV
+	[ ] Response - dispatches collision callback to collided Entities
+
+Game Requirements
+========================================
+[ ] All Warmup1 requirements must still be fulfilled
+	# trust me?
+[ ] The player can use a key to toggle between first and third person cameras
+	# use '9' and '0' or '+' and '-'
+[ ] Cylinder-cylinder collision response must be used somewhere
+	# Pretty much all in game collisions are cylinder-cylinder. Even the ground is a giant cylinder. game/gamescreens/GameScreen is where the objects are initialized and each constructor (Item, Ground, Player, UFO) contains at least one collision shape.
+[ ] There must be at least 1 NPC (non-player character), such as an enemy or opponent, with some basic AI
+	# there are other cylinder men who constantly run away from the player (game/entities/Item)
+[ ] The game must have a non-arbitrary and reasonably achievable win or loss condition
+	# get to the UFO and capture all the cylinder men before they run off the edge of the map.
+[ ] The game must be resettable upon win or loss without restarting the program
+	# hit enter from the gameover menu to return to the start menu.
+[ ] The game can never enter an unwinnable or unloseable state
+	# yep
+
+Global requirements
+========================================
+[ ] Top-level handin directory contains a Qt project file, a README, and an INSTRUCTIONS file
+[ ] README has a copy of the rubric with explanations of how to verify requirements
+[ ] README documents any known bugs
+[ ] README indicates number of hours taken
+[ ] INSTRUCTIONS contains all information needed to play the game
+[ ] Engine and game code logically separated
+[ ] Engine code well designed
+[ ] Game code well designed
+[ ] Runs on department machines
+[ ] Does not crash
+[ ] Works at 800x600 and fullscreen resolutions
+[ ] Runs at 30+ UPS and never dips below 20 UPS unless indicated in the specific handout
+
 
 
 Issues:
 	
-	Text won't render when using the OpenGL core profile so the fps doesn't show up anymore :/ I'll try and find a library or something to render text if the QGL methods won't work.
+	FPS problems print to the console (only below 30 fps).
 
-	Some of the warmup 2 classes like Player, World, and ActionCamera are floating around but they aren't actually being used yet. Just adding to the clutter.
 
-	The grass is reflective because it will actually be snow when the grass requirement is lifted.
+~Hours:
+24
 

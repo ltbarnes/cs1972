@@ -1,16 +1,40 @@
-Project: Warmup1
+Project: Warmup2
 Student: Logan Barnes (ltbarnes)
 
 
 Instructions:
 
-	Move around and jump!
+	Get to the space ship and save the suicidal cylinder men! The light beam from the flying saucer will pick up the cylinder people if the ship is close enough. Save all the cylinders to win the game. If one falls of the game world you lose.
 
 
-Keys:
+Ground Movement:
 
-	 WASD 			- 		move
-	SPACE 			- 		jump
+	 WASD 			- 		 move
+	SPACE 			- 		 jump
 	  C 			-  		crouch
-  CapsLock(hold) 	- 		walk
-  	Shift(hold) 	- 		sprint
+   CapsLock 		- 		 walk
+  Shift(hold) 		- 		sprint
+
+  	  F				- 	enter/exit vehicle
+
+
+Flying Saucer:
+	
+	WASD 			- 	horizontal movement
+	 E/Q			- 		up/down
+	SPACE 			-  	toggle gravity beam
+
+
+Camera Controls:
+
+	Mouse 			- 	  look around
+	 '9'			- 	third person view
+	 '0'			- 	first person view
+	 '+' 			- 		zoom in
+	 '-' 			- 		zoom out
+
+
+General:
+
+	esc 			- 		 quit
+   enter			- continue passed menu
