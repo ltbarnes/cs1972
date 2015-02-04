@@ -12,9 +12,10 @@ Player::Player(ActionCamera *camera, glm::vec3 pos)
     m_eyeHeight = EYE_HEIGHT;
     m_camera->setCenter(getPosition() + glm::vec3(0.f, m_eyeHeight, 0.f));
 
+    m_offset = 0.f;
     reset();
 
-    CollisionShape *cs = new CollisionCylinder(glm::vec3(), glm::vec3(1.f, 2.f, 1.f));
+    CollisionShape *cs = new CollisionCylinder(glm::vec3(), glm::vec3(1.f, 2.f, 1.f), "player");
     addCollisionShape(cs);
 
     RenderShape *rs = new RenderShape();
@@ -45,6 +46,7 @@ void Player::reset()
     m_crouch = false;
     m_walk = false;
     m_sprint = false;
+    m_camera->setOffset(m_offset);
 }
 
 
@@ -91,10 +93,10 @@ void Player::onTick(float secs)
 }
 
 
-void Player::handleCollision(Entity *other, glm::vec3 mtv, glm::vec3 impulse)
+void Player::handleCollision(Collision *col)
 {
-    MovableEntity::handleCollision(other, mtv, impulse);
-    if (mtv.y > 0.f)
+    MovableEntity::handleCollision(col);
+    if (col->mtv.y > 0.f && col->c2->getID() != "beam")
         m_canJump = true;
 }
 
@@ -121,8 +123,6 @@ void Player::onMouseMoved(QMouseEvent *, float deltaX, float deltaY)
 
 void Player::onKeyPressed(QKeyEvent *e)
 {
-    float offset;
-
     switch (e->key())
     {
     case Qt::Key_W:
@@ -151,19 +151,25 @@ void Player::onKeyPressed(QKeyEvent *e)
         break;
     case Qt::Key_Minus:
     case Qt::Key_Underscore:
-        offset = m_camera->getOffset();
-        offset += 1.f;
-        if (offset > 10.f)
-            offset = 10.f;
-        m_camera->setOffset(offset);
+        m_offset += 1.f;
+        if (m_offset > 10.f)
+            m_offset = 10.f;
+        m_camera->setOffset(m_offset);
         break;
     case Qt::Key_Plus:
     case Qt::Key_Equal:
-        offset = m_camera->getOffset();
-        offset -= 1.f;
-        if (offset < 0.f)
-            offset = 0.f;
-        m_camera->setOffset(offset);
+        m_offset -= 1.f;
+        if (m_offset < 0.f)
+            m_offset = 0.f;
+        m_camera->setOffset(m_offset);
+        break;
+    case Qt::Key_0:
+        m_offset = 0.f;
+        m_camera->setOffset(m_offset);
+        break;
+    case Qt::Key_9:
+        m_offset = 25.f;
+        m_camera->setOffset(m_offset);
         break;
     default:
         break;

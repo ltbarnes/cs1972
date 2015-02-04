@@ -1,5 +1,6 @@
 #include "staticentity.h"
 #include "movableentity.h"
+#include "collisionshape.h"
 
 StaticEntity::StaticEntity(glm::vec3 pos)
     : Entity(pos)
@@ -11,16 +12,19 @@ StaticEntity::~StaticEntity()
 }
 
 
-void StaticEntity::handleCollision(Entity *other, glm::vec3 mtv, glm::vec3)
+void StaticEntity::handleCollision(Collision *col)
 {
-    other->bump(mtv * -.5f);
-    glm::vec3 momentum = other->getVelocity() * other->getMass();
-    float mag2 = glm::dot(mtv, mtv);
+    if (!col->c2->isReactable())
+        return;
+    MovableEntity *other = dynamic_cast<MovableEntity* >(col->e2);
+    other->bump(col->mtv * -.5f);
+    glm::vec3 momentum = other->getVelocity() * col->c2->getMass();
+    float mag2 = glm::dot(col->mtv, col->mtv);
     glm::vec3 imp;
     if (mag2 < 0.001f)
         imp = glm::vec3(0.f);
     else
-        imp = (glm::dot(momentum, mtv) / mag2) * mtv;
-    dynamic_cast<MovableEntity* >(other)->applyImpulse(-imp);
+        imp = (glm::dot(momentum, col->mtv) / mag2) * col->mtv;
+    other->applyImpulse(-col->impulse);
 }
 

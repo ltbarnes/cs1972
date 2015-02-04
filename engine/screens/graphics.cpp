@@ -90,7 +90,6 @@ void Graphics::setUniforms(Camera *camera)
     glUniformMatrix4fv(m_defaultLocs["view"], 1, GL_FALSE,
             glm::value_ptr(camera->getViewMatrix()));
 
-    m_useCubeMap = false;
     clearLights();
 }
 

@@ -3,8 +3,8 @@
 
 #include "printing.h"
 
-CollisionCylinder::CollisionCylinder(glm::vec3 pos, glm::vec3 dim)
-    : CollisionShape(pos, dim)
+CollisionCylinder::CollisionCylinder(glm::vec3 pos, glm::vec3 dim, QString id)
+    : CollisionShape(pos, dim, id)
 {
 }
 

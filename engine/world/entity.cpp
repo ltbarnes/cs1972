@@ -141,8 +141,8 @@ QList<Collision *> Entity::collides(Entity *e)
             {
                col->e1 = this;
                col->e2 = e;
-               float m1 = this->getMass();
-               float m2 = e->getMass();
+               float m1 = cs1->getMass();
+               float m2 = cs2->getMass();
                glm::vec3 v1 = this->getVelocity();
                glm::vec3 v2 = e->getVelocity();
                float mag2 = glm::dot(col->mtv, col->mtv);

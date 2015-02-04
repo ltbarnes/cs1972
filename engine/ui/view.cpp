@@ -44,7 +44,7 @@ void View::initializeGL()
     }
 
     // init the Graphics object.
-    m_app->init(new MenuScreen());
+    m_app->init(new MenuScreen(m_app));
 //    m_app->onResize(width(), height());
 
     // Enable depth testing, so that objects are occluded based on depth instead of drawing order.

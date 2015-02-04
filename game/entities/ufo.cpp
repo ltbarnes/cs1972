@@ -3,16 +3,20 @@
 
 #include "printing.h"
 
-UFO::UFO(ActionCamera *camera, glm::vec3 pos)
-    : MovableEntity(pos, 100.f)
+UFO::UFO(ActionCamera *camera, glm::vec3 pos, World *world)
+    : MovableEntity(pos)
 {
     m_camera = camera;
+    m_world = world;
 
+    m_offset = 30.f;
+    m_beam = false;
     reset();
 
     // saucer
     CollisionShape *cs;
-    cs = new CollisionCylinder(glm::vec3(), glm::vec3(16.f, 1.5f, 16.f));
+    cs = new CollisionCylinder(glm::vec3(), glm::vec3(16.f, 1.5f, 16.f), "hull");
+    cs->setMass(100.f);
     addCollisionShape(cs);
 
     RenderShape *rs;
@@ -28,7 +32,8 @@ UFO::UFO(ActionCamera *camera, glm::vec3 pos)
     addRenderShape(rs);
 
     // dome
-    cs = new CollisionCylinder(glm::vec3(0, .8f, 0), glm::vec3(6, 3, 6));
+    cs = new CollisionCylinder(glm::vec3(0, 2.f, 0), glm::vec3(6, .5f, 6), "ufo");
+    cs->setMass(25.f);
     addCollisionShape(cs);
 
     rs = new RenderShape();
@@ -43,17 +48,23 @@ UFO::UFO(ActionCamera *camera, glm::vec3 pos)
     rs->repeatV = 1.f;
     addRenderShape(rs);
 
+    // beam
+    cs = new CollisionCylinder(glm::vec3(0, -25, 0), glm::vec3(20, 50, 20), "beam");
+    cs->setReactable(false);
+    addCollisionShape(cs);
+
     rs = new RenderShape();
     rs->type = CONE;
     rs->color = glm::vec3(1.f, .3f, 0.f);
     rs->shininess = 0.f;
     rs->transparency = 0.3f;
-    rs->trans = glm::translate(glm::mat4(), glm::vec3(0, -20.f, 0));
-    rs->trans = glm::scale(rs->trans, glm::vec3(5.f, 40.f, 5.f));
+    rs->trans = glm::translate(glm::mat4(), glm::vec3(0, -25.f, 0));
+    rs->trans = glm::scale(rs->trans, glm::vec3(15.f, 50.f, 15.f));
     rs->texture = "";
     rs->repeatU = 1.f;
     rs->repeatV = 1.f;
     addRenderShape(rs);
+
 }
 
 
@@ -66,7 +77,7 @@ void UFO::reset()
     m_wsad = 0b0000;
     m_up = false;
     m_down = false;
-    m_beam = false;
+    m_camera->setOffset(m_offset);
 }
 
 
@@ -76,7 +87,7 @@ void UFO::onTick(float secs)
 
     MovableEntity::onTick(secs);
 
-    if (getPosition().y > 40.f)
+    if (getPosition().y > 50.f)
         m_beam = false;
 
     glm::vec3 force = glm::vec3(0.f);
@@ -100,6 +111,10 @@ void UFO::onTick(float secs)
     thrust.y = force.y;
 
     applyForce((thrust - m_vel) * 100.f);
+
+    m_rotation = glm::rotate(glm::mat4(), (std::abs(force.z) - glm::length(glm::vec2(m_vel.x, m_vel.z))) * force.z / -70000.f, glm::vec3(-look.z, 0, look.x));
+    m_rotation = glm::rotate(m_rotation, (std::abs(force.x) - glm::length(glm::vec2(m_vel.x, m_vel.z))) * force.x / 70000.f, glm::vec3(look.x, 0, look.z));
+//    cout << (std::abs(force.z) - )
 }
 
 
@@ -123,10 +138,28 @@ void UFO::setCameraPos()
 }
 
 
-//void UFO::handleCollision(Entity *other, glm::vec3 mtv, glm::vec3 impulse)
-//{
-//    MovableEntity::handleCollision(other, mtv, impulse);
-//}
+void UFO::handleCollision(Collision *col)
+{
+    MovableEntity::handleCollision(col);
+    if (m_beam && col->c1->getID() == "beam" && col->c2->getID() != "ground")
+    {
+        MovableEntity *item = dynamic_cast<MovableEntity  *>(col->e2);
+        glm::vec3 itemPos = item->getPosition();
+        glm::vec3 pos = getPosition();
+        glm::vec3 force = glm::vec3(pos.x, 0, pos.z) - glm::vec3(itemPos.x, 0, itemPos.z);
+        float len = glm::length(force);
+        float mag = max(0.f, (100.f - len * len) / 4.f);
+        item->applyForce(glm::normalize(force) * mag);
+
+        if (len < 5.f)
+            item->applyForce(glm::vec3(0, (50.f - (pos.y - itemPos.y)) * .5f, 0));
+    }
+    if (m_beam && col->c1->getID() == "hull" && col->c2->getID() == "item")
+    {
+        m_world->setToDeleteMovable(dynamic_cast<MovableEntity  *>(col->e2));
+    }
+
+}
 
 
 void UFO::onMouseMoved(QMouseEvent *, float deltaX, float deltaY)
@@ -137,8 +170,6 @@ void UFO::onMouseMoved(QMouseEvent *, float deltaX, float deltaY)
 
 void UFO::onKeyPressed(QKeyEvent *e)
 {
-    float offset;
-
     switch (e->key())
     {
     case Qt::Key_W:
@@ -165,19 +196,25 @@ void UFO::onKeyPressed(QKeyEvent *e)
         break;
     case Qt::Key_Minus:
     case Qt::Key_Underscore:
-        offset = m_camera->getOffset();
-        offset += 1.f;
-        if (offset > 25.f)
-            offset = 25.f;
-        m_camera->setOffset(offset);
+        m_offset += 1.f;
+        if (m_offset > 30.f)
+            m_offset = 30.f;
+        m_camera->setOffset(m_offset);
         break;
     case Qt::Key_Plus:
     case Qt::Key_Equal:
-        offset = m_camera->getOffset();
-        offset -= 1.f;
-        if (offset < 0.f)
-            offset = 0.f;
-        m_camera->setOffset(offset);
+        m_offset -= 1.f;
+        if (m_offset < 0.f)
+            m_offset = 0.f;
+        m_camera->setOffset(m_offset);
+        break;
+    case Qt::Key_0:
+        m_offset = 0.f;
+        m_camera->setOffset(m_offset);
+        break;
+    case Qt::Key_9:
+        m_offset = 30.f;
+        m_camera->setOffset(m_offset);
         break;
     default:
         break;

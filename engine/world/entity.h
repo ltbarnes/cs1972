@@ -30,7 +30,7 @@ public:
     QList<CollisionShape *> getCollisionShapes();
 
     void addRenderShape(RenderShape *rs);
-    void addCollisionShape(CollisionShape *cs);
+    virtual void addCollisionShape(CollisionShape *cs);
 
     virtual void onTick(float secs);
     virtual void onDrawOpaque(Graphics *g);
@@ -41,7 +41,7 @@ public:
     virtual float getMass();
 
     virtual QList<Collision *> collides(Entity *e);
-    virtual void handleCollision(Entity *other, glm::vec3 mtv, glm::vec3 impulse) = 0;
+    virtual void handleCollision(Collision *col) = 0;
 
     void bump(glm::vec3 amount);
 

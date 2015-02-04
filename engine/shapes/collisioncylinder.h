@@ -7,7 +7,7 @@
 class CollisionCylinder : public CollisionShape
 {
 public:
-    CollisionCylinder(glm::vec3 pos, glm::vec3 dim);
+    CollisionCylinder(glm::vec3 pos, glm::vec3 dim, QString id);
     virtual ~CollisionCylinder();
 
     virtual Collision *collides(CollisionShape *cs);

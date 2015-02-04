@@ -6,6 +6,8 @@ World::World()
 {
     m_staticEntities.clear();
     m_movableEntities.clear();
+    m_collisions.clear();
+    m_me2Delete.clear();
 }
 
 World::~World()
@@ -28,18 +30,35 @@ void World::addStaticEntity(StaticEntity *se)
     m_staticEntities.append(se);
 }
 
-bool World::removeMovableEntity(MovableEntity *me)
+bool World::removeMovableEntity(MovableEntity *me, bool clearMem)
 {
-    return m_movableEntities.removeOne(me);
+    bool result = m_movableEntities.removeOne(me);
+    if (clearMem)
+        delete me;
+    return result;
 }
 
-bool World::removeStaticEntity(StaticEntity *se)
+void World::setToDeleteMovable(MovableEntity *me)
 {
-    return m_staticEntities.removeOne(se);
+    m_me2Delete.append(me);
+}
+
+bool World::removeStaticEntity(StaticEntity *se, bool clearMem)
+{
+    bool result = m_staticEntities.removeOne(se);
+    if (clearMem)
+        delete se;
+    return result;
 }
 
 void World::onTick(float secs)
 {
+    foreach(MovableEntity *me, m_me2Delete)
+    {
+        removeMovableEntity(me, true);
+    }
+    m_me2Delete.clear();
+
     // update (tick) movableEntities
     foreach(Entity *e, m_movableEntities)
     {
@@ -88,8 +107,19 @@ void World::handleCollisions()
 {
     foreach(Collision *col, m_collisions)
     {
-        col->e1->handleCollision(col->e2, col->mtv, col->impulse);
-        col->e2->handleCollision(col->e1, col->mtv * -1.f, col->impulse * -1.f);
+        col->e1->handleCollision(col);
+
+        // swap
+        Entity *tempE = col->e1;
+        col->e1 = col->e2;
+        col->e2 = tempE;
+        CollisionShape *tempS = col->c1;
+        col->c1 = col->c2;
+        col->c2 = tempS;
+        col->mtv *= -1.f;
+        col->impulse *= -1.f;
+
+        col->e1->handleCollision(col);
     }
 
 }

@@ -1,6 +1,7 @@
 #include "playerscreen.h"
 #include "item.h"
 #include "ground.h"
+#include "application.h"
 
 #include "printing.h"
 
@@ -9,22 +10,29 @@ float eyeHeight = 2.f;
 bool up;
 bool down;
 
-PlayerScreen::PlayerScreen()
+PlayerScreen::PlayerScreen(Application *parent)
+    : Screen(parent)
 {
     ActionCamera *cam = new ActionCamera();
 
-    m_player = new Player(cam, glm::vec3(0.f, 1.f, 5.f));
-    m_ufo = new UFO(cam, glm::vec3(0.f, 5.f, 5.f));
     m_world = new GameWorld();
+
+    m_ufo = new UFO(cam, glm::vec3(0.f, 5.f, 5.f), m_world);
+    m_player = new Player(cam, glm::vec3(0.f));
 
     m_world->addMovableEntity(m_player);
     m_world->addMovableEntity(m_ufo);
-    m_world->addMovableEntity(new Item(glm::vec3(0.f)));
-    m_world->addMovableEntity(new Item(glm::vec3(0.f, 2.f, 0.f)));
 
+    float angle;
+    for (int i = 0; i < 15; i++)
+    {
+        angle = 6.283f * i / 15.f;
+        m_world->addMovableEntity(new Item(5.f * glm::vec3(glm::cos(angle), 0.f, glm::sin(angle)), m_player));
+    }
     m_world->addStaticEntity(new Ground(glm::vec3(0, -1, 0)));
 
     this->setCamera(cam);
+    m_parentApp->setUseCubeMap(true);
 
     m_inShip = false;
 }
@@ -95,7 +103,7 @@ void PlayerScreen::onKeyPressed(QKeyEvent *e)
         {
             m_inShip = true;
             m_ufo->reset();
-            m_world->removeMovableEntity(m_player);
+            m_world->removeMovableEntity(m_player, false);
         }
     }
     if (m_inShip)
