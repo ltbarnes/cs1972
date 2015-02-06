@@ -1,6 +1,7 @@
 #include "item.h"
 #include "collisioncylinder.h"
 #include "endgamescreen.h"
+#include "application.h"
 
 Item::Item(glm::vec3 pos, Player *player, Application *app)
     : MovableEntity(pos)

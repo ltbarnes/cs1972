@@ -1,7 +1,6 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include "entity.h"
 #include "movableentity.h"
 #include "staticentity.h"
 #include <QList>
