@@ -1,9 +1,9 @@
 #ifndef ITEM_H
 #define ITEM_H
 
-#include "movableentity.h"
 #include "player.h"
-#include "application.h"
+
+class Application;
 
 class Item : public MovableEntity
 {
