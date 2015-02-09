@@ -6,12 +6,12 @@
 #include <cassert>
 #include <QGLWidget>
 
-#define RIGHT ":/cubemap/posx.jpg"
-#define LEFT ":/cubemap/negx.jpg"
-#define TOP ":/cubemap/posy.jpg"
-#define BOTTOM ":/cubemap/negy.jpg"
-#define BACK ":/cubemap/posz.jpg"
-#define FRONT ":/cubemap/negz.jpg"
+#define RIGHT ":/cubemap/posx.png"
+#define LEFT ":/cubemap/negx.png"
+#define TOP ":/cubemap/posy.png"
+#define BOTTOM ":/cubemap/negy.png"
+#define BACK ":/cubemap/posz.png"
+#define FRONT ":/cubemap/negz.png"
 
 using namespace std;
 

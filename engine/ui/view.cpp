@@ -1,7 +1,7 @@
 #include "view.h"
 #include <QApplication>
 #include <QKeyEvent>
-#include "menuscreen.h"
+#include "minecraftmenu.h"
 
 #include <iostream>
 using namespace std;
@@ -47,7 +47,7 @@ void View::initializeGL()
     }
 
     // init the Graphics object.
-    m_app->init(new MenuScreen(m_app));
+    m_app->init(new MinecraftMenu(m_app));
 //    m_app->onResize(width(), height());
 
     // Enable depth testing, so that objects are occluded based on depth instead of drawing order.
@@ -88,10 +88,11 @@ void View::paintGL()
     // TODO: call your game rendering code here
     m_app->onRender();
 
-    if (fps < 20.f)
-        cout << "ERMAHGERD YE GEME ES SLEEEWWWWWW (fps: " << fps << ")" << endl;
-    else if (fps < 30.f)
-        cout << "Ya done messed up dawg. Get it together. (fps: " << fps << ")" << endl;
+//    if (fps < 20.f)
+//        cout << "ERMAHGERD YE GEME ES SLEEEWWWWWW (fps: " << fps << ")" << endl;
+//    else if (fps < 30.f)
+//        cout << "Ya done messed up dawg. Get it together. (fps: " << fps << ")" << endl;
+
 //    // Can't use Core profile with this
 //    glUseProgram(0);
 //    glColor3f(1.f, 1.f, 1.f);

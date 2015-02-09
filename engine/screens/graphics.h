@@ -52,6 +52,9 @@ public:
     void setWorldColor(float r, float g, float b);
     void setColor(float r, float g, float b, float transparency, float shininess);
     void setTexture(const QString &key, float repeatU = 1.f, float repeatV = 1.f);
+//    void setAtlas(const QString &key);
+//    void setAtlasPosition(float x, float y);
+//    void setTexturePos(float u, float v);
     void setTransparentMode(bool on);
 
     void useCubeMap(bool use);

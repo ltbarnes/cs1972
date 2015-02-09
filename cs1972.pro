@@ -14,15 +14,19 @@ macx {
 }
 
 # If you add your own folders, add them to INCLUDEPATH and DEPENDPATH, e.g.
-INCLUDEPATH += glm engine game shaders \
+INCLUDEPATH += glm engine game shaders engine/common \
                engine/ui engine/screens engine/scene \
                engine/camera engine/shapes engine/world \
-               game/gamescreens game/world game/entities \
+               engine/common engine/voxel \
+               # game/warmup1/gamescreens game/warmup1/world game/warmup1/entities \ # warmup
+               game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ # minecraft
                res/images res/images/cubemap
 DEPENDPATH +=  glm engine game shaders \
                engine/ui engine/screens engine/scene \
                engine/camera engine/shapes engine/world \
-               game/gamescreens game/world game/entities \
+               engine/common engine/voxel \
+               # game/warmup1/gamescreens game/warmup1/world game/warmup1/entities \ # warmup
+               game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ #minecraft
                res/images res/images/cubemap
 DEFINES += TIXML_USE_STL
 OTHER_FILES += shaders/shader.frag shaders/shader.vert
@@ -34,27 +38,35 @@ SOURCES += \
     engine/screens/application.cpp \
     engine/screens/graphics.cpp \
     engine/camera/camera.cpp \
-    engine/screens/openglscreen.cpp \
     engine/shapes/shape.cpp \
-    game/gamescreens/menuscreen.cpp \
     engine/shapes/cube.cpp \
     engine/screens/cubemap.cpp \
-    game/entities/player.cpp \
     engine/camera/actioncamera.cpp \
     engine/world/world.cpp \
     engine/world/entity.cpp \
     engine/world/movableentity.cpp \
-    game/world/gameworld.cpp \
     engine/shapes/cylinder.cpp \
     engine/shapes/sphere.cpp \
     engine/shapes/collisioncylinder.cpp \
-    game/entities/item.cpp \
     engine/world/staticentity.cpp \
-    game/entities/ground.cpp \
-    game/entities/ufo.cpp \
     engine/shapes/cone.cpp \
-    game/gamescreens/endgamescreen.cpp \
-    game/gamescreens/gamescreen.cpp
+    engine/voxel/chunk.cpp \
+### minecraft
+    game/minecraft/gamescreens/minecraftmenu.cpp \
+    game/minecraft/gamescreens/gamescreen.cpp \
+    game/minecraft/world/minecraftworld.cpp \
+    engine/voxel/voxelmanager.cpp \
+    engine/common/point3d.cpp \
+    game/minecraft/entities/player.cpp
+### warmup
+#    game/warmup/gamescreens/menuscreen.cpp \
+#    game/warmup/gamescreens/gamescreen.cpp \
+#    game/warmup/gamescreens/endgamescreen.cpp \
+#    game/warmup/world/gameworld.cpp \
+#    game/warmup/entities/player.cpp \
+#    game/warmup/entities/item.cpp \
+#    game/warmup/entities/ufo.cpp \
+#    game/warmup/entities/ground.cpp
 
 HEADERS += \
     engine/ui/mainwindow.h \
@@ -63,28 +75,36 @@ HEADERS += \
     engine/screens/graphics.h \
     engine/screens/screen.h \
     engine/camera/camera.h \
-    engine/screens/openglscreen.h \
     engine/shapes/shape.h \
-    game/gamescreens/menuscreen.h \
     engine/shapes/cube.h \
     engine/screens/cubemap.h \
-    game/entities/player.h \
     engine/camera/actioncamera.h \
     engine/world/world.h \
     engine/world/entity.h \
     engine/world/movableentity.h \
-    game/world/gameworld.h \
     engine/shapes/cylinder.h \
     engine/shapes/sphere.h \
     engine/shapes/collisionshape.h \
     engine/shapes/collisioncylinder.h \
-    game/entities/item.h \
     engine/world/staticentity.h \
-    game/entities/ground.h \
-    game/entities/ufo.h \
     engine/shapes/cone.h \
-    game/gamescreens/endgamescreen.h \
-    game/gamescreens/gamescreen.h
+    engine/voxel/chunk.h \
+### minecraft
+    game/minecraft/gamescreens/minecraftmenu.h \
+    game/minecraft/gamescreens/gamescreen.h \
+    game/minecraft/world/minecraftworld.h \
+    engine/voxel/voxelmanager.h \
+    engine/common/point3d.h \
+    game/minecraft/entities/player.h
+### warmup
+#    game/warmup/gamescreens/menuscreen.h \
+#    game/warmup/gamescreens/gamescreen.h \
+#    game/warmup/gamescreens/endgamescreen.h \
+#    game/warmup/world/gameworld.h \
+#    game/warmup/entities/player.h \
+#    game/warmup/entities/item.h \
+#    game/warmup/entities/ufo.h \
+#    game/warmup/entities/ground.h
 
 FORMS += engine/ui/mainwindow.ui
 

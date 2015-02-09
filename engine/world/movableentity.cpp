@@ -4,7 +4,7 @@
 MovableEntity::MovableEntity(glm::vec3 pos)
     : Entity(pos)
 {
-    m_mass = 0.f;
+    m_mass = 0.001f;
     m_vel = glm::vec3();
 
     m_force = glm::vec3();
