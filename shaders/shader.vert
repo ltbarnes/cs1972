@@ -24,13 +24,16 @@ uniform vec3 specular_color = vec3(1.0);
 uniform float shininess = 1.0;
 uniform float transparency = 1.0;
 
-uniform float repeatU = 1.0;
-uniform float repeatV = 1.0;
+uniform vec2 subImages = vec2(1.);
+uniform vec2 subPos = vec2(0.);
+uniform vec2 repeatUV = vec2(1.0);
 
 uniform vec3 allBlack = vec3(1.0);
 
 void main(){
-    texc = vec2(texCoord.x * repeatU, texCoord.y * repeatV);
+
+    texc = (subPos / subImages) + (texCoord / subImages); // for atlas
+//        texc = vec2(texCoord.x * repeatU, texCoord.y * repeatV);
 
     vec4 position_cameraSpace = view * model * vec4(position, 1.0);
     vec4 normal_cameraSpace = vec4(normalize(mat3(transpose(inverse(view * model))) * normal), 0.0);

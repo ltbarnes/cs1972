@@ -12,14 +12,14 @@ public:
 
     void init(GLuint shader);
 
-    void updateGL(GLuint shader);
+    virtual void calcVerts();
+    virtual void updateGL(GLuint shader);
     void cleanUp();
 
-    virtual void calcVerts();
     virtual bool animate();
 
     void render();
-    void transformAndRender(GLuint shader, glm::mat4 trans);
+    virtual void transformAndRender(GLuint shader, glm::mat4 trans, int faces = 0);
 
     float map(const float val, const float oldMin, const float oldMax, const float newMin, const float newMax);
     glm::vec2 mapPoints(const glm::vec2 val, const glm::vec2 oldMin, const glm::vec2 oldMax,

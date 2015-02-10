@@ -11,6 +11,7 @@
 #include "cube.h"
 #include "cylinder.h"
 #include "sphere.h"
+#include "facecube.h"
 
 
 enum ShapeType
@@ -52,8 +53,8 @@ public:
     void setWorldColor(float r, float g, float b);
     void setColor(float r, float g, float b, float transparency, float shininess);
     void setTexture(const QString &key, float repeatU = 1.f, float repeatV = 1.f);
-//    void setAtlas(const QString &key);
-//    void setAtlasPosition(float x, float y);
+    void setAtlas(const QString &key, glm::vec2 numSubImages);
+    void setAtlasPosition(float x, float y);
 //    void setTexturePos(float u, float v);
     void setTransparentMode(bool on);
 
@@ -68,6 +69,7 @@ public:
     void drawCube(glm::mat4 trans);
     void drawCyl(glm::mat4 trans);
     void drawSphere(glm::mat4 trans);
+    void drawFaceCube(glm::mat4 trans, int info);
 
     static GLuint loadShaders(const char *vertex_file_path, const char *fragment_file_path);
 
@@ -80,11 +82,13 @@ private:
     glm::vec3 m_lightPos;
 
     QHash<QString, GLint> m_defaultLocs;
+    QHash<QString, GLint> m_sparseLocs;
     QHash<QString, GLint> m_cubeLocs;
 
     QHash<QString, GLint> m_textures;
 
     GLuint m_defaultShader;
+    GLuint m_sparseShader;
     GLuint m_cubeShader;
 
     CubeMap *m_cubeMap;
@@ -94,10 +98,14 @@ private:
     Shape *m_cube;
     Shape *m_cyl;
     Shape *m_sphere;
+    Shape *m_faceCube;
 
     bool m_useCubeMap;
+    bool m_usingAtlas;
 
-    glm::mat4 p, v;
+    glm::vec2 m_subImages;
+
+//    glm::mat4 m_p, m_v;
 
 };
 

@@ -22,6 +22,16 @@ struct Point
     }
 };
 
+inline Point operator+(const Point& p1, const Point& p2)
+{
+    return Point(p1.x + p2.x, p1.y + p2.y, p1.z + p2.z);
+}
+
+inline Point operator-(const Point& p1, const Point& p2)
+{
+    return Point(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
+}
+
 inline Point operator*(const Point& p1, const float f)
 {
     return Point(p1.x * f, p1.y * f, p1.z * f);

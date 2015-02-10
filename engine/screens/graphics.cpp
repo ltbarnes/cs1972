@@ -24,18 +24,30 @@ Graphics::Graphics()
     m_cube = new Cube(10);
     m_cyl = new Cylinder(50);
     m_sphere = new Sphere(50);
+    m_faceCube = new FaceCube();
 
     m_cubeMap = new CubeMap();
     m_useCubeMap = false;
+    m_usingAtlas = false;
+    m_subImages = glm::vec2(1.f);
+
+    m_defaultLocs.clear();
+    m_sparseLocs.clear();
+    m_cubeLocs.clear();
 }
 
 Graphics::~Graphics()
 {
+    // shapes
     delete m_quad;
     delete m_cone;
     delete m_cube;
     delete m_cyl;
     delete m_sphere;
+    delete m_faceCube;
+
+    // skybox
+    delete m_cubeMap;
 }
 
 void Graphics::init()
@@ -56,8 +68,27 @@ void Graphics::init()
     m_defaultLocs["useTexture"] = glGetUniformLocation(m_defaultShader, "useTexture");
     m_defaultLocs["tex"] = glGetUniformLocation(m_defaultShader, "tex");
 
-    m_defaultLocs["repeatU"] = glGetUniformLocation(m_defaultShader, "repeatU");
-    m_defaultLocs["repeatV"] = glGetUniformLocation(m_defaultShader, "repeatV");
+    m_defaultLocs["subImages"] = glGetUniformLocation(m_defaultShader, "subImages");
+    m_defaultLocs["subPos"] = glGetUniformLocation(m_defaultShader, "subPos");
+    m_defaultLocs["repeatUV"] = glGetUniformLocation(m_defaultShader, "repeatUV");
+
+
+    m_sparseShader = Graphics::loadShaders(
+                ":/shaders/sparse.vert",
+                ":/shaders/sparse.frag");
+
+    m_sparseLocs["projection"] = glGetUniformLocation(m_sparseShader, "projection");
+    m_sparseLocs["view"] = glGetUniformLocation(m_sparseShader, "view");
+    m_sparseLocs["envMap"] = glGetUniformLocation(m_sparseShader, "envMap");
+
+    m_sparseLocs["tex"] = glGetUniformLocation(m_sparseShader, "tex");
+    m_sparseLocs["useTexture"] = glGetUniformLocation(m_sparseShader, "useTexture");
+    m_sparseLocs["transparency"] = glGetUniformLocation(m_sparseShader, "transparency");
+
+    m_sparseLocs["subImages"] = glGetUniformLocation(m_sparseShader, "subImages");
+    m_sparseLocs["subPos"] = glGetUniformLocation(m_sparseShader, "subPos");
+    m_sparseLocs["repeatUV"] = glGetUniformLocation(m_sparseShader, "repeatUV");
+
 
     m_cubeShader = Graphics::loadShaders(
                 ":/shaders/cubemap.vert",
@@ -74,6 +105,7 @@ void Graphics::init()
     m_cube->init(m_defaultShader);
     m_cyl->init(m_defaultShader);
     m_sphere->init(m_defaultShader);
+    m_faceCube->init(m_sparseShader);
 
     loadTexturesFromDirectory();
 }
@@ -83,12 +115,12 @@ void Graphics::setUniforms(Camera *camera)
 {
     assert(camera);
 
-    glUseProgram(m_defaultShader);
+    glUseProgram(m_sparseShader);
 
     // Set scene uniforms.
-    glUniformMatrix4fv(m_defaultLocs["projection"], 1, GL_FALSE,
+    glUniformMatrix4fv(m_sparseLocs["projection"], 1, GL_FALSE,
             glm::value_ptr(camera->getProjectionMatrix()));
-    glUniformMatrix4fv(m_defaultLocs["view"], 1, GL_FALSE,
+    glUniformMatrix4fv(m_sparseLocs["view"], 1, GL_FALSE,
             glm::value_ptr(camera->getViewMatrix()));
 
     clearLights();
@@ -120,6 +152,37 @@ void Graphics::setColor(float r, float g, float b, float transparency, float shi
 }
 
 
+void Graphics::setAtlas(const QString &key, glm::vec2 numSubImages)
+{
+    GLint tex = m_textures.value(key);
+
+    if (tex && key.length() > 0)
+    {
+        glUniform2f(m_sparseLocs["subImages"], numSubImages.x, numSubImages.y);
+        glUniform1i(m_sparseLocs["useTexture"], 1);
+        glUniform1i(m_sparseLocs["tex"], 1);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, m_textures.value(key));
+        glActiveTexture(GL_TEXTURE0);
+
+        m_usingAtlas = true;
+        m_subImages = numSubImages;
+    }
+    else
+    {
+        glUniform1i(m_sparseLocs["useTexture"], 0);
+        m_usingAtlas = false;
+    }
+}
+
+
+void Graphics::setAtlasPosition(float x, float y)
+{
+    glUniform2f(m_sparseLocs["subPos"], x, y);
+}
+
+
 void Graphics::setTexture(const QString &key, float repeatU, float repeatV)
 {
     GLint tex = m_textures.value(key);
@@ -128,8 +191,7 @@ void Graphics::setTexture(const QString &key, float repeatU, float repeatV)
     {
         glUniform1i(m_defaultLocs["useTexture"], 1);
         glUniform1i(m_defaultLocs["tex"], 1);
-        glUniform1f(m_defaultLocs["repeatU"], repeatU);
-        glUniform1f(m_defaultLocs["repeatV"], repeatV);
+        glUniform2f(m_defaultLocs["repeatUV"], repeatU, repeatV);
 
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, m_textures.value(key));
@@ -139,6 +201,7 @@ void Graphics::setTexture(const QString &key, float repeatU, float repeatV)
     {
         glUniform1i(m_defaultLocs["useTexture"], 0);
     }
+    m_usingAtlas = false;
 }
 
 
@@ -237,6 +300,12 @@ void Graphics::drawSphere(glm::mat4 trans)
 }
 
 
+void Graphics::drawFaceCube(glm::mat4 trans, int faces)
+{
+    m_faceCube->transformAndRender(m_sparseShader, trans, faces);
+}
+
+
 
 
 
@@ -291,8 +360,8 @@ void Graphics::loadTexture(const QString &filename, const QString &key)
     gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, texture.width(), texture.height(), GL_RGBA, GL_UNSIGNED_BYTE, texture.bits());
 
     // filtering options
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // coordinate wrapping options
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

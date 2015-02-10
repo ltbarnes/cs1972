@@ -14,6 +14,8 @@ public:
 
     void addBlock(int x, int y, int z, char type);
 
+    inline static glm::vec4 getCoords(int index, Point dim);
+
 private:
     VoxelManager *m_vm;
 };

@@ -15,7 +15,7 @@ GameScreen::GameScreen(Application *parent)
 {
     ActionCamera *cam = new ActionCamera();
     m_world = new MinecraftWorld();
-    m_player = new Player(cam, glm::vec3(0,0,5), m_world);
+    m_player = new Player(cam, glm::vec3(-15,15,32), m_world);
 
     m_world->addMovableEntity(m_player);
 
@@ -38,12 +38,14 @@ void GameScreen::onTick(float secs)
 
 void GameScreen::onRender(Graphics *g)
 {
-    g->setColor(1.f, 1.f, 1.f, 1.f, 1.f);
-    g->setWorldColor(1.f, 1.f, 1.f);
-    g->setTexture("enter.jpg");
+//    g->setColor(1.f, 1.f, 1.f, 1.f, 1.f);
+//    g->setWorldColor(1.f, 1.f, 1.f);
+//    g->setTexture("enter.jpg");
 
     m_world->onDraw(g);
 }
+
+
 
 // key events
 void GameScreen::onKeyPressed(QKeyEvent *e)

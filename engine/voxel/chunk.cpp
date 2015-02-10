@@ -1,11 +1,5 @@
 #include "chunk.h"
 
-const char AIR = 0;
-const char DEFAULT = 1;
-const char GRASS = 2;
-const char DIRT = 3;
-const char STONE = 4;
-
 #include <iostream>
 using namespace std;
 //#include <glm/ext.hpp>
@@ -16,20 +10,41 @@ Chunk::Chunk(Point p, Point dim)
     m_dim = dim;
     m_size = m_dim.x * m_dim.y * m_dim.z;
 
-    m_blocks = new char[m_size];
+    m_neighbors[0] = Point( 0, 1, 0);
+    m_neighbors[1] = Point( 1, 0, 0);
+    m_neighbors[2] = Point( 0, 0, 1);
+    m_neighbors[3] = Point(-1, 0, 0);
+    m_neighbors[4] = Point( 0, 0,-1);
+    m_neighbors[5] = Point( 0,-1, 0);
+
+    m_blocks = new int[m_size];
     for (int i = 0; i < m_size; i++)
         m_blocks[i] = 0;
 
-    int hm[35] = {1, 2, 3, 4, 5,
-                  2, 3, 4, 5, 6,
-                  3, 4, 5, 6, 7,
-                  4, 4, 5, 6, 6,
-                  5, 5, 5, 5, 5,
-                  6, 5, 5, 5, 4,
-                  6, 5, 4, 4, 3};
+    int hm[16*16] = {1, 2, 3, 4, 5, 4, 5, 5, 1, 2, 3, 4, 5, 4, 5, 5,
+                     2, 3, 4, 5, 6, 5, 5, 5, 2, 3, 4, 5, 6, 5, 5, 5,
+                     3, 4, 5, 6, 7, 6, 5, 5, 3, 4, 5, 6, 7, 6, 5, 5,
+                     4, 4, 5, 6, 6, 5, 5, 4, 4, 4, 5, 6, 6, 5, 5, 4,
+                     5, 5, 5, 5, 5, 5, 4, 3, 5, 5, 5, 5, 5, 5, 4, 3,
+                     6, 5, 5, 5, 4, 4, 3, 3, 6, 5, 5, 5, 4, 4, 3, 3,
+                     6, 5, 4, 4, 3, 3, 3, 3, 6, 5, 4, 4, 3, 3, 3, 3,
+                     5, 5, 4, 3, 3, 3, 3, 3, 5, 5, 4, 3, 3, 3, 3, 3,
+                     1, 2, 3, 4, 5, 4, 5, 5, 1, 2, 3, 4, 5, 4, 5, 5,
+                     2, 3, 4, 5, 6, 5, 5, 5, 2, 3, 4, 5, 6, 5, 5, 5,
+                     3, 4, 5, 6, 7, 6, 5, 5, 3, 4, 5, 6, 7, 6, 5, 5,
+                     4, 4, 5, 6, 6, 5, 5, 4, 4, 4, 5, 6, 6, 5, 5, 4,
+                     5, 5, 5, 5, 5, 5, 4, 3, 5, 5, 5, 5, 5, 5, 4, 3,
+                     6, 5, 5, 5, 4, 4, 3, 3, 6, 5, 5, 5, 4, 4, 3, 3,
+                     6, 5, 4, 4, 3, 3, 3, 3, 6, 5, 4, 4, 3, 3, 3, 3,
+                     5, 5, 4, 3, 3, 3, 3, 3, 5, 5, 4, 3, 3, 3, 3, 3};
 
-    if (p == Point())
-        buildChunk(hm, 5, 7);
+//    if (p == Point())
+        buildChunk(hm, 16, 16);
+
+//    cout << (1 << 6) << endl;
+//    cout << (1 << 7) << endl;
+//    cout << (1 << 8) << endl;
+//    cout << (1 << 9) << endl;
 }
 
 Chunk::~Chunk()
@@ -39,21 +54,80 @@ Chunk::~Chunk()
 
 void Chunk::buildChunk(int *heightMap, int w, int h)
 {
+    assert(m_dim.x == w && m_dim.y == h);
+
     int numBlocks;
+    int index = 0;
+    int type = 1;
     for (int z = 0; z < h; z++)
     {
         for (int x = 0; x < w; x++)
         {
-            numBlocks = heightMap[(z*w + x)];
+            int mapI = z*w + x;
+
+            numBlocks = heightMap[mapI] + 9;
             for (int y = 0; y < numBlocks; y++)
-                addBlock(x, y, z, 1);
+            {
+                int sides = 0;
+                // check posz
+                if (z == h-1 || heightMap[mapI + w] <= y-9)
+                    sides |= (1 << 14);
+                if (x == w-1 || heightMap[mapI + 1] <= y-9)
+                    sides |= (1 << 13);
+                if (z == 0 || heightMap[mapI - w] <= y-9)
+                    sides |= (1 << 12);
+                if (x == 0 || heightMap[mapI -1] <= y-9)
+                    sides |= (1 << 11);
+                if (y == numBlocks-1)
+                    sides |= (1 << 10);
+                if (y == 0)
+                    sides |= (1 << 9);
+
+                updateBlock(index++, (sides | type));
+            }
+            index += m_dim.y - numBlocks;
         }
     }
 }
 
-void Chunk::addBlock(int x, int y, int z, char type)
+void Chunk::updateBlock(int index, int info)
 {
-    m_blocks[(getIndex(x - m_p.x, y - m_p.y, z - m_p.z, m_dim))] = type;
+    m_blocks[index] = info;
+    if (info >> 8) // at least one size needs to be rendered
+        m_drawables.insert(index);
+    else
+        m_drawables.remove(index);
+}
+
+void Chunk::addBlock(int x, int y, int z, int type)
+{
+    Point p = Point(x, y, z) - m_p;
+    m_blocks[(getIndex(p.x, p.y, p.z, m_dim))] = type;
+
+    int b;
+    Point n;
+//    for (int i = 0; i < 6; i++) {
+//        n = m_neighbors[i] + p;
+//        if ((b = m_blocks[(getIndex(n.x, n.y, n.z, m_dim))]))
+//        {
+
+//        }
+//        else
+//        {
+
+//        }
+//    }
+//    m_drawables.
+}
+
+
+int Chunk::getNeighbor(Point block, Point dir)
+{
+    Point n = block + dir;
+    if (n.x < 0 || n.y < 0 || n.z < 0 || n.x >= m_dim.x ||
+            n.y >= m_dim.y || n.z >= m_dim.z)
+        return 0;
+    return m_blocks[(getIndex(n.x, n.y, n.z, m_dim))];
 }
 
 
@@ -65,40 +139,71 @@ void Chunk::removeBlock(int x, int y, int z)
 
 void Chunk::onTick(float) {}
 
-
-void Chunk::onDraw(Graphics *g)
+Point Chunk::getLocation()
 {
-    char b;
-    glm::mat4 trans = glm::mat4();
-    glm::vec4 p = glm::vec4(m_p.x, m_p.y, m_p.z, 0);
-    for (int i = 0; i < m_size; i++)
-    {
-        if ((b = m_blocks[i]))
-        {
-            switch(b)
-            {
-            case AIR:
-                break;
-            case DEFAULT:
-//                g->setAtlasPos();
-                g->setColor(0, 0, 1, 1, 0);
-                break;
-            case GRASS:
-                g->setColor(0, 1, 0, 1, 0);
-                break;
-            case DIRT:
-                g->setColor(1, 0, 0, 1, 0);
-                break;
-            case STONE:
-                g->setColor(0, 0, 0, 1, 0);
-                break;
-            default:
-                break;
-            }
-            trans[3] = getCoords(i, m_dim) + p;
-            g->drawCube(trans);
-        }
-    }
+    return m_p;
+}
+
+glm::vec4 Chunk::getLocationV()
+{
+    return glm::vec4(m_p.x, m_p.y, m_p.z, 1.f);
+}
+
+Point Chunk::getDimension()
+{
+    return m_dim;
+}
+
+glm::vec4 Chunk::getDimensionV()
+{
+    return glm::vec4(m_p.x, m_p.y, m_p.z, 0.f);
+}
+
+int* Chunk::getBlocks(int *size)
+{
+    *size = m_size;
+    return m_blocks;
+}
+
+
+QSet<int> Chunk::getDrawables()
+{
+    return m_drawables;
+}
+
+void Chunk::onDraw(Graphics *)
+{
+//    char b;
+//    glm::mat4 trans = glm::mat4();
+//    glm::vec4 p = glm::vec4(m_p.x, m_p.y, m_p.z, 0);
+//    for (int i = 0; i < m_size; i++)
+//    {
+//        if ((b = m_blocks[i]))
+//        {
+//            switch(b)
+//            {
+//            case AIR:
+//                break;
+//            case DEFAULT:
+////                g->setAtlasPos();
+//                g->setColor(0, 0, 1, 1, 0);
+//                break;
+//            case GRASS:
+//                g->setColor(0, 1, 0, 1, 0);
+//                break;
+//            case DIRT:
+//                g->setColor(1, 0, 0, 1, 0);
+//                break;
+//            case STONE:
+//                g->setColor(0, 0, 0, 1, 0);
+//                break;
+//            default:
+//                break;
+//            }
+//            trans[3] = getCoords(i, m_dim) + p;
+//            g->drawCube(trans);
+//        }
+//    }
 }
 
 
@@ -108,10 +213,10 @@ int Chunk::getIndex(int x, int y, int z, Point dim)
 }
 
 
-glm::vec4 Chunk::getCoords(int index, Point dim)
-{
-    int y = index % dim.y;
-    int x = (index / dim.y) % dim.x;
-    int z = index / (dim.x*dim.y);
-    return glm::vec4(x, y, z, 1);
-}
+//glm::vec4 Chunk::getCoords(int index, Point dim)
+//{
+//    return glm::vec4(((index / dim.y) % dim.x),
+//                     (index % dim.y),
+//                     (index / (dim.x*dim.y)),
+//                     0.f);
+//}

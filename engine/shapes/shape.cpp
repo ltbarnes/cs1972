@@ -160,7 +160,7 @@ void Shape::render()
 }
 
 
-void Shape::transformAndRender(GLuint shader, glm::mat4 trans)
+void Shape::transformAndRender(GLuint shader, glm::mat4 trans, int)
 {
     glBindVertexArray(m_vaoID);
     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, glm::value_ptr(trans));
@@ -173,7 +173,6 @@ void Shape::transformAndRender(GLuint shader, glm::mat4 trans)
 //    glBindVertexArray(0);
 //    glUniform3f(glGetUniformLocation(shader, "allBlack"), 1, 1, 1);
 }
-
 
 void Shape::addVertex(int *i, glm::vec3 v, glm::vec3 norm)
 {
@@ -209,13 +208,13 @@ bool Shape::animate()
 glm::vec2 Shape::mapPoints(const glm::vec2 val, const glm::vec2 oldMin, const glm::vec2 oldMax,
                        const glm::vec2 newMin, const glm::vec2 newMax)
 {
-    return (val - oldMin) / (oldMax - oldMin) * (newMax - newMin) + oldMin;
+    return (val - oldMin) / (oldMax - oldMin) * (newMax - newMin) + newMin;
 }
 
 
 float Shape::map(const float val, const float oldMin, const float oldMax, const float newMin, const float newMax)
 {
-    return (val - oldMin) / (oldMax - oldMin) * (newMax - newMin) + oldMin;
+    return (val - oldMin) / (oldMax - oldMin) * (newMax - newMin) + newMin;
 }
 
 
