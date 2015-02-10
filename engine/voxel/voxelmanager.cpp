@@ -4,11 +4,13 @@
 #include <iostream>
 using namespace std;
 
-VoxelManager::VoxelManager(Point center, Point dim, Point chunkSize)
+VoxelManager::VoxelManager(Point center, Point dim, Point chunkSize, ChunkBuilder *cb)
 {
     m_center = center;
     m_dim = dim;
     m_chunkSize = chunkSize;
+
+    m_chunkBuilder = cb;
 
     m_min = Point(0, 0, 0);
     m_max = Point(0, 0, 0);
@@ -21,20 +23,26 @@ VoxelManager::VoxelManager(Point center, Point dim, Point chunkSize)
             for (int z = -m_dim.z; z < m_dim.z; z++)
             {
                 p = Point(x, y, z) * m_chunkSize;
-                addChunk(new Chunk(p, m_chunkSize));
+                addChunk(p);
             }
         }
     }
-
 }
 
 VoxelManager::~VoxelManager()
 {
+    foreach(Chunk *chunk, m_chunks)
+        delete chunk;
+
+    delete m_chunkBuilder;
 }
 
 
-void VoxelManager::addChunk(Chunk *chunk)
+void VoxelManager::addChunk(Point pnt)
 {
+//    m_chunkBuilder.getChunk(p);
+    Chunk *chunk = new Chunk(pnt, m_chunkSize);
+
     Point p = chunk->getLocation();
     m_chunks.insert(p, chunk);
 

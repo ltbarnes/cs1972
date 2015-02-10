@@ -2,20 +2,21 @@
 #define VOXELMANAGER_H
 
 #include "chunk.h"
-//#include "point3d.h"
 #include <QHash>
+
+class ChunkBuilder;
 
 class VoxelManager// : public Manager
 {
 public:
-    VoxelManager(Point center, Point dim, Point chunkSize);
+    VoxelManager(Point center, Point dim, Point chunkSize, ChunkBuilder *cb);
     virtual ~VoxelManager();
 
     QList<Chunk*> getChunks();
     void onDraw(Graphics *g);
 
     void buildChunk(Point p, int *heightMap, int w, int h);
-    void addChunk(Chunk * chunk);
+    void addChunk(Point pnt);
 
     void addBlock(float x, float y, float z, char type);
 
@@ -23,6 +24,7 @@ public:
 
 private:
     QHash<Point, Chunk *> m_chunks;
+    ChunkBuilder *m_chunkBuilder;
 
     Point m_chunkSize;
     Point m_center, m_dim;

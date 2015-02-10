@@ -58,7 +58,8 @@ SOURCES += \
     engine/voxel/voxelmanager.cpp \
     engine/common/point3d.cpp \
     game/minecraft/entities/player.cpp \
-    engine/shapes/facecube.cpp
+    engine/shapes/facecube.cpp \
+    game/minecraft/world/mcchunkbuilder.cpp
 ### warmup
 #    game/warmup/gamescreens/menuscreen.cpp \
 #    game/warmup/gamescreens/gamescreen.cpp \
@@ -97,7 +98,9 @@ HEADERS += \
     engine/voxel/voxelmanager.h \
     engine/common/point3d.h \
     game/minecraft/entities/player.h \
-    engine/shapes/facecube.h
+    engine/shapes/facecube.h \
+    engine/voxel/chunkbuilder.h \
+    game/minecraft/world/mcchunkbuilder.h
 ### warmup
 #    game/warmup/gamescreens/menuscreen.h \
 #    game/warmup/gamescreens/gamescreen.h \

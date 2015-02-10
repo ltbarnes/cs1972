@@ -3,13 +3,31 @@
 #include "application.h"
 #include "gamescreen.h"
 
+#include <cstdlib>
+
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
+
+#include <iostream>
+using namespace std;
 
 
 MinecraftMenu::MinecraftMenu(Application *parent)
     : Screen(parent)
 {
+    uint seed = 500;
+    for (int i = 0; i < 5; i++)
+    {
+        for (int j = 0; j < 5; j++)
+        {
+            srand(seed);
+            srand(rand() * (j + 1));
+            srand(rand() * (i + 1));
+            cout << (rand() % 64) << ", ";
+        }
+        cout << endl;
+    }
+
 }
 
 MinecraftMenu::~MinecraftMenu()

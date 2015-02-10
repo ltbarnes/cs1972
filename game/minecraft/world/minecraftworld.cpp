@@ -1,5 +1,6 @@
 #include "minecraftworld.h"
 #include "point3d.h"
+#include "mcchunkbuilder.h"
 #include <QSet>
 
 const char AIR = 0;
@@ -10,7 +11,7 @@ const char STONE = 4;
 
 MinecraftWorld::MinecraftWorld()
 {
-    m_vm = new VoxelManager(Point(), Point(1, 1, 1), Point(32, 32, 32));
+    m_vm = new VoxelManager(Point(), Point(1, 1, 1), Point(32, 32, 32), new MCChunkBuilder(500));
 }
 
 
