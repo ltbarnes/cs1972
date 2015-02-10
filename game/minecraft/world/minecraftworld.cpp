@@ -10,7 +10,7 @@ const char STONE = 4;
 
 MinecraftWorld::MinecraftWorld()
 {
-    m_vm = new VoxelManager(Point(), Point(1, 1, 1), Point(16, 16, 16));
+    m_vm = new VoxelManager(Point(), Point(1, 1, 1), Point(32, 32, 32));
 }
 
 

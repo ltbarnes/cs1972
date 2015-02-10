@@ -39,9 +39,9 @@ void VoxelManager::addChunk(Chunk *chunk)
     m_chunks.insert(p, chunk);
 
     // check neighbor chunks and optimize faces
-    if (m_chunks.contains(p + Point(0, 0, 16)))
+    if (m_chunks.contains(p + Point(0, 0, m_chunkSize.z)))
     {
-        Chunk *nc = m_chunks.value(p + Point(0, 0, 16));
+        Chunk *nc = m_chunks.value(p + Point(0, 0, m_chunkSize.z));
 
         int size;
         int *cb = chunk->getBlocks(&size);
@@ -64,9 +64,9 @@ void VoxelManager::addChunk(Chunk *chunk)
             }
         }
     }
-    if (m_chunks.contains(p + Point(0, 0, -16)))
+    if (m_chunks.contains(p + Point(0, 0, -m_chunkSize.z)))
     {
-        Chunk *nc = m_chunks.value(p + Point(0, 0, -16));
+        Chunk *nc = m_chunks.value(p + Point(0, 0, -m_chunkSize.z));
 
         int size;
         int *cb = chunk->getBlocks(&size);
@@ -81,7 +81,7 @@ void VoxelManager::addChunk(Chunk *chunk)
                 int blockn = ncb[indexn];
                 if (block && blockn)
                 {
-                    block &=  0b10111111111111;
+                    block &=  0b11011111111111;
                     blockn &= 0b01111111111111;
                     chunk->updateBlock(index, block);
                     nc->updateBlock(indexn, blockn);
@@ -89,57 +89,108 @@ void VoxelManager::addChunk(Chunk *chunk)
             }
         }
     }
-//    // check neighbor chunks and optimize faces
-//    if (m_chunks.contains(p + Point(16, 0, 0)))
-//    {
-//        Chunk *nc = m_chunks.value(p + Point(16, 0, 0));
+    // check neighbor chunks and optimize faces
+    if (m_chunks.contains(p + Point(m_chunkSize.x, 0, 0)))
+    {
+        Chunk *nc = m_chunks.value(p + Point(m_chunkSize.x, 0, 0));
 
-//        int size;
-//        int *cb = chunk->getBlocks(&size);
-//        int *ncb = nc->getBlocks(&size);
-//        for (int z = 0; z < m_chunkSize.z; z++)
-//        {
-//            for (int y = 0; y < m_chunkSize.y; y++)
-//            {
-//                int index = getIndex(m_chunkSize.x - 1, y, z);
-//                int block = cb[index];
-//                int indexn = getIndex(0, y, z);
-//                int blockn = ncb[indexn];
-//                if (block && blockn)
-//                {
-//                    block &=  0b10111111111111;
-//                    blockn &= 0b11101111111111;
-//                    chunk->updateBlock(index, block);
-//                    nc->updateBlock(indexn, blockn);
-//                }
-//            }
-//        }
-//    }
-//    if (m_chunks.contains(p + Point(-16, 0, 0)))
-//    {
-//        Chunk *nc = m_chunks.value(p + Point(-16, 0, 0));
+        int size;
+        int *cb = chunk->getBlocks(&size);
+        int *ncb = nc->getBlocks(&size);
+        for (int z = 0; z < m_chunkSize.z; z++)
+        {
+            for (int y = 0; y < m_chunkSize.y; y++)
+            {
+                int index = getIndex(m_chunkSize.x - 1, y, z);
+                int block = cb[index];
+                int indexn = getIndex(0, y, z);
+                int blockn = ncb[indexn];
+                if (block && blockn)
+                {
+                    block &=  0b10111111111111;
+                    blockn &= 0b11101111111111;
+                    chunk->updateBlock(index, block);
+                    nc->updateBlock(indexn, blockn);
+                }
+            }
+        }
+    }
+    if (m_chunks.contains(p + Point(-m_chunkSize.x, 0, 0)))
+    {
+        Chunk *nc = m_chunks.value(p + Point(-m_chunkSize.x, 0, 0));
 
-//        int size;
-//        int *cb = chunk->getBlocks(&size);
-//        int *ncb = nc->getBlocks(&size);
-//        for (int z = 0; z < m_chunkSize.z; z++)
-//        {
-//            for (int y = 0; y < m_chunkSize.y; y++)
-//            {
-//                int index = getIndex(0, y, z);
-//                int block = cb[index];
-//                int indexn = getIndex(m_chunkSize.x - 1, y, z);
-//                int blockn = ncb[indexn];
-//                if (block && blockn)
-//                {
-//                    block &=  0b11101111111111;
-//                    blockn &= 0b10111111111111;
-//                    chunk->updateBlock(index, block);
-//                    nc->updateBlock(indexn, blockn);
-//                }
-//            }
-//        }
-//    }
+        int size;
+        int *cb = chunk->getBlocks(&size);
+        int *ncb = nc->getBlocks(&size);
+        for (int z = 0; z < m_chunkSize.z; z++)
+        {
+            for (int y = 0; y < m_chunkSize.y; y++)
+            {
+                int index = getIndex(0, y, z);
+                int block = cb[index];
+                int indexn = getIndex(m_chunkSize.x - 1, y, z);
+                int blockn = ncb[indexn];
+                if (block && blockn)
+                {
+                    block &=  0b11101111111111;
+                    blockn &= 0b10111111111111;
+                    chunk->updateBlock(index, block);
+                    nc->updateBlock(indexn, blockn);
+                }
+            }
+        }
+    }
+    // check neighbor chunks and optimize faces
+    if (m_chunks.contains(p + Point(0, m_chunkSize.y, 0)))
+    {
+        Chunk *nc = m_chunks.value(p + Point(0, m_chunkSize.y, 0));
+
+        int size;
+        int *cb = chunk->getBlocks(&size);
+        int *ncb = nc->getBlocks(&size);
+        for (int z = 0; z < m_chunkSize.z; z++)
+        {
+            for (int x = 0; x < m_chunkSize.x; x++)
+            {
+                int index = getIndex(x, m_chunkSize.y - 1, z);
+                int block = cb[index];
+                int indexn = getIndex(x, 0, z);
+                int blockn = ncb[indexn];
+                if (block && blockn)
+                {
+                    block &=  0b11110111111111;
+                    blockn &= 0b11111011111111;
+                    chunk->updateBlock(index, block);
+                    nc->updateBlock(indexn, blockn);
+                }
+            }
+        }
+    }
+    if (m_chunks.contains(p + Point(0,-m_chunkSize.y, 0)))
+    {
+        Chunk *nc = m_chunks.value(p + Point(0,-m_chunkSize.y, 0));
+
+        int size;
+        int *cb = chunk->getBlocks(&size);
+        int *ncb = nc->getBlocks(&size);
+        for (int z = 0; z < m_chunkSize.z; z++)
+        {
+            for (int x = 0; x < m_chunkSize.x; x++)
+            {
+                int index = getIndex(x, 0, z);
+                int block = cb[index];
+                int indexn = getIndex(x, m_chunkSize.y - 1, z);
+                int blockn = ncb[indexn];
+                if (block && blockn)
+                {
+                    block &=  0b11111011111111;
+                    blockn &= 0b11110111111111;
+                    chunk->updateBlock(index, block);
+                    nc->updateBlock(indexn, blockn);
+                }
+            }
+        }
+    }
 }
 
 

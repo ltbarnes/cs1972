@@ -136,7 +136,7 @@ void FaceCube::transformAndRender(GLuint shader, glm::mat4 trans, int info)
 
     for (int i = 0; i < 6; i++)
     {
-        if (info & (1 << (14 - i)))
+        if (info & (1 << (13 - i)))
             glDrawArrays(GL_TRIANGLE_STRIP, (i * 6), 4);
 
     }
