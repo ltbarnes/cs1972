@@ -4,51 +4,28 @@ Student: Logan Barnes (ltbarnes)
 
 Common Engine Requirements
 ========================================
-[ ] Third person support built into your camera, with the ability to toggle between the two cameras
-	
-	### engine/camera/ActionCamera contains an offset parameter that can be set by other classes. Use the '+' and '-' keys in game for finer adjustments and '9' and '0' as third/first person toggles
+[ ] Graphics object supports convenient drawing from a texture atlas
+	### 
 
-[ ] Entity/World hierarchy
-	[ ] Virtual Entity class representing a single logical game object with (minimally) the following contract:
-	
-	###	engine/world/Entity is the basic entity class capable of rendering ticking and storing both render and collision shapes. engine/world/MovableEntity is capable of moving via forces and impulses and handles collisions based on momentum. engine/world/StaticEntity is static and handles collisions accordingly.
-		
-		[ ] Timed updates (tick)
-		[ ] Render events (draw)
-		[ ] Creation of a collision shape (for now, getCylinder)
-		[ ] Instance variables for position, velocity, and an acceleration accumulator
-	[ ] Virtual World class representing a collection of Entities with (minimally) the following contract:
-
-	### engine/world/World is the base world class that handles updating entities, staging them for removal (and removing them), drawing entities, and dealing with collisions.
-
-		[ ] Timed updates (tick)
-		[ ] Render events (draw)
-		[ ] Entity management (add/remove an Entity)
-[ ] Cylinder-cylinder collision detection, resolution, and generation of a response callback
-	
-	### engine/shapes/CollisionShape is the base class for all collision shapes. engine/shapes/CollisionCylinder is implemented on this base class and contains the collidesCylinder function for dealing with cylinder on cylinder collisions.
-	The World class initiates and keeps track of collision detection and resolution the passes the collision data to the appropriate entity via a Collision struct (in the Entity header). Note: each entity can have multiple collision shapes to build more complex entities.
-
-	[ ] Detection - determine that two cylinders are overlapping
-	[ ] Resolution - translate the cylinders out of detection using the MTV
-	[ ] Response - dispatches collision callback to collided Entities
+Voxel Engine Requirements
+========================================
+[ ] Chunk-based world representation (implemented as a "manager")
+[ ] Block defined as a 1x1x1 cube with (minimally) the following characteristics:
+	[ ] Transparency - should the engine render block faces adjacent to this block?
+	[ ] Passability - can entities pass through this block?
+[ ] Chunk defined as a CxCxC group of blocks, where C is a single parameter (or 3 different ones) determining chunk dimensions
+[ ] Chunks render only block faces that are adjacent to transparent blocks, with the exception of chunk boundaries, which may always be rendered
 
 Game Requirements
 ========================================
-[ ] All Warmup1 requirements must still be fulfilled
-	# well nothing was deleted...
-[ ] The player can use a key to toggle between first and third person cameras
-	# use '9' and '0' or '+' and '-'
-[ ] Cylinder-cylinder collision response must be used somewhere
-	# Pretty much all in game collisions are cylinder-cylinder. Even the ground is a giant cylinder. game/gamescreens/GameScreen is where the objects are initialized and each constructor (Item, Ground, Player, UFO) contains at least one collision shape.
-[ ] There must be at least 1 NPC (non-player character), such as an enemy or opponent, with some basic AI
-	# there are other cylinder men who constantly run away from the player (game/entities/Item)
-[ ] The game must have a non-arbitrary and reasonably achievable win or loss condition
-	# get to the UFO and capture all the cylinder men before they run off the edge of the map.
-[ ] The game must be resettable upon win or loss without restarting the program
-	# hit enter from the gameover menu to return to the start menu.
-[ ] The game can never enter an unwinnable or unloseable state
-	# yep
+[ ] Movement and view controls must the same as warmup
+[ ] The world must have no gravity, so the player must have an additional key control to change their height
+[ ] The terrain in the world must be procedurally generated
+	[ ] Chunk composition is algorithmically determined with the complexity of at least a sin wave
+	[ ] Terrain contains at least two visually unique blocks besides air/empty blocks
+	[ ] All blocks must be textured from a single texture atlas
+[ ] The world must consist of a 2x2x2 grid of size C = 32 chunks
+[ ] The game must run at 20+ FPS on department machines: this requirement overrides the standard 30+ FPS requirement
 
 Global requirements
 ========================================

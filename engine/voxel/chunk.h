@@ -5,6 +5,11 @@
 #include "point3d.h"
 #include <QSet>
 
+enum BlockType
+{
+    DEFAULT, GRASS, DIRT, STONE
+};
+
 class Chunk
 {
 public:

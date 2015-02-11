@@ -1,8 +1,7 @@
 #include "facecube.h"
-#include <glm/ext.hpp>
 
-//#include <iostream>
-//using namespace std;
+#define GLM_FORCE_RADIANS
+#include <glm/gtc/type_ptr.hpp>
 
 FaceCube::FaceCube()
     : Shape(1)

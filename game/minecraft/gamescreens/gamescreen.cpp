@@ -15,8 +15,7 @@ GameScreen::GameScreen(Application *parent)
 {
     ActionCamera *cam = new ActionCamera();
     m_world = new MinecraftWorld();
-//    m_player = new Player(cam, glm::vec3(-15,15,32), m_world);
-    m_player = new Player(cam, glm::vec3(0,0,0), m_world);
+    m_player = new Player(cam, glm::vec3(0,5,0), m_world);
 
     m_world->addMovableEntity(m_player);
 
@@ -39,10 +38,6 @@ void GameScreen::onTick(float secs)
 
 void GameScreen::onRender(Graphics *g)
 {
-//    g->setColor(1.f, 1.f, 1.f, 1.f, 1.f);
-//    g->setWorldColor(1.f, 1.f, 1.f);
-//    g->setTexture("enter.jpg");
-
     m_world->onDraw(g);
 }
 
@@ -51,29 +46,6 @@ void GameScreen::onRender(Graphics *g)
 // key events
 void GameScreen::onKeyPressed(QKeyEvent *e)
 {
-    switch(e->key())
-    {
-    case Qt::Key_Return:
-//        m_parentApp->addScreen(new GameScreen(m_parentApp));
-        break;
-    case Qt::Key_1:
-        m_world->addBlock(-5, 0, 1, 1);
-        break;
-    case Qt::Key_2:
-        m_world->addBlock(-3, 0, 1, 1);
-        break;
-    case Qt::Key_3:
-        m_world->addBlock(-1, 0, 1, 1);
-        break;
-    case Qt::Key_4:
-        m_world->addBlock(1, 0, 1, 1);
-        break;
-    case Qt::Key_5:
-        m_world->addBlock(1, 0, 1, 1);
-        break;
-    default:
-        break;
-    }
     m_player->onKeyPressed(e);
 }
 

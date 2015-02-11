@@ -2,16 +2,11 @@
 #include "point3d.h"
 #include "mcchunkbuilder.h"
 #include <QSet>
-
-const char AIR = 0;
-const char DEFAULT = 1;
-const char GRASS = 2;
-const char DIRT = 3;
-const char STONE = 4;
+#include <QTime>
 
 MinecraftWorld::MinecraftWorld()
 {
-    m_vm = new VoxelManager(Point(), Point(1, 1, 1), Point(32, 32, 32), new MCChunkBuilder(500));
+    m_vm = new VoxelManager(Point(), Point(1, 1, 1), Point(32, 32, 32), new MCChunkBuilder(QTime::currentTime().msec()));
 }
 
 
@@ -46,19 +41,19 @@ void MinecraftWorld::onDraw(Graphics *g)
             {
                 switch(b & 0b11111111)
                 {
-                case AIR:
-                    break;
+//                case AIR:
+//                    break;
                 case DEFAULT:
                     g->setAtlasPosition(3,0);
                     break;
                 case GRASS:
-                    g->setAtlasPosition(0,0);
+                    g->setAtlasPosition(5,3);
                     break;
                 case DIRT:
                     g->setAtlasPosition(2,0);
                     break;
                 case STONE:
-                    g->setAtlasPosition(1,0);
+                    g->setAtlasPosition(0,1);
                     break;
                 default:
                     break;

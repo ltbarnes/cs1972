@@ -1,9 +1,5 @@
 #include "cube.h"
 
-#include <iostream>
-using namespace std;
-#include <glm/gtx/string_cast.hpp>
-
 Cube::Cube(int complexity) : Shape(complexity)
 {
 }
@@ -101,8 +97,6 @@ void Cube::makeSide(int *index, glm::vec3 norm, double spacing, bool first, bool
 
             t1 = mapPoints(glm::vec2(j, i), omin, omax, nmin, nmax);
             t2 = mapPoints(glm::vec2(j, i+1), omin, omax, nmin, nmax);
-            if (t1.x < 0.f)
-                cout << glm::to_string(norm) << endl;
 
             addVertexT(index, v1, norm, t1);
             addVertexT(index, v2, norm, t2);

@@ -9,7 +9,7 @@ public:
     MCChunkBuilder(int seed);
     virtual ~MCChunkBuilder();
 
-    virtual Chunk* getChunk(Point p);
+    virtual Chunk* getChunk(Point p, Point dim);
 };
 
 #endif // MCCHUNKBUILDER_H

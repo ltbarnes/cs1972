@@ -14,17 +14,15 @@ macx {
 }
 
 # If you add your own folders, add them to INCLUDEPATH and DEPENDPATH, e.g.
-INCLUDEPATH += glm engine game shaders engine/common \
-               engine/ui engine/screens engine/scene \
-               engine/camera engine/shapes engine/world \
-               engine/common engine/voxel \
+INCLUDEPATH += glm engine game shaders \
+               engine/common engine/ui engine/graphics \
+               engine/shapes engine/world engine/voxel \
                # game/warmup1/gamescreens game/warmup1/world game/warmup1/entities \ # warmup
                game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ # minecraft
                res/images res/images/cubemap
 DEPENDPATH +=  glm engine game shaders \
-               engine/ui engine/screens engine/scene \
-               engine/camera engine/shapes engine/world \
-               engine/common engine/voxel \
+               engine/common engine/ui engine/graphics \
+               engine/shapes engine/world engine/voxel \
                # game/warmup1/gamescreens game/warmup1/world game/warmup1/entities \ # warmup
                game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ #minecraft
                res/images res/images/cubemap
@@ -35,30 +33,30 @@ SOURCES += \
     engine/main.cpp \
     engine/ui/mainwindow.cpp \
     engine/ui/view.cpp \
-    engine/screens/application.cpp \
-    engine/screens/graphics.cpp \
-    engine/camera/camera.cpp \
-    engine/shapes/shape.cpp \
-    engine/shapes/cube.cpp \
-    engine/screens/cubemap.cpp \
-    engine/camera/actioncamera.cpp \
+    engine/ui/application.cpp \
+    engine/common/point3d.cpp \
+    engine/graphics/graphics.cpp \
+    engine/graphics/cubemap.cpp \
+    engine/graphics/camera.cpp \
+    engine/graphics/actioncamera.cpp \
     engine/world/world.cpp \
     engine/world/entity.cpp \
     engine/world/movableentity.cpp \
+    engine/world/staticentity.cpp \
+    engine/shapes/shape.cpp \
+    engine/shapes/cube.cpp \
     engine/shapes/cylinder.cpp \
     engine/shapes/sphere.cpp \
     engine/shapes/collisioncylinder.cpp \
-    engine/world/staticentity.cpp \
     engine/shapes/cone.cpp \
+    engine/shapes/facecube.cpp \
     engine/voxel/chunk.cpp \
+    engine/voxel/voxelmanager.cpp \
 ### minecraft
     game/minecraft/gamescreens/minecraftmenu.cpp \
     game/minecraft/gamescreens/gamescreen.cpp \
     game/minecraft/world/minecraftworld.cpp \
-    engine/voxel/voxelmanager.cpp \
-    engine/common/point3d.cpp \
     game/minecraft/entities/player.cpp \
-    engine/shapes/facecube.cpp \
     game/minecraft/world/mcchunkbuilder.cpp
 ### warmup
 #    game/warmup/gamescreens/menuscreen.cpp \
@@ -73,33 +71,33 @@ SOURCES += \
 HEADERS += \
     engine/ui/mainwindow.h \
     engine/ui/view.h \
-    engine/screens/application.h \
-    engine/screens/graphics.h \
-    engine/screens/screen.h \
-    engine/camera/camera.h \
-    engine/shapes/shape.h \
-    engine/shapes/cube.h \
-    engine/screens/cubemap.h \
-    engine/camera/actioncamera.h \
+    engine/ui/application.h \
+    engine/ui/screen.h \
+    engine/common/point3d.h \
+    engine/graphics/graphics.h \
+    engine/graphics/cubemap.h \
+    engine/graphics/camera.h \
+    engine/graphics/actioncamera.h \
     engine/world/world.h \
     engine/world/entity.h \
     engine/world/movableentity.h \
+    engine/world/staticentity.h \
+    engine/shapes/shape.h \
+    engine/shapes/cube.h \
     engine/shapes/cylinder.h \
     engine/shapes/sphere.h \
     engine/shapes/collisionshape.h \
     engine/shapes/collisioncylinder.h \
-    engine/world/staticentity.h \
     engine/shapes/cone.h \
+    engine/shapes/facecube.h \
     engine/voxel/chunk.h \
+    engine/voxel/voxelmanager.h \
+    engine/voxel/chunkbuilder.h \
 ### minecraft
     game/minecraft/gamescreens/minecraftmenu.h \
     game/minecraft/gamescreens/gamescreen.h \
     game/minecraft/world/minecraftworld.h \
-    engine/voxel/voxelmanager.h \
-    engine/common/point3d.h \
     game/minecraft/entities/player.h \
-    engine/shapes/facecube.h \
-    engine/voxel/chunkbuilder.h \
     game/minecraft/world/mcchunkbuilder.h
 ### warmup
 #    game/warmup/gamescreens/menuscreen.h \

@@ -1,4 +1,5 @@
 #include "voxelmanager.h"
+#include "chunkbuilder.h"
 #include <QHash>
 
 #include <iostream>
@@ -40,8 +41,8 @@ VoxelManager::~VoxelManager()
 
 void VoxelManager::addChunk(Point pnt)
 {
-//    m_chunkBuilder.getChunk(p);
-    Chunk *chunk = new Chunk(pnt, m_chunkSize);
+    Chunk *chunk = m_chunkBuilder->getChunk(pnt, m_chunkSize);
+//    Chunk *chunk = new Chunk(pnt, m_chunkSize);
 
     Point p = chunk->getLocation();
     m_chunks.insert(p, chunk);

@@ -10,7 +10,7 @@ public:
     ChunkBuilder(int seed) { m_seed = seed; }
     virtual ~ChunkBuilder() {}
 
-    virtual Chunk* getChunk(Point p) = 0;
+    virtual Chunk* getChunk(Point p, Point dim) = 0;
 
 protected:
     int m_seed;
