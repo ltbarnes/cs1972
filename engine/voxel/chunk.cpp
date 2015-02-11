@@ -1,9 +1,5 @@
 #include "chunk.h"
 
-#include <iostream>
-using namespace std;
-//#include <glm/ext.hpp>
-
 Chunk::Chunk(Point p, Point dim)
 {
     m_p = p;
@@ -86,8 +82,8 @@ void Chunk::addBlock(int x, int y, int z, int type)
     Point p = Point(x, y, z) - m_p;
     m_blocks[(getIndex(p.x, p.y, p.z, m_dim))] = type;
 
-    int b;
-    Point n;
+//    int b;
+//    Point n;
 //    for (int i = 0; i < 6; i++) {
 //        n = m_neighbors[i] + p;
 //        if ((b = m_blocks[(getIndex(n.x, n.y, n.z, m_dim))]))

@@ -55,7 +55,6 @@ public:
     void setTexture(const QString &key, float repeatU = 1.f, float repeatV = 1.f);
     void setAtlas(const QString &key, glm::vec2 numSubImages);
     void setAtlasPosition(float x, float y);
-//    void setTexturePos(float u, float v);
     void setTransparentMode(bool on);
 
     void useCubeMap(bool use);
