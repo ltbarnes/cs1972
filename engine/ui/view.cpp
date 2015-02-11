@@ -24,6 +24,7 @@ View::View(QGLFormat format, QWidget *parent) : QGLWidget(format, parent)
     m_app = new Application();
 
     m_mouseDown = false;
+    m_fpsInit = false   ;
 }
 
 View::~View()
@@ -80,9 +81,6 @@ void View::initializeGL()
     QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
 }
 
-int tcounter;
-int thcounter;
-
 void View::paintGL()
 {
     glClearColor(0, 0, 0, 0);
@@ -91,24 +89,16 @@ void View::paintGL()
     // TODO: call your game rendering code here
     m_app->onRender();
 
-    if (fps < 20.f)
-        tcounter++;
-//        cout << "ERMAHGERD YE GEME ES SLEEEWWWWWW (fps: " << fps << ")" << endl;
-    else if (fps < 30.f)
-        thcounter++;
-//        cout << "Ya done messed up dawg. Get it together. (fps: " << fps << ")" << endl;
-
-    if (thcounter > 50)
+    if (m_fpsInit)
     {
-        cout << "still slew derg" << endl;
-        thcounter = 0;
+        if (fps < 20.f)
+            cout << "ERMAHGERD YE GEME ES SLEEEWWWWWW (fps: " << fps << ")" << endl;
+        else if (fps < 30.f)
+            cout << "Ya done messed up dawg. Get it together. (fps: " << fps << ")" << endl;
     }
+    else if (fps > 30.f)
+        m_fpsInit = true;
 
-    if (tcounter > 50)
-    {
-        cout << "ssuper slew derg" << endl;
-        tcounter = 0;
-    }
 //    // Can't use Core profile with this
 //    glUseProgram(0);
 //    glColor3f(1.f, 1.f, 1.f);

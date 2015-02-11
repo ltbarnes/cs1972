@@ -13,6 +13,10 @@
 #include "sphere.h"
 #include "facecube.h"
 
+enum GraphicsMode
+{
+    DEFAULT, SPARSE, CUBEMAP
+};
 
 enum ShapeType
 {
@@ -48,7 +52,8 @@ public:
     ~Graphics();
 
     void init();
-    void setUniforms(Camera *camera);
+    void setCamera(Camera *camera);
+    void setGraphicsMode(GraphicsMode gm);
 
     void setWorldColor(float r, float g, float b);
     void setColor(float r, float g, float b, float transparency, float shininess);
@@ -86,11 +91,15 @@ private:
 
     QHash<QString, GLint> m_textures;
 
+    GLuint m_currentShader;
     GLuint m_defaultShader;
     GLuint m_sparseShader;
     GLuint m_cubeShader;
 
     CubeMap *m_cubeMap;
+
+    glm::mat4 m_currProj;
+    glm::mat4 m_currView;
 
     Shape *m_quad;
     Shape *m_cone;
