@@ -81,6 +81,9 @@ void View::initializeGL()
     QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
 }
 
+int freq = 100;
+int counter = 0;
+float totalfps = 0.f;
 void View::paintGL()
 {
     glClearColor(0, 0, 0, 0);
@@ -95,6 +98,17 @@ void View::paintGL()
             cout << "ERMAHGERD YE GEME ES SLEEEWWWWWW (fps: " << fps << ")" << endl;
         else if (fps < 30.f)
             cout << "Ya done messed up dawg. Get it together. (fps: " << fps << ")" << endl;
+
+        totalfps += fps;
+        counter++;
+
+        if (counter >= freq)
+        {
+            cout << "Avg fps: " << (totalfps / counter) << endl;
+            totalfps = 0.f;
+            counter = 0;
+        }
+
     }
     else if (fps > 30.f)
         m_fpsInit = true;
