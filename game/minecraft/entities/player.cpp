@@ -49,7 +49,7 @@ void Player::onTick(float secs)
     thrust += glm::normalize(glm::vec3(-look.z, 0.f, look.x)) * force.x;
     thrust.y = force.y;
 
-    applyForce((thrust - m_vel) * 10.f);
+    applyImpulse((thrust - m_vel) /** 10.f*/);
 }
 
 
