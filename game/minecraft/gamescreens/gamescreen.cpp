@@ -38,6 +38,7 @@ void GameScreen::onTick(float secs)
 
 void GameScreen::onRender(Graphics *g)
 {
+    g->setGraphicsMode(SPARSE);
     m_world->onDraw(g);
 }
 

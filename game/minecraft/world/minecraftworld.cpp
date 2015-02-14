@@ -43,8 +43,8 @@ void MinecraftWorld::onDraw(Graphics *g)
                 {
 //                case AIR:
 //                    break;
-                case DEFAULT:
-                    g->setAtlasPosition(3,0);
+//                case DEFAULT:
+//                    g->setAtlasPosition(3,0);
                     break;
                 case GRASS:
                     g->setAtlasPosition(5,3);

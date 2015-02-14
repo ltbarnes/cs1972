@@ -108,22 +108,50 @@ void Graphics::init()
     m_faceCube->init(m_sparseShader);
 
     loadTexturesFromDirectory();
+
+    m_currentShader = m_defaultShader;
 }
 
 
-void Graphics::setUniforms(Camera *camera)
+void Graphics::setCamera(Camera *camera)
 {
     assert(camera);
 
-    glUseProgram(m_sparseShader);
+    m_currProj = camera->getProjectionMatrix();
+    m_currView = camera->getViewMatrix();
 
-    // Set scene uniforms.
-    glUniformMatrix4fv(m_sparseLocs["projection"], 1, GL_FALSE,
-            glm::value_ptr(camera->getProjectionMatrix()));
-    glUniformMatrix4fv(m_sparseLocs["view"], 1, GL_FALSE,
-            glm::value_ptr(camera->getViewMatrix()));
+    if (m_currentShader == m_defaultShader)
+        clearLights();
+}
 
-    clearLights();
+
+void Graphics::setGraphicsMode(GraphicsMode gm)
+{
+    switch(gm)
+    {
+    case DEFAULT:
+        m_currentShader = m_defaultShader;
+        glUseProgram(m_defaultShader);
+
+        // Set scene uniforms.
+        glUniformMatrix4fv(m_defaultLocs["projection"], 1, GL_FALSE,
+                glm::value_ptr(m_currProj));
+        glUniformMatrix4fv(m_defaultLocs["view"], 1, GL_FALSE,
+                glm::value_ptr(m_currView));
+        break;
+    case SPARSE:
+        m_currentShader = m_sparseShader;
+        glUseProgram(m_sparseShader);
+
+        // Set scene uniforms.
+        glUniformMatrix4fv(m_sparseLocs["projection"], 1, GL_FALSE,
+                glm::value_ptr(m_currProj));
+        glUniformMatrix4fv(m_sparseLocs["view"], 1, GL_FALSE,
+                glm::value_ptr(m_currView));
+        break;
+    case CUBEMAP:
+        break;
+    }
 }
 
 
@@ -272,37 +300,37 @@ void Graphics::addLight(const Light &light)
 
 void Graphics::drawQuad(glm::mat4 trans)
 {
-    m_quad->transformAndRender(m_defaultShader, trans);
+    m_quad->transformAndRender(m_currentShader, trans);
 }
 
 
 void Graphics::drawCone(glm::mat4 trans)
 {
-    m_cone->transformAndRender(m_defaultShader, trans);
+    m_cone->transformAndRender(m_currentShader, trans);
 }
 
 
 void Graphics::drawCube(glm::mat4 trans)
 {
-    m_cube->transformAndRender(m_defaultShader, trans);
+    m_cube->transformAndRender(m_currentShader, trans);
 }
 
 
 void Graphics::drawCyl(glm::mat4 trans)
 {
-    m_cyl->transformAndRender(m_defaultShader, trans);
+    m_cyl->transformAndRender(m_currentShader, trans);
 }
 
 
 void Graphics::drawSphere(glm::mat4 trans)
 {
-    m_sphere->transformAndRender(m_defaultShader, trans);
+    m_sphere->transformAndRender(m_currentShader, trans);
 }
 
 
 void Graphics::drawFaceCube(glm::mat4 trans, int faces)
 {
-    m_faceCube->transformAndRender(m_sparseShader, trans, faces);
+    m_faceCube->transformAndRender(m_currentShader, trans, faces);
 }
 
 

@@ -7,8 +7,8 @@
 
 enum BlockType
 {
-    AIR, DEFAULT, GRASS, DIRT, STONE
-//   0,     1,      2,    3,     4
+    AIR, GRASS, DIRT, STONE
+//   0,    1,     2,    3
 };
 
 class Chunk

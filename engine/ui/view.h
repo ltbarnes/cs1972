@@ -45,6 +45,7 @@ private:
     Application *m_app;
 
     bool m_mouseDown;
+    bool m_fpsInit;
 };
 
 #endif // VIEW_H

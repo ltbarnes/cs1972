@@ -24,6 +24,7 @@ void MinecraftMenu::onTick(float) {}
 
 void MinecraftMenu::onRender(Graphics *g)
 {
+    g->setGraphicsMode(DEFAULT);
     g->setColor(1.f, 1.f, 1.f, 1.f, 1.f);
     g->setWorldColor(1.f, 1.f, 1.f);
     g->setTexture("enter.jpg");
