@@ -4,6 +4,9 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
 
+#include <iostream>
+using namespace std;
+
 Entity::Entity(glm::vec3 pos)
 {
     m_pos = pos;
@@ -91,7 +94,6 @@ void Entity::onDrawTransparent(Graphics *g)
 
 void Entity::drawFromList(Graphics *g, QList<RenderShape *> shapes, glm::mat4 posMat)
 {
-
     foreach(RenderShape *rs, shapes)
     {
         g->setTexture(rs->texture, rs->repeatU, rs->repeatV);
@@ -124,7 +126,7 @@ void Entity::bump(glm::vec3 amount)
     setPosition(getPosition() + amount);
 }
 
-QList<Collision *> Entity::collides(Entity *e)
+QList<Collision *> Entity::collides(Entity *e, float)
 {
     QList<CollisionShape *> cshapes = e->getCollisionShapes();
     QList<Collision *> cols;

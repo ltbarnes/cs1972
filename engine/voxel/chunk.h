@@ -33,17 +33,22 @@ public:
     inline static int getIndex(int x, int y, int z, Point dim);
     inline int getNeighbor(Point block, Point dir);
 
+    virtual QList<Collision *> collides(Entity *e, float secs);
     virtual void handleCollision(Collision *col);
 
+    virtual void onDrawOpaque(Graphics *g);
+    virtual void onDrawTransparent(Graphics *g);
+
 private:
-    char *m_blocks;
-
-    QSet<int> m_drawables;
-
-    Point m_neighbors[6];
+    Collision *checkCollisionY(CollisionShape *cs, glm::vec3 distance);
 
     Point m_p, m_dim;
     int m_size;
+
+    char *m_blocks;
+    QSet<int> m_drawables;
+
+    Point m_neighbors[6];
 
     GLuint m_vaoID;
     GLuint m_vboID;

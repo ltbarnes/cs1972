@@ -10,7 +10,8 @@ public:
     MinecraftWorld(GLuint shader);
     virtual ~MinecraftWorld();
 
-    void onDraw(Graphics *g);
+    virtual void onDraw(Graphics *g);
+    virtual void onTick(float secs);
 
 //    void addBlock(int x, int y, int z, char type);
 

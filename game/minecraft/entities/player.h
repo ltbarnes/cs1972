@@ -25,6 +25,8 @@ public:
     virtual void onKeyPressed(QKeyEvent *e);
     virtual void onKeyReleased(QKeyEvent *e);
 
+    virtual void handleCollision(Collision *col);
+
 private:
     ActionCamera *m_camera;
 

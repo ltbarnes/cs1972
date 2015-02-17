@@ -40,7 +40,7 @@ public:
     virtual glm::vec3 getVelocity();
     virtual float getMass();
 
-    virtual QList<Collision *> collides(Entity *e);
+    virtual QList<Collision *> collides(Entity *e, float secs);
     virtual void handleCollision(Collision *col) = 0;
 
     void bump(glm::vec3 amount);

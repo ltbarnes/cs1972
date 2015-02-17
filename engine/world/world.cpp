@@ -65,11 +65,11 @@ void World::onTick(float secs)
     }
 
     // collisions
-    detectCollisions();
+    detectCollisions(secs);
     handleCollisions();
 }
 
-void World::detectCollisions()
+void World::detectCollisions(float secs)
 {
     foreach(Collision *c, m_collisions)
         delete c;
@@ -86,7 +86,7 @@ void World::detectCollisions()
         // check static entities
         foreach(Entity *es, m_staticEntities)
         {
-            collisions = e1->collides(es);
+            collisions = es->collides(e1, secs);
             if (collisions.size() > 0)
                 m_collisions.append(collisions);
         }
@@ -95,7 +95,7 @@ void World::detectCollisions()
         for (int j = i + 1; j < moveSize; j++)
         {
             e2 = m_movableEntities.value(j);
-            collisions = e1->collides(e2);
+            collisions = e1->collides(e2, secs);
             if (collisions.size() > 0)
                 m_collisions.append(collisions);
         }
@@ -112,11 +112,11 @@ void World::handleCollisions()
         Entity *tempE = col->e1;
         col->e1 = col->e2;
         col->e2 = tempE;
-        CollisionShape *tempS = col->c1;
-        col->c1 = col->c2;
-        col->c2 = tempS;
-        col->mtv *= -1.f;
-        col->impulse *= -1.f;
+//        CollisionShape *tempS = col->c1;
+//        col->c1 = col->c2;
+//        col->c2 = tempS;
+//        col->mtv *= -1.f;
+//        col->impulse *= -1.f;
 
         col->e1->handleCollision(col);
     }

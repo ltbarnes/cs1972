@@ -4,6 +4,7 @@
 
 #include <iostream>
 using namespace std;
+#include <glm/ext.hpp>
 
 Chunk::Chunk(Point p, Point dim)
 {
@@ -30,6 +31,7 @@ Chunk::~Chunk()
 {
     if (m_blocks)
         delete[] m_blocks;
+
     if (m_vaoID)
         glDeleteVertexArrays(1, &m_vaoID);
     if (m_vboID)
@@ -180,20 +182,107 @@ int Chunk::getIndex(int x, int y, int z, Point dim)
     return z*dim.y*dim.x + x*dim.y + y;
 }
 
+QList<Collision *> Chunk::collides(Entity *e, float secs)
+{
+    MovableEntity *me = dynamic_cast<MovableEntity* >(e);
+    QList<CollisionShape *> cshapes = me->getCollisionShapes();
+    QList<Collision *> cols;
+    Collision *col;
+
+    glm::vec3 distance = e->getVelocity() * secs;
+
+    foreach(CollisionShape *cs, cshapes)
+    {
+        col = checkCollisionY(cs, distance);
+        if (col)
+        {
+            col->e1 = this;
+            col->e2 = e;
+//            cols.append(col);
+        }
+    }
+
+    return cols;
+}
+
+Collision *Chunk::checkCollisionY(CollisionShape *cs, glm::vec3 distance)
+{
+    Collision *col = NULL;
+    glm::vec3 mtv = glm::vec3();
+
+    glm::vec3 p = glm::vec3(m_p.x, m_p.y, m_p.z);
+
+    glm::vec3 dir = glm::vec3(
+                (distance.x > 0 ? 1 : -1),
+                (distance.y > 0 ? 1 : -1),
+                (distance.z > 0 ? 1 : -1));
+
+    glm::vec3 dim = cs->getDim() * .5f;
+    glm::vec3 pos = cs->getPos();
+    glm::vec3 dest = pos + distance;
+
+    glm::vec3 minBlocks = glm::round(pos - dim) - p;
+    glm::vec3 maxBlocks = glm::round(pos + dim) - p;
+
+    glm::vec3 nearBlocks = glm::round(pos + dim * dir) - p;
+    glm::vec3 farBlocks = glm::round(dest + dim * dir) - p;
+
+    // check Y
+    for (int y = (int) nearBlocks.y; y != (int) farBlocks.y; y += (int) dir.y)
+    {
+        for (int x = (int) minBlocks.x; x <= maxBlocks.x; x++)
+        {
+            for (int z = (int) minBlocks.z; z <= maxBlocks.z; z++)
+            {
+                if (m_blocks[getIndex(x, y, z, m_dim)])
+                {
+                    mtv.y = farBlocks.y - ((pos.y + dim.y * dir.y) - p.y);
+                }
+            }
+        }
+    }
+
+    cout << "..........STARTING.........." << endl;
+    cout << "dist: " << glm::to_string(distance) << endl;
+    cout << "pos: " << glm::to_string(pos) << endl;
+    cout << "dest: " << glm::to_string(dest) << endl;
+    cout << "min: " << glm::to_string(minBlocks) << endl;
+    cout << "max: " << glm::to_string(maxBlocks) << endl;
+    cout << "far: " << glm::to_string(farBlocks) << endl << endl;
+    if (glm::length2(mtv) > 0.000001)
+    {
+        col = new Collision();
+        col->mtv = mtv;
+    }
+
+    return col;
+}
 
 void Chunk::handleCollision(Collision *col)
 {
     if (!col->c2->isReactable())
         return;
+
     MovableEntity *other = dynamic_cast<MovableEntity* >(col->e2);
-    other->bump(col->mtv * -.5f);
-    glm::vec3 momentum = other->getVelocity() * col->c2->getMass();
-    float mag2 = glm::dot(col->mtv, col->mtv);
-    glm::vec3 imp;
-    if (mag2 < 0.001f)
-        imp = glm::vec3(0.f);
-    else
-        imp = (glm::dot(momentum, col->mtv) / mag2) * col->mtv;
-    other->applyImpulse(-col->impulse);
+    other->getPosition();
+    other->getVelocity();
+
+//    other->setPosition(other->getPosition() + col->mtv);
+//    glm::vec3 vel = other->getVelocity();
+//    vel.y = 0;
+//    other->setVelocity(vel);
+
+//    other->bump(col->mtv * -.5f);
+//    glm::vec3 momentum = other->getVelocity() * col->c2->getMass();
+//    float mag2 = glm::dot(col->mtv, col->mtv);
+//    glm::vec3 imp;
+//    if (mag2 < 0.001f)
+//        imp = glm::vec3(0.f);
+//    else
+//        imp = (glm::dot(momentum, col->mtv) / mag2) * col->mtv;
+//    other->applyImpulse(-col->impulse);
 }
+
+void Chunk::onDrawOpaque(Graphics *) {}
+void Chunk::onDrawTransparent(Graphics *) {}
 

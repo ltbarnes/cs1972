@@ -26,7 +26,7 @@ public:
 //    void addManager(VoxelManager *vm);
 
 protected:
-    virtual void detectCollisions();
+    virtual void detectCollisions(float secs);
     virtual void handleCollisions();
 
     QList<StaticEntity *> m_staticEntities;

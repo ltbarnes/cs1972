@@ -37,8 +37,9 @@ VoxelManager::VoxelManager(GLuint shader, Point center, Point dim, Point chunkSi
 
 VoxelManager::~VoxelManager()
 {
-    foreach(Chunk *chunk, m_chunks)
-        delete chunk;
+    // world deletes them
+//    foreach(Chunk *chunk, m_chunks)
+//        delete chunk;
 
     delete m_chunkBuilder;
 }
@@ -69,15 +70,6 @@ void VoxelManager::onDraw(Graphics *g)
         c->onDraw(g);
     }
 }
-
-
-//void VoxelManager::buildChunk(Point p, int *heightMap, int w, int h)
-//{
-//    Chunk *chunk;
-//    chunk = new Chunk(p, m_chunkSize);
-//    assert(w == m_chunkSize.x && h == m_chunkSize.z);
-//    chunk->buildChunk(heightMap, w, h);
-//}
 
 //void VoxelManager::addBlock(float x, float y, float z, char type)
 //{

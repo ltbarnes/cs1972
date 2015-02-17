@@ -15,7 +15,6 @@ public:
     QList<Chunk*> getChunks();
     void onDraw(Graphics *g);
 
-//    void buildChunk(Point p, int *heightMap, int w, int h);
     void addChunk(Point pnt);
 
 //    void addBlock(float x, float y, float z, char type);
