@@ -5,6 +5,8 @@
 #include "staticentity.h"
 #include <QList>
 
+class VoxelManager;
+
 class World
 {
 public:
@@ -21,6 +23,8 @@ public:
     virtual void onTick(float secs);
     virtual void onDraw(Graphics *g);
 
+//    void addManager(VoxelManager *vm);
+
 protected:
     virtual void detectCollisions();
     virtual void handleCollisions();
@@ -31,6 +35,7 @@ protected:
     QList<Collision *> m_collisions;
     QList<MovableEntity *> m_me2Delete;
 
+//    VoxelManager *m_vm;
 
 };
 

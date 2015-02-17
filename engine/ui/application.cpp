@@ -128,4 +128,9 @@ void Application::onResize(int w, int h)
     m_height = h;
 }
 
+GLuint Application::getShader(GraphicsMode gm)
+{
+    return m_g->setGraphicsMode(gm);
+}
+
 

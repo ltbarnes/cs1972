@@ -1,4 +1,9 @@
 #include "chunk.h"
+#include "movableentity.h"
+#include "collisionshape.h"
+
+#include <iostream>
+using namespace std;
 
 Chunk::Chunk(Point p, Point dim)
 {
@@ -13,74 +18,130 @@ Chunk::Chunk(Point p, Point dim)
     m_neighbors[4] = Point( 0, 0,-1);
     m_neighbors[5] = Point( 0,-1, 0);
 
-    m_blocks = new int[m_size];
+    m_blocks = 0;
+    m_vaoID = 0;
+    m_vboID = 0;
+    m_blocks = new char[m_size];
     for (int i = 0; i < m_size; i++)
         m_blocks[i] = 0;
 }
 
 Chunk::~Chunk()
 {
-    delete m_blocks;
+    if (m_blocks)
+        delete[] m_blocks;
+    if (m_vaoID)
+        glDeleteVertexArrays(1, &m_vaoID);
+    if (m_vboID)
+        glDeleteBuffers(1, &m_vboID);
+}
+
+void Chunk::init(GLuint shader, char *blocks, QSet<int> drawables, float *vertexData, int numVerts)
+{
+    m_blocks = blocks;
+    m_drawables = QSet<int>(drawables);
+    m_numVerts = numVerts;
+
+    if (m_vaoID)
+        glDeleteVertexArrays(1, &m_vaoID);
+    if (m_vboID)
+        glDeleteBuffers(1, &m_vboID);
+
+    // Initialize the vertex array object.
+    glGenVertexArrays(1, &m_vaoID);
+    glBindVertexArray(m_vaoID);
+
+    // Initialize the vertex buffer object.
+    glGenBuffers(1, &m_vboID);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
+
+    glBufferData(GL_ARRAY_BUFFER, 5 * m_numVerts * sizeof(GLfloat), vertexData, GL_STATIC_DRAW);
+
+    GLuint position = glGetAttribLocation(shader, "position");
+    GLuint texCoord = glGetAttribLocation(shader, "texCoord");
+
+    glEnableVertexAttribArray(position);
+    glVertexAttribPointer(
+        position,
+        3,                   // Num coordinates per position
+        GL_FLOAT,            // Type
+        GL_FALSE,            // Normalized
+        sizeof(GLfloat) * 5, // Stride
+        (void*) 0            // Array buffer offset
+    );
+    glEnableVertexAttribArray(texCoord);
+    glVertexAttribPointer(
+        texCoord,
+        2,                              // Num coordinates per position
+        GL_FLOAT,                       // Type
+        GL_TRUE,                        // Normalized
+        sizeof(GLfloat) * 5,            // Stride
+        (void*) (sizeof(GLfloat) * 3)   // Array buffer offset
+    );
+
+    // Unbind buffers.
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 void Chunk::buildChunk(int *heightMap, int w, int h)
 {
-    assert(m_dim.x == w && m_dim.y == h);
+//    assert(m_dim.x == w && m_dim.y == h);
 
-    int numBlocks;
-    int index = 0;
-    int type = 1;
-    for (int z = 0; z < h; z++)
-    {
-        for (int x = 0; x < w; x++)
-        {
-            int mapI = z*w + x;
+//    int numBlocks;
+//    int index = 0;
+//    int type = 1;
+//    for (int z = 0; z < h; z++)
+//    {
+//        for (int x = 0; x < w; x++)
+//        {
+//            int mapI = z*w + x;
 
-            numBlocks = glm::clamp(heightMap[mapI], m_p.y, m_p.y + m_dim.y);
-            for (int y = m_p.y; y < numBlocks; y++)
-            {
-                int sides = 0;
-                // check posz
-                if (z == h-1 || heightMap[mapI + w] <= y)
-                    sides |= (1 << 13);
-                if (x == w-1 || heightMap[mapI + 1] <= y)
-                    sides |= (1 << 12);
-                if (z == 0 || heightMap[mapI - w] <= y)
-                    sides |= (1 << 11);
-                if (x == 0 || heightMap[mapI -1] <= y)
-                    sides |= (1 << 10);
-                if (y == numBlocks-1)
-                    sides |= (1 << 9);
-                if (y == m_p.y)
-                    sides |= (1 << 8);
+//            numBlocks = glm::clamp(heightMap[mapI], m_p.y, m_p.y + m_dim.y);
+//            for (int y = m_p.y; y < numBlocks; y++)
+//            {
+//                char sides = 0;
+//                // check posz
+//                if (z == h-1 || heightMap[mapI + w] <= y)
+//                    sides |= (1 << 5);
+//                if (x == w-1 || heightMap[mapI + 1] <= y)
+//                    sides |= (1 << 4);
+//                if (z == 0 || heightMap[mapI - w] <= y)
+//                    sides |= (1 << 3);
+//                if (x == 0 || heightMap[mapI -1] <= y)
+//                    sides |= (1 << 2);
+//                if (y == numBlocks-1)
+//                    sides |= (1 << 1);
+//                if (y == m_p.y)
+//                    sides |= (1);
 
-                if (y < -25)
-                    type = STONE;
-                else if (y == numBlocks - 1)
-                    type = GRASS;
-                else
-                    type = DIRT;
+//                if (y < -25)
+//                    type = STONE;
+//                else if (y == numBlocks - 1)
+//                    type = GRASS;
+//                else
+//                    type = DIRT;
 
-                updateBlock(index++, (sides | type));
-            }
-            index += m_dim.y - (numBlocks - m_p.y);
-        }
-    }
+//                updateBlock(index++, sides, type);
+//            }
+//            index += m_dim.y - (numBlocks - m_p.y);
+//        }
+//    }
 }
 
-void Chunk::updateBlock(int index, int info)
+void Chunk::updateBlock(int index, int drawable, char type)
 {
-    m_blocks[index] = info;
-    if (info >> 8) // at least one size needs to be rendered
+    m_blocks[index] = type;
+    if (drawable) // at least one size needs to be rendered
         m_drawables.insert(index);
     else
         m_drawables.remove(index);
 }
 
-void Chunk::addBlock(int x, int y, int z, int type)
-{
-    Point p = Point(x, y, z) - m_p;
-    m_blocks[(getIndex(p.x, p.y, p.z, m_dim))] = type;
+//void Chunk::addBlock(int x, int y, int z, int type)
+//{
+//    Point p = Point(x, y, z) - m_p;
+//    m_blocks[(getIndex(p.x, p.y, p.z, m_dim))] = type;
 
 //    int b;
 //    Point n;
@@ -96,7 +157,7 @@ void Chunk::addBlock(int x, int y, int z, int type)
 //        }
 //    }
 //    m_drawables.
-}
+//}
 
 
 int Chunk::getNeighbor(Point block, Point dir)
@@ -109,11 +170,13 @@ int Chunk::getNeighbor(Point block, Point dir)
 }
 
 
-void Chunk::removeBlock(int x, int y, int z)
-{
-    int index = getIndex(m_p.x - x, m_p.y - y, m_p.z - z, m_dim);
-    m_blocks[index] = 0;
-}
+//void Chunk::removeBlock(int x, int y, int z)
+//{
+//    int index = getIndex(m_p.x - x, m_p.y - y, m_p.z - z, m_dim);
+//    m_blocks[index] = 0;
+
+//     // check neighbors
+//}
 
 void Chunk::onTick(float) {}
 
@@ -137,7 +200,7 @@ glm::vec4 Chunk::getDimensionV()
     return glm::vec4(m_p.x, m_p.y, m_p.z, 0.f);
 }
 
-int* Chunk::getBlocks(int *size)
+char* Chunk::getBlocks(int *size)
 {
     *size = m_size;
     return m_blocks;
@@ -151,37 +214,9 @@ QSet<int> Chunk::getDrawables()
 
 void Chunk::onDraw(Graphics *)
 {
-//    char b;
-//    glm::mat4 trans = glm::mat4();
-//    glm::vec4 p = glm::vec4(m_p.x, m_p.y, m_p.z, 0);
-//    for (int i = 0; i < m_size; i++)
-//    {
-//        if ((b = m_blocks[i]))
-//        {
-//            switch(b)
-//            {
-//            case AIR:
-//                break;
-//            case DEFAULT:
-////                g->setAtlasPos();
-//                g->setColor(0, 0, 1, 1, 0);
-//                break;
-//            case GRASS:
-//                g->setColor(0, 1, 0, 1, 0);
-//                break;
-//            case DIRT:
-//                g->setColor(1, 0, 0, 1, 0);
-//                break;
-//            case STONE:
-//                g->setColor(0, 0, 0, 1, 0);
-//                break;
-//            default:
-//                break;
-//            }
-//            trans[3] = getCoords(i, m_dim) + p;
-//            g->drawCube(trans);
-//        }
-//    }
+    glBindVertexArray(m_vaoID);
+    glDrawArrays(GL_TRIANGLES, 0, m_numVerts);
+    glBindVertexArray(0);
 }
 
 
@@ -191,10 +226,19 @@ int Chunk::getIndex(int x, int y, int z, Point dim)
 }
 
 
-//glm::vec4 Chunk::getCoords(int index, Point dim)
-//{
-//    return glm::vec4(((index / dim.y) % dim.x),
-//                     (index % dim.y),
-//                     (index / (dim.x*dim.y)),
-//                     0.f);
-//}
+void Chunk::handleCollision(Collision *col)
+{
+    if (!col->c2->isReactable())
+        return;
+    MovableEntity *other = dynamic_cast<MovableEntity* >(col->e2);
+    other->bump(col->mtv * -.5f);
+    glm::vec3 momentum = other->getVelocity() * col->c2->getMass();
+    float mag2 = glm::dot(col->mtv, col->mtv);
+    glm::vec3 imp;
+    if (mag2 < 0.001f)
+        imp = glm::vec3(0.f);
+    else
+        imp = (glm::dot(momentum, col->mtv) / mag2) * col->mtv;
+    other->applyImpulse(-col->impulse);
+}
+

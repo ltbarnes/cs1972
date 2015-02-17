@@ -53,7 +53,7 @@ public:
 
     void init();
     void setCamera(Camera *camera);
-    void setGraphicsMode(GraphicsMode gm);
+    GLuint setGraphicsMode(GraphicsMode gm);
 
     void setWorldColor(float r, float g, float b);
     void setColor(float r, float g, float b, float transparency, float shininess);

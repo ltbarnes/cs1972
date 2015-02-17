@@ -14,7 +14,7 @@ GameScreen::GameScreen(Application *parent)
     : Screen(parent)
 {
     ActionCamera *cam = new ActionCamera();
-    m_world = new MinecraftWorld();
+    m_world = new MinecraftWorld(m_parentApp->getShader(SPARSE));
     m_player = new Player(cam, glm::vec3(0,5,0), m_world);
 
     m_world->addMovableEntity(m_player);

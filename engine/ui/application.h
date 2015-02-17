@@ -35,6 +35,7 @@ public:
     void onResize(int w, int h);
 
     void setUseCubeMap(bool use);
+    GLuint getShader(GraphicsMode gm);
 
 private:
     QList<Screen *> m_screens;

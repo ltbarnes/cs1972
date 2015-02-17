@@ -125,7 +125,7 @@ void Graphics::setCamera(Camera *camera)
 }
 
 
-void Graphics::setGraphicsMode(GraphicsMode gm)
+GLuint Graphics::setGraphicsMode(GraphicsMode gm)
 {
     switch(gm)
     {
@@ -152,6 +152,7 @@ void Graphics::setGraphicsMode(GraphicsMode gm)
     case CUBEMAP:
         break;
     }
+    return m_currentShader;
 }
 
 

@@ -4,9 +4,9 @@
 #include <QSet>
 #include <QTime>
 
-MinecraftWorld::MinecraftWorld()
+MinecraftWorld::MinecraftWorld(GLuint shader)
 {
-    m_vm = new VoxelManager(Point(), Point(1, 1, 1), Point(32, 32, 32), new MCChunkBuilder(QTime::currentTime().msec()));
+    m_vm = new VoxelManager(shader, Point(), Point(5, 2, 5), Point(32, 32, 32), new MCChunkBuilder(QTime::currentTime().msec()));
 }
 
 
@@ -19,50 +19,7 @@ MinecraftWorld::~MinecraftWorld()
 void MinecraftWorld::onDraw(Graphics *g)
 {
     g->setAtlas("terrain.png", glm::vec2(16.f));
-
-    QList<Chunk*> chunks = m_vm->getChunks();
-
-    glm::mat4 trans = glm::mat4();
-    int b;
-    int *blocks;
-    QSet<int> drawables;
-    int size;
-    glm::vec4 p;
-    Point dim;
-    foreach (Chunk *chunk, chunks)
-    {
-        blocks = chunk->getBlocks(&size);
-        drawables = chunk->getDrawables();
-        p = chunk->getLocationV();
-        dim = chunk->getDimension();
-        foreach (int i, drawables)
-        {
-            if ((b = blocks[i]))
-            {
-                switch(b & 0b11111111)
-                {
-//                case AIR:
-//                    break;
-//                case DEFAULT:
-//                    g->setAtlasPosition(3,0);
-                    break;
-                case GRASS:
-                    g->setAtlasPosition(5,3);
-                    break;
-                case DIRT:
-                    g->setAtlasPosition(2,0);
-                    break;
-                case STONE:
-                    g->setAtlasPosition(0,1);
-                    break;
-                default:
-                    break;
-                }
-                trans[3] = getCoords(i, dim) + p;
-                g->drawFaceCube(trans, b);
-            }
-        }
-    }
+    m_vm->onDraw(g);
 }
 
 glm::vec4 MinecraftWorld::getCoords(int index, Point dim)
@@ -76,8 +33,8 @@ glm::vec4 MinecraftWorld::getCoords(int index, Point dim)
 
 
 
-void MinecraftWorld::addBlock(int x, int y, int z, char type)
-{
-    m_vm->addBlock(x, y, z, type);
-}
+//void MinecraftWorld::addBlock(int x, int y, int z, char type)
+//{
+//    m_vm->addBlock(x, y, z, type);
+//}
 

@@ -1,4 +1,5 @@
 #include "world.h"
+#include "voxelmanager.h"
 
 World::World()
 {
@@ -124,6 +125,9 @@ void World::handleCollisions()
 
 void World::onDraw(Graphics *g)
 {
+//    if (m_vm)
+//        m_vm->onDraw(g);
+
     foreach(Entity *e, m_staticEntities)
         e->onDrawOpaque(g);
 
@@ -136,4 +140,9 @@ void World::onDraw(Graphics *g)
     foreach(Entity *e, m_movableEntities)
         e->onDrawTransparent(g);
 }
+
+//void World::addManager(VoxelManager *vm)
+//{
+
+//}
 

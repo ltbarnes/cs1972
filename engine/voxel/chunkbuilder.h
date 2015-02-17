@@ -1,6 +1,8 @@
 #ifndef CHUNKBUILDER_H
 #define CHUNKBUILDER_H
 
+#include <GL/glew.h>
+
 struct Point;
 class Chunk;
 
@@ -10,7 +12,7 @@ public:
     ChunkBuilder(int seed) { m_seed = seed; }
     virtual ~ChunkBuilder() {}
 
-    virtual Chunk* getChunk(Point p, Point dim) = 0;
+    virtual Chunk *getChunk(GLuint shader, Point p, Point dim) = 0;
 
 protected:
     int m_seed;

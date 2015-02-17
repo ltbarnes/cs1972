@@ -20,6 +20,7 @@ struct Point
         this->y = y;
         this->z = z;
     }
+
 };
 
 inline Point operator+(const Point& p1, const Point& p2)

@@ -35,6 +35,11 @@ glm::mat4 Camera::getViewMatrix()
     return m_view;
 }
 
+glm::mat4 Camera::getFrustumMatrix()
+{
+    return m_frustum;
+}
+
 glm::vec4 Camera::getLook()
 {
     return m_look;
@@ -61,10 +66,10 @@ void Camera::setAspectRatio(float a)
 //    orientLook(eye, m_look, m_up);
 //}
 
-void Camera::setThirdPersonDistance(float dist)
-{
-    m_thirdDist = dist;
-}
+//void Camera::setThirdPersonDistance(float dist)
+//{
+//    m_thirdDist = dist;
+//}
 
 void Camera::orientLook(glm::vec4 &eye, glm::vec4 &look, glm::vec4 &up)
 {
@@ -75,6 +80,7 @@ void Camera::orientLook(glm::vec4 &eye, glm::vec4 &look, glm::vec4 &up)
 
     setCameraSpace();
     setViewMatrix();
+    setFrustumMatrix();
 }
 
 void Camera::moveHorizontal(glm::vec2 dir)
@@ -87,18 +93,21 @@ void Camera::moveAlongU(float mag)
 {
     m_eye += m_u * mag;
     setViewMatrix();
+    setFrustumMatrix();
 }
 
 void Camera::moveAlongUp(float mag)
 {
     m_eye += m_up * mag;
     setViewMatrix();
+    setFrustumMatrix();
 }
 
 void Camera::moveAlongLook(float mag)
 {
     m_eye += m_look * mag;
     setViewMatrix();
+    setFrustumMatrix();
 }
 
 void Camera::pitch(float degrees)
@@ -112,6 +121,7 @@ void Camera::pitch(float degrees)
         setCameraSpace();
     }
     setViewMatrix();
+    setFrustumMatrix();
 }
 
 void Camera::yaw(float degrees)
@@ -122,6 +132,7 @@ void Camera::yaw(float degrees)
     m_up = glm::rotate(m_up, radians, vec);
     setCameraSpace();
     setViewMatrix();
+    setFrustumMatrix();
 }
 
 void Camera::roll(float degrees)
@@ -129,6 +140,7 @@ void Camera::roll(float degrees)
     m_up = glm::rotate(m_up, glm::radians(degrees), glm::vec3(m_look));
     setCameraSpace();
     setViewMatrix();
+    setFrustumMatrix();
 }
 
 void Camera::setCameraSpace()
@@ -180,6 +192,11 @@ void Camera::setProjectionMatrix()
                                       0.0,   0.0,     -1.0,         0.0);
     perspective = glm::transpose(perspective);
     m_proj = perspective * scale;
+}
+
+void Camera::setFrustumMatrix()
+{
+    m_frustum = m_proj * m_view;
 }
 
 

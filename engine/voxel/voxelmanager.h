@@ -9,16 +9,16 @@ class ChunkBuilder;
 class VoxelManager// : public Manager
 {
 public:
-    VoxelManager(Point center, Point dim, Point chunkSize, ChunkBuilder *cb);
+    VoxelManager(GLuint shader, Point center, Point dim, Point chunkSize, ChunkBuilder *cb);
     virtual ~VoxelManager();
 
     QList<Chunk*> getChunks();
     void onDraw(Graphics *g);
 
-    void buildChunk(Point p, int *heightMap, int w, int h);
+//    void buildChunk(Point p, int *heightMap, int w, int h);
     void addChunk(Point pnt);
 
-    void addBlock(float x, float y, float z, char type);
+//    void addBlock(float x, float y, float z, char type);
 
     inline int getIndex(int x, int y, int z);
 
@@ -29,6 +29,8 @@ private:
     Point m_chunkSize;
     Point m_center, m_dim;
     Point m_max, m_min;
+
+    GLuint m_shader;
 };
 
 #endif // VOXELMANAGER_H

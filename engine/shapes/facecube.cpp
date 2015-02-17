@@ -32,25 +32,15 @@ void FaceCube::calcVerts()
     int index = 0;
     // front
     addFace(&index, trf, tlf, brf, blf);
-    addVertexSparse(&index, blf);
     // rightside
-    addVertexSparse(&index, trb);
     addFace(&index, trb, trf, brb, brf);
-    addVertexSparse(&index, brf);
     // back
-    addVertexSparse(&index, tlb);
     addFace(&index, tlb, trb, blb, brb);
-    addVertexSparse(&index, brb);
     // leftside
-    addVertexSparse(&index, tlf);
     addFace(&index, tlf, tlb, blf, blb);
-    addVertexSparse(&index, blb);
     // top
-    addVertexSparse(&index, trb);
     addFace(&index, trb, tlb, trf, tlf);
-    addVertexSparse(&index, tlf);
     // bottom
-    addVertexSparse(&index, brf);
     addFace(&index, brf, blf, brb, blb);
 }
 
@@ -135,8 +125,8 @@ void FaceCube::transformAndRender(GLuint shader, glm::mat4 trans, int info)
 
     for (int i = 0; i < 6; i++)
     {
-        if (info & (1 << (13 - i)))
-            glDrawArrays(GL_TRIANGLE_STRIP, (i * 6), 4);
+//        if (info & (1 << (13 - i)))
+            glDrawArrays(GL_TRIANGLE_STRIP, (i * 4), 4);
 
     }
 

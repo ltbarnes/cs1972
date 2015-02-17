@@ -7,12 +7,12 @@
 class MinecraftWorld : public World
 {
 public:
-    MinecraftWorld();
+    MinecraftWorld(GLuint shader);
     virtual ~MinecraftWorld();
 
     void onDraw(Graphics *g);
 
-    void addBlock(int x, int y, int z, char type);
+//    void addBlock(int x, int y, int z, char type);
 
     inline static glm::vec4 getCoords(int index, Point dim);
 

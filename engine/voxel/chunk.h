@@ -3,23 +3,20 @@
 
 #include "graphics.h"
 #include "point3d.h"
+#include "staticentity.h"
 #include <QSet>
 
-enum BlockType
-{
-    AIR, GRASS, DIRT, STONE
-//   0,    1,     2,    3
-};
-
-class Chunk
+class Chunk : public StaticEntity
 {
 public:
     Chunk(Point p, Point dim);
     virtual ~Chunk();
 
+    void init(GLuint shader, char *blocks, QSet<int> drawables, float *vertexData, int numVerts);
+
     void buildChunk(int *heightMap, int w, int h);
-    void updateBlock(int index, int info);
-    int *getBlocks(int *size);
+    void updateBlock(int index, int drawable, char type);
+    char *getBlocks(int *size);
     QSet<int> getDrawables();
 
 
@@ -28,18 +25,19 @@ public:
     Point getDimension();
     glm::vec4 getDimensionV();
 
-    void addBlock(int x, int y, int z, int type);
-    void removeBlock(int x, int y, int z);
+//    void addBlock(int x, int y, int z, int type);
+//    void removeBlock(int x, int y, int z);
 
     void onTick(float secs);
     void onDraw(Graphics *g);
 
     inline static int getIndex(int x, int y, int z, Point dim);
     inline int getNeighbor(Point block, Point dir);
-//    static glm::vec4 getCoords(int index, Point dim);
+
+    virtual void handleCollision(Collision *col);
 
 private:
-    int *m_blocks;
+    char *m_blocks;
 
     QSet<int> m_drawables;
 
@@ -47,6 +45,10 @@ private:
 
     Point m_p, m_dim;
     int m_size;
+
+    GLuint m_vaoID;
+    GLuint m_vboID;
+    int m_numVerts;
 };
 
 #endif // CHUNK_H

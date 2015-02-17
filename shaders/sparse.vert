@@ -16,8 +16,8 @@ uniform vec2 repeatUV = vec2(1.0);
 
 void main() {
 
-    texc = (subPos / subImages) + (texCoord / subImages); // for atlas
-//        texc = vec2(texCoord.x * repeatU, texCoord.y * repeatV);
+//    texc = (subPos / subImages) + (texCoord / subImages); // for atlas
+    texc = vec2(texCoord.x * repeatUV.x, texCoord.y * repeatUV.y);
 
     gl_Position = projection * view * model * vec4(position, 1.0);
 }
