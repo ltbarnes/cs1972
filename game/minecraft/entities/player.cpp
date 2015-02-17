@@ -66,7 +66,10 @@ void Player::onTick(float secs)
     thrust.y = force.y;
 
     glm::vec3 vel = thrust - m_vel;
-    vel.y = 0.f;
+    if (m_up)
+        vel.y = m_forceAmt;
+    else
+        vel.y = 0.f;
 
     applyImpulse(vel);
 }
@@ -183,6 +186,12 @@ void Player::onKeyReleased(QKeyEvent *e)
     }
 }
 
-void Player::handleCollision(Collision *) {}
+void Player::handleCollision(Collision *col)
+{
+        setPosition(getPosition() + col->mtv);
+        glm::vec3 vel = getVelocity();
+        vel.y = 0;
+        setVelocity(vel);
+}
 
 

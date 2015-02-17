@@ -53,7 +53,8 @@ Chunk *MCChunkBuilder::getChunk(GLuint shader, Point p, Point dim)
         for (int i = 0; i < dim.x; i++)
         {
             float x = ((p.x + i) * (p.x + i) + (p.z + k) * (p.z + k)) * .0002f + m_seed;
-            hm[index++] = (int)glm::round((glm::cos(x) * glm::cos(sqrt2 * x)) * 10.f) - 20;
+//            hm[index++] = (int)glm::round((glm::cos(x) * glm::cos(sqrt2 * x)) * 10.f) - 20;
+            hm[index++] = 1;
         }
     }
 

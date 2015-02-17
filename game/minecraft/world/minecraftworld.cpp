@@ -56,3 +56,21 @@ glm::vec4 MinecraftWorld::getCoords(int index, Point dim)
 //    m_vm->addBlock(x, y, z, type);
 //}
 
+void MinecraftWorld::handleCollisions()
+{
+//    QHash<Entity *  , Collision *> mtvs;
+
+    foreach(Collision *col, m_collisions)
+    {
+//        Entity *e = col->e2;
+//        if (mtvs.contains(e))
+//            col->mtv = glm::min(col->mtv, mtvs.value(e)->mtv);
+        col->e2->handleCollision(col);
+//        mtvs.insert(e, col);
+    }
+
+//    QList<Entity *> keys = mtvs.keys();
+//    foreach(Entity *e, keys)
+//        e->handleCollision(mtvs.value(e));
+
+}

@@ -17,6 +17,9 @@ public:
 
     inline static glm::vec4 getCoords(int index, Point dim);
 
+protected:
+    virtual void handleCollisions();
+
 private:
     VoxelManager *m_vm;
 };

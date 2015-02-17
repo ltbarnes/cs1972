@@ -18,7 +18,6 @@ public:
     char *getBlocks(int *size);
     QSet<int> getDrawables();
 
-
     Point getLocation();
     glm::vec4 getLocationV();
     Point getDimension();
@@ -38,6 +37,8 @@ public:
 
     virtual void onDrawOpaque(Graphics *g);
     virtual void onDrawTransparent(Graphics *g);
+
+    bool contains(glm::vec3 point);
 
 private:
     Collision *checkCollisionY(CollisionShape *cs, glm::vec3 distance);
