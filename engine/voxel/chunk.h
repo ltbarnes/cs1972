@@ -14,7 +14,6 @@ public:
 
     void init(GLuint shader, char *blocks, QSet<int> drawables, float *vertexData, int numVerts);
 
-    void buildChunk(int *heightMap, int w, int h);
     void updateBlock(int index, int drawable, char type);
     char *getBlocks(int *size);
     QSet<int> getDrawables();

@@ -31,8 +31,6 @@ glm::vec4 MinecraftWorld::getCoords(int index, Point dim)
 }
 
 
-
-
 //void MinecraftWorld::addBlock(int x, int y, int z, char type)
 //{
 //    m_vm->addBlock(x, y, z, type);

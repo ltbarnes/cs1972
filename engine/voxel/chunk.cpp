@@ -84,51 +84,6 @@ void Chunk::init(GLuint shader, char *blocks, QSet<int> drawables, float *vertex
     glBindVertexArray(0);
 }
 
-void Chunk::buildChunk(int *heightMap, int w, int h)
-{
-//    assert(m_dim.x == w && m_dim.y == h);
-
-//    int numBlocks;
-//    int index = 0;
-//    int type = 1;
-//    for (int z = 0; z < h; z++)
-//    {
-//        for (int x = 0; x < w; x++)
-//        {
-//            int mapI = z*w + x;
-
-//            numBlocks = glm::clamp(heightMap[mapI], m_p.y, m_p.y + m_dim.y);
-//            for (int y = m_p.y; y < numBlocks; y++)
-//            {
-//                char sides = 0;
-//                // check posz
-//                if (z == h-1 || heightMap[mapI + w] <= y)
-//                    sides |= (1 << 5);
-//                if (x == w-1 || heightMap[mapI + 1] <= y)
-//                    sides |= (1 << 4);
-//                if (z == 0 || heightMap[mapI - w] <= y)
-//                    sides |= (1 << 3);
-//                if (x == 0 || heightMap[mapI -1] <= y)
-//                    sides |= (1 << 2);
-//                if (y == numBlocks-1)
-//                    sides |= (1 << 1);
-//                if (y == m_p.y)
-//                    sides |= (1);
-
-//                if (y < -25)
-//                    type = STONE;
-//                else if (y == numBlocks - 1)
-//                    type = GRASS;
-//                else
-//                    type = DIRT;
-
-//                updateBlock(index++, sides, type);
-//            }
-//            index += m_dim.y - (numBlocks - m_p.y);
-//        }
-//    }
-}
-
 void Chunk::updateBlock(int index, int drawable, char type)
 {
     m_blocks[index] = type;

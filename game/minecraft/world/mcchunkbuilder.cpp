@@ -1,9 +1,9 @@
 #include "mcchunkbuilder.h"
 #include "chunk.h"
 
-#include <iostream>
-using namespace std;
-#include <glm/ext.hpp>
+//#include <iostream>
+//using namespace std;
+//#include <glm/ext.hpp>
 
 
 MCChunkBuilder::MCChunkBuilder(int seed)
