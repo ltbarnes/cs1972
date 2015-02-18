@@ -1,65 +1,36 @@
-Project: Minecraft 1
+Project: Minecraft 2
 Student: Logan Barnes (ltbarnes)
 
 
 Common Engine Requirements
 ========================================
-[ ] Graphics object supports convenient drawing from a texture atlas
-	### The engine/graphics/Graphics object has a setAtlas() and setAtlasPosition() function.
+[ ] Camera or graphics object supports view frustum culling of axis-aligned bounding boxes
+	### in engine/voxel/voxelmanager the graphics object is used to cull the chunks
 
 Voxel Engine Requirements
 ========================================
-[ ] Chunk-based world representation (implemented as a "manager")
-	### engine/voxel/VoxelManager stores and manipulates the chunks
-
-[ ] Block defined as a 1x1x1 cube with (minimally) the following characteristics:
-	[ ] Transparency - should the engine render block faces adjacent to this block?
-	[ ] Passability - can entities pass through this block?
-
-	### The blocks are stored as ints with the last 8 bits corresponding to type (for rendering and passability).
-		The adjacent 6 bits represent which faces should be rendered depending on neighboring blocks.
-		The int array representing the blocks is owned by the engine/voxel/Chunk class.
-
-[ ] Chunk defined as a CxCxC group of blocks, where C is a single parameter (or 3 different ones) determining chunk dimensions
-	### engine/voxel/Chunk class.
-
-[ ] Chunks render only block faces that are adjacent to transparent blocks, with the exception of chunk boundaries, which may always be rendered
-	### When the chunks are created the block faces are set so adjacent faces aren't passed to the gpu.
-		The engine/voxel/Chunk class handles faces within each chunk and the engine/voxel/VoxelManager class handles adjacent faces between the chunks.
+[ ] Collision detection and sliding response with collided blocks for arbitrary size axis-asligned bounding boxes
+	### engine/voxel/voxelmanager handles collisions with chunks
+[ ] Per-chunk Vertex Buffer Objects
+	### game/world/mcchunkbuilder creates the vbo then gives it to the chunk in the init() function
 
 Game Requirements
 ========================================
-[ ] Movement and view controls must the same as warmup
-	### Mouse changes look direction and WASD traverses.
-
-[ ] The world must have no gravity, so the player must have an additional key control to change their height
-	### E and Q move the player up and down respectively.
-
-[ ] The terrain in the world must be procedurally generated
-	[ ] Chunk composition is algorithmically determined with the complexity of at least a sin wave
-		### The algorithm is located in the game/world/MCChunkBuilder class and uses a couple cosine functions.
-			The seed is set in the game/world/MinecraftWorld class and uses the current time.
-
-	[ ] Terrain contains at least two visually unique blocks besides air/empty blocks
-		### the block types are set in the engine/voxel/Chunk class depending on height.
-
-	[ ] All blocks must be textured from a single texture atlas
-		### Only using the given "terrain.png" file.
-
-[ ] The world must consist of a 2x2x2 grid of size C = 32 chunks
-	### Set in the game/world/MinecraftWorld constructor.
-
-[ ] The game must run at 20+ FPS on department machines: this requirement overrides the standard 30+ FPS requirement
-	### Seems to be doing alright.
-
+[ ] Movement and view controls must the same as warmup (including gravity and jumping)
+	### handled in the game/entities/player class
+[ ] The world must consists of a 10x2x10 grid of size C = 32 chunks
+	### set in the game/world/minecraftworld constructor
+[ ] The game must run at 40+ FPS on department machines: this requirement overrides the standard 30+ FPS requirement
 
 
 Issues:
 	
-	FPS problems print to the console (only below 30 fps).
-	Compiled with Qt5.2 (works when running qmake5.2.0 on department machines).
+	-Z face collisions can be a little glitchy since x is handled first.
+	-Collision abstractions are a mess
+	-FPS prints to the console.
+	-Compiled with Qt5.2.0
 
 
 ~Hours:
-24
+15
 

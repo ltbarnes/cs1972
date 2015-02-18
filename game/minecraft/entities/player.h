@@ -32,6 +32,7 @@ private:
 
     int m_wsad;
     bool m_up, m_down;
+    bool m_canJump, m_jump;
 
     float m_offset;
     World *m_world;

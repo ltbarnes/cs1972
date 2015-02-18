@@ -18,6 +18,8 @@ Player::Player(ActionCamera *camera, glm::vec3 pos, World *world)
     setMass(1.f);
 
     m_forceAmt = 5.f;
+    m_jump = false;
+    m_canJump = false;
 
     CollisionShape *cs = new CollisionCylinder(glm::vec3(), glm::vec3(.98f, 1.98f, .98f), "player");
     addCollisionShape(cs);
@@ -54,10 +56,10 @@ void Player::onTick(float secs)
         force.x -= m_forceAmt;
     if (m_wsad & 0b0001)
         force.x += m_forceAmt;
-    if (m_up)
-        force.y += m_forceAmt;
-    if (m_down)
-        force.y -= m_forceAmt;
+//    if (m_up)
+//        force.y += m_forceAmt;
+//    if (m_down)
+//        force.y -= m_forceAmt;
 
     glm::vec4 look = m_camera->getLook();
 
@@ -66,10 +68,11 @@ void Player::onTick(float secs)
     thrust.y = force.y;
 
     glm::vec3 vel = thrust - m_vel;
-    if (m_up)
+    if (m_jump && m_canJump)
         vel.y = m_forceAmt;
     else
         vel.y = 0.f;
+    m_canJump = false;
 
     applyImpulse(vel);
 }
@@ -120,6 +123,7 @@ void Player::onKeyPressed(QKeyEvent *e)
         m_down = true;
         break;
     case Qt::Key_Space:
+        m_jump = true;
         break;
     case Qt::Key_Minus:
     case Qt::Key_Underscore:
@@ -177,6 +181,7 @@ void Player::onKeyReleased(QKeyEvent *e)
         m_down = false;
         break;
     case Qt::Key_Space:
+        m_jump = false;
         break;
     case Qt::Key_Shift:
         m_forceAmt = 5.f;
@@ -189,9 +194,10 @@ void Player::onKeyReleased(QKeyEvent *e)
 void Player::handleCollision(Collision *col)
 {
         setPosition(getPosition() + col->mtv);
-        glm::vec3 vel = getVelocity();
-        vel.y = 0;
-        setVelocity(vel);
+        if (col->impulse.x > 0)
+            m_canJump = true;
+//        vel.y = 0;
+//        setVelocity(vel);
 //        cout << "player" <<endl;
 }
 
