@@ -53,8 +53,8 @@ Chunk *MCChunkBuilder::getChunk(GLuint shader, Point p, Point dim)
         for (int i = 0; i < dim.x; i++)
         {
             float x = ((p.x + i) * (p.x + i) + (p.z + k) * (p.z + k)) * .0002f + m_seed;
-//            hm[index++] = (int)glm::round((glm::cos(x) * glm::cos(sqrt2 * x)) * 10.f) - 20;
-            hm[index++] = 1;
+            hm[index++] = (int)glm::round((glm::cos(x) * glm::cos(sqrt2 * x)) * 10.f);
+//            hm[index++] = 1;
         }
     }
 
@@ -106,7 +106,7 @@ void MCChunkBuilder::buildChunk(GLuint shader, Chunk *chunk, int *heightMap, Poi
                 if (y == p.y)
                     sides |= (1);
 
-                if (y < -55)
+                if (y < -25)
                     type = STONE;
                 else if (y == heightMap[mapI] - 1)
                     type = ORIGINAL;

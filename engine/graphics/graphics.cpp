@@ -119,6 +119,7 @@ void Graphics::setCamera(Camera *camera)
 
     m_currProj = camera->getProjectionMatrix();
     m_currView = camera->getViewMatrix();
+    m_frustum = camera->getFrustumMatrix();
 
     if (m_currentShader == m_defaultShader)
         clearLights();
@@ -243,6 +244,12 @@ void Graphics::setTransparentMode(bool on)
     }
     else
         glDisable(GL_BLEND);
+}
+
+
+glm::mat4 Graphics::getFrustum()
+{
+    return m_frustum;
 }
 
 

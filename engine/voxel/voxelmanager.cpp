@@ -63,11 +63,68 @@ QList<Chunk*> VoxelManager::getChunks()
 
 void VoxelManager::onDraw(Graphics *g)
 {
+    glm::mat4 frust = g->getFrustum();
+
+    glm::vec4 planes[6];
+    planes[0] = frust[3] - frust[0]; // negx
+    planes[1] = frust[3] - frust[1]; // negy
+    planes[2] = frust[3] - frust[2]; // negz
+    planes[3] = frust[3] + frust[0]; // posx
+    planes[4] = frust[3] + frust[1]; // posy
+    planes[5] = frust[3] + frust[2]; // posz
+
+
     glm::mat4 trans = glm::mat4();
-    foreach (Chunk *c, m_chunks) {
-        trans[3] = c->getLocationV();
-        glUniformMatrix4fv(glGetUniformLocation(m_shader, "model"), 1, GL_FALSE, glm::value_ptr(trans));
-        c->onDraw(g);
+
+    glm::vec4 pos, dim;
+    glm::vec4 plan, corn;
+    glm::vec4 corners[8];
+
+    foreach (Chunk *c, m_chunks)
+    {
+        pos = c->getLocationV();
+        dim = c->getDimensionV();
+
+        corners[0] = pos + dim * glm::vec4(-1,-1,-1, 0 );
+        corners[1] = pos + dim * glm::vec4( 1,-1,-1, 0 );
+        corners[2] = pos + dim * glm::vec4(-1, 1,-1, 0 );
+        corners[3] = pos + dim * glm::vec4(-1,-1, 1, 0 );
+        corners[4] = pos + dim * glm::vec4(-1, 1, 1, 0 );
+        corners[5] = pos + dim * glm::vec4( 1,-1, 1, 0 );
+        corners[6] = pos + dim * glm::vec4( 1, 1,-1, 0 );
+        corners[7] = pos + dim * glm::vec4( 1, 1, 1, 0 );
+
+        int numOutside;
+        bool render = true;
+        for (int p = 0; p < 6; p++)
+        {
+            plan = planes[p];
+            numOutside = 0;
+
+            for (int c = 0; c < 8; c++)
+            {
+                corn = corners[c];
+
+                // inside plane
+                if (glm::dot(plan, corn) > 0.f)
+                {
+                    break;
+                }
+                numOutside++;
+            }
+            if (numOutside >= 8)
+            {
+                render = false;
+                break;
+            }
+        }
+
+        if (render)
+        {
+            trans[3] = pos;
+            glUniformMatrix4fv(glGetUniformLocation(m_shader, "model"), 1, GL_FALSE, glm::value_ptr(trans));
+            c->onDraw(g);
+        }
     }
 }
 

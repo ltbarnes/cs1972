@@ -9,14 +9,14 @@ using namespace std;
 
 MinecraftWorld::MinecraftWorld(GLuint shader)
 {
-    m_vm = new VoxelManager(shader, Point(), Point(1, 1, 1), Point(32, 32, 32), new MCChunkBuilder(QTime::currentTime().msec()));
+    m_vm = new VoxelManager(shader, Point(), Point(10, 2, 10), Point(32, 32, 32), new MCChunkBuilder(QTime::currentTime().msec()));
 
-    QList<Chunk *> chunks = m_vm->getChunks();
+//    QList<Chunk *> chunks = m_vm->getChunks();
 
 //    cout << "Chunks: " << chunks.size() << endl;
 
-    foreach (Chunk *chunk, chunks)
-        addStaticEntity(chunk);
+//    foreach (Chunk *chunk, chunks)
+//        addStaticEntity(chunk);
 }
 
 
@@ -29,8 +29,8 @@ void MinecraftWorld::onTick(float secs)
 {
     World::onTick(secs);
 
-    foreach (MovableEntity *me, m_movableEntities)
-        me->applyForce(glm::vec3(0, -10.f * me->getMass(), 0));
+//    foreach (MovableEntity *me, m_movableEntities)
+//        me->applyForce(glm::vec3(0, -10.f * me->getMass(), 0));
 }
 
 void MinecraftWorld::onDraw(Graphics *g)

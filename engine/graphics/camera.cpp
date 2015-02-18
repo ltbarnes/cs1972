@@ -196,7 +196,7 @@ void Camera::setProjectionMatrix()
 
 void Camera::setFrustumMatrix()
 {
-    m_frustum = m_proj * m_view;
+    m_frustum = glm::transpose(m_proj * m_view);
 }
 
 

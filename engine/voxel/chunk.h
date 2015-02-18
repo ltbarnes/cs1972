@@ -3,10 +3,10 @@
 
 #include "graphics.h"
 #include "point3d.h"
-#include "staticentity.h"
+//#include "staticentity.h"
 #include <QSet>
 
-class Chunk : public StaticEntity
+class Chunk// : public StaticEntity
 {
 public:
     Chunk(Point p, Point dim);
@@ -32,16 +32,16 @@ public:
     inline static int getIndex(int x, int y, int z, Point dim);
     inline int getNeighbor(Point block, Point dir);
 
-    virtual QList<Collision *> collides(Entity *e, float secs);
-    virtual void handleCollision(Collision *col);
+//    virtual QList<Collision *> collides(Entity *e, float secs);
+//    virtual void handleCollision(Collision *col);
 
-    virtual void onDrawOpaque(Graphics *g);
-    virtual void onDrawTransparent(Graphics *g);
+//    virtual void onDrawOpaque(Graphics *g);
+//    virtual void onDrawTransparent(Graphics *g);
 
-    bool contains(glm::vec3 point);
+//    bool contains(glm::vec3 point);
 
 private:
-    Collision *checkCollisionY(CollisionShape *cs, glm::vec3 distance);
+//    Collision *checkCollisionY(CollisionShape *cs, glm::vec3 distance);
 
     Point m_p, m_dim;
     int m_size;

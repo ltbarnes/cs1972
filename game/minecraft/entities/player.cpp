@@ -66,10 +66,10 @@ void Player::onTick(float secs)
     thrust.y = force.y;
 
     glm::vec3 vel = thrust - m_vel;
-    if (m_up)
-        vel.y = m_forceAmt;
-    else
-        vel.y = 0.f;
+//    if (m_up)
+//        vel.y = m_forceAmt;
+//    else
+//        vel.y = 0.f;
 
     applyImpulse(vel);
 }

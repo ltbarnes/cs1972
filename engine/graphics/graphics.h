@@ -62,6 +62,8 @@ public:
     void setAtlasPosition(float x, float y);
     void setTransparentMode(bool on);
 
+    glm::mat4 getFrustum();
+
     void useCubeMap(bool use);
     bool cubeMapIsActive();
     void drawCubeMap(Camera *camera);
@@ -113,8 +115,7 @@ private:
 
     glm::vec2 m_subImages;
 
-//    glm::mat4 m_p, m_v;
-
+    glm::mat4 m_frustum;
 };
 
 #endif // GRAPHICS_H
