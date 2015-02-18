@@ -9,7 +9,7 @@ using namespace std;
 
 MinecraftWorld::MinecraftWorld(GLuint shader)
 {
-    m_vm = new VoxelManager(shader, Point(), Point(10, 2, 10), Point(32, 32, 32), new MCChunkBuilder(QTime::currentTime().msec()));
+    m_vm = new VoxelManager(shader, Point(), Point(5, 1, 5), Point(32, 32, 32), new MCChunkBuilder(QTime::currentTime().msec()));
 
 //    QList<Chunk *> chunks = m_vm->getChunks();
 
@@ -29,8 +29,8 @@ void MinecraftWorld::onTick(float secs)
 {
     World::onTick(secs);
 
-//    foreach (MovableEntity *me, m_movableEntities)
-//        me->applyForce(glm::vec3(0, -10.f * me->getMass(), 0));
+    foreach (MovableEntity *me, m_movableEntities)
+        me->applyForce(glm::vec3(0, -10.f * me->getMass(), 0));
 }
 
 void MinecraftWorld::onDraw(Graphics *g)
@@ -50,27 +50,42 @@ glm::vec4 MinecraftWorld::getCoords(int index, Point dim)
                      0.f);
 }
 
+void MinecraftWorld::detectCollisions(float secs)
+{
+    foreach(Collision *c, m_collisions)
+        delete c;
+    m_collisions.clear();
+
+    Collision *col;
+    MovableEntity *me;
+
+    int moveSize = m_movableEntities.size();
+    for (int i = 0; i < moveSize; i++)
+    {
+        me = m_movableEntities.value(i);
+
+        col = m_vm->predictCollision(me, secs);
+
+        if (col)
+            m_collisions.append(col);
+    }
+}
+
+void MinecraftWorld::handleCollisions()
+{
+    foreach(Collision *col, m_collisions)
+    {
+        col->e1->handleCollision(col);
+    }
+}
+
+//void MinecraftWorld::predictCollision(MovableEntity *me, float secs)
+//{
+//    m_vm->predictCollision(me, secs);
+//}
+
 
 //void MinecraftWorld::addBlock(int x, int y, int z, char type)
 //{
 //    m_vm->addBlock(x, y, z, type);
 //}
-
-void MinecraftWorld::handleCollisions()
-{
-//    QHash<Entity *  , Collision *> mtvs;
-
-    foreach(Collision *col, m_collisions)
-    {
-//        Entity *e = col->e2;
-//        if (mtvs.contains(e))
-//            col->mtv = glm::min(col->mtv, mtvs.value(e)->mtv);
-        col->e2->handleCollision(col);
-//        mtvs.insert(e, col);
-    }
-
-//    QList<Entity *> keys = mtvs.keys();
-//    foreach(Entity *e, keys)
-//        e->handleCollision(mtvs.value(e));
-
-}

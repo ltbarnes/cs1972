@@ -19,15 +19,15 @@ Player::Player(ActionCamera *camera, glm::vec3 pos, World *world)
 
     m_forceAmt = 5.f;
 
-    CollisionShape *cs = new CollisionCylinder(glm::vec3(), glm::vec3(1, 2, 1), "player");
+    CollisionShape *cs = new CollisionCylinder(glm::vec3(), glm::vec3(.98f, 1.98f, .98f), "player");
     addCollisionShape(cs);
 
     RenderShape *rs = new RenderShape();
-    rs->type = CUBE;
+    rs->type = CYLINDER;
     rs->color = glm::vec3(0, 1, 0);
     rs->shininess = 32.f;
     rs->transparency = 1.f;
-    rs->trans = glm::scale(glm::mat4(), glm::vec3(1.f, 2.f, 1.f));
+    rs->trans = glm::scale(glm::mat4(), glm::vec3(.98f, 1.98f, .98f));
     rs->texture = "";
     rs->repeatU = 1.f;
     rs->repeatV = 1.f;
@@ -66,10 +66,10 @@ void Player::onTick(float secs)
     thrust.y = force.y;
 
     glm::vec3 vel = thrust - m_vel;
-//    if (m_up)
-//        vel.y = m_forceAmt;
-//    else
-//        vel.y = 0.f;
+    if (m_up)
+        vel.y = m_forceAmt;
+    else
+        vel.y = 0.f;
 
     applyImpulse(vel);
 }
@@ -192,6 +192,7 @@ void Player::handleCollision(Collision *col)
         glm::vec3 vel = getVelocity();
         vel.y = 0;
         setVelocity(vel);
+//        cout << "player" <<endl;
 }
 
 

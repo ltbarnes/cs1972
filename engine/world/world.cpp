@@ -52,10 +52,6 @@ bool World::removeStaticEntity(StaticEntity *se, bool clearMem)
 
 void World::onTick(float secs)
 {
-    // collisions
-    detectCollisions(secs);
-    handleCollisions();
-
     foreach(MovableEntity *me, m_me2Delete)
     {
         removeMovableEntity(me, true);
@@ -67,6 +63,10 @@ void World::onTick(float secs)
     {
         e->onTick(secs);
     }
+
+    // collisions
+    detectCollisions(secs);
+    handleCollisions();
 }
 
 void World::detectCollisions(float secs)

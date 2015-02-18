@@ -26,6 +26,8 @@ public:
 //    void addBlock(int x, int y, int z, int type);
 //    void removeBlock(int x, int y, int z);
 
+    char getSingleBlock(int x, int y, int z);
+
     void onTick(float secs);
     void onDraw(Graphics *g);
 

@@ -1,12 +1,15 @@
 #include "voxelmanager.h"
 #include "chunkbuilder.h"
 #include <QHash>
+#include "movableentity.h"
+#include "collisionshape.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 using namespace std;
+#include <glm/ext.hpp>
 
 VoxelManager::VoxelManager(GLuint shader, Point center, Point dim, Point chunkSize, ChunkBuilder *cb)
 {
@@ -126,6 +129,105 @@ void VoxelManager::onDraw(Graphics *g)
             c->onDraw(g);
         }
     }
+}
+
+Collision *VoxelManager::predictCollision(MovableEntity *me, float secs)
+{
+    QList<CollisionShape *> cshapes = me->getCollisionShapes();
+    Collision *col = NULL;
+
+    glm::vec3 distance = me->getVelocity() * secs;
+
+    foreach(CollisionShape *cs, cshapes)
+    {
+        col = checkCollisionY(cs, distance);
+        if (col)
+            col->e1 = me;
+    }
+
+    return col;
+}
+
+Collision *VoxelManager::checkCollisionY(CollisionShape *cs, glm::vec3 distance)
+{
+    Collision *col = NULL;
+    glm::vec3 mtv = glm::vec3();
+
+//    if (glm::length2(p) > 0.00001f)
+//        return NULL;
+
+    glm::vec3 dir = glm::vec3(
+                (distance.x >= 0 ? 1 : -1),
+                (distance.y >= 0 ? 1 : -1),
+                (distance.z >= 0 ? 1 : -1));
+
+    glm::vec3 dim = cs->getDim() * .5f;
+    glm::vec3 pos = cs->getPos();
+    glm::vec3 dest = pos + distance;
+
+    glm::vec3 minBlocks = glm::round(pos - dim);
+    glm::vec3 maxBlocks = glm::round(pos + dim);
+
+    glm::vec3 nearBlocks = glm::round(pos + dim * dir);
+    glm::vec3 farBlocks = glm::round(dest + dim * dir);
+
+    // check Y
+    int far = (int) (farBlocks.y + dir.y);
+    for (int y = (int) nearBlocks.y; y != far; y += (int) dir.y)
+    {
+        for (int x = (int) minBlocks.x; x <= maxBlocks.x; x++)
+        {
+            for (int z = (int) minBlocks.z; z <= maxBlocks.z; z++)
+            {
+                Point bp = Point(roundDown(x, m_chunkSize.x), roundDown(y, m_chunkSize.y), roundDown(z, m_chunkSize.z));
+                Chunk *c = m_chunks.value(bp, NULL);
+
+                if (c && c->getSingleBlock(x - bp.x, y - bp.y, z - bp.z))
+                {
+                    mtv.y += farBlocks.y - ((pos.y + dim.y * dir.y));
+                    mtv.y += (mtv.y > 0.f ? -0.500001f : 0.500001f);
+//                    cout << "COLLISION: " << mtv.y << endl;
+                    goto ENDY;
+                }
+            }
+        }
+    }
+    ENDY:
+    {}
+//        cout << endl;
+
+//        if (glm::length2(p) < 0.00001f)
+//        {
+//        cout << "BLOCK: " << glm::to_string(p) << endl;
+//        cout << "dist: " << glm::to_string(distance) << endl;
+//        cout << "dir: " << glm::to_string(dir) << endl;
+//        cout << "pos: " << glm::to_string(pos) << endl;
+//        cout << "dest: " << glm::to_string(dest) << endl;
+//        cout << "min: " << glm::to_string(minBlocks) << endl;
+//        cout << "max: " << glm::to_string(maxBlocks) << endl;
+//        cout << "near: " << glm::to_string(nearBlocks) << endl;
+//        cout << "far: " << glm::to_string(farBlocks) << endl << endl;
+//        }
+
+        if (glm::length2(mtv) > 0.000001)
+        {
+            col = new Collision();
+            col->mtv = mtv;
+        }
+
+        return col;
+}
+
+int VoxelManager::roundDown(int num, int multiple)
+{
+//    if (multiple == 0)
+//        return num;
+    int r = abs(num) % multiple;
+    if (r == 0)
+        return num;
+    if (num < 0)
+        return -(abs(num) + multiple - r);
+    return num - r;
 }
 
 //void VoxelManager::addBlock(float x, float y, float z, char type)

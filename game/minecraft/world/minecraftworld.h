@@ -18,7 +18,10 @@ public:
     inline static glm::vec4 getCoords(int index, Point dim);
 
 protected:
+    virtual void detectCollisions(float secs);
     virtual void handleCollisions();
+
+//    virtual Collision *predictCollision(MovableEntity *me, float secs);
 
 private:
     VoxelManager *m_vm;

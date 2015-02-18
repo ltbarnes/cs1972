@@ -2,6 +2,7 @@
 #define VOXELMANAGER_H
 
 #include "chunk.h"
+#include "movableentity.h"
 #include <QHash>
 
 class ChunkBuilder;
@@ -21,7 +22,14 @@ public:
 
     inline int getIndex(int x, int y, int z);
 
+    virtual Collision *predictCollision(MovableEntity *e, float secs);
+
+    //    bool contains(glm::vec3 point);
+    int roundDown(int num, int multiple);
+
 private:
+    Collision *checkCollisionY(CollisionShape *cs, glm::vec3 distance);
+
     QHash<Point, Chunk *> m_chunks;
     ChunkBuilder *m_chunkBuilder;
 

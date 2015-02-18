@@ -177,6 +177,18 @@ void Chunk::onDraw(Graphics *)
 }
 
 
+char Chunk::getSingleBlock(int x, int y, int z)
+{
+    assert( x >= 0 && x < m_dim.x);
+    if( y < 0 || y >= m_dim.y)
+            cout << "y: " << y << endl;
+    assert( y >= 0 && y < m_dim.y);
+    assert( z >= 0 && z < m_dim.z);
+
+    return m_blocks[getIndex(x, y, z, m_dim)];
+}
+
+
 int Chunk::getIndex(int x, int y, int z, Point dim)
 {
     return z*dim.y*dim.x + x*dim.y + y;
