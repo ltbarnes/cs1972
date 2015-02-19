@@ -30,7 +30,7 @@ void MinecraftWorld::onTick(float secs)
     World::onTick(secs);
 
     foreach (MovableEntity *me, m_movableEntities)
-        me->applyForce(glm::vec3(0, -10.f * me->getMass(), 0));
+        me->applyForce(glm::vec3(0, -11.f * me->getMass(), 0));
 }
 
 void MinecraftWorld::onDraw(Graphics *g)

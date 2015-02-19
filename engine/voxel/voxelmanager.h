@@ -28,7 +28,7 @@ public:
     int roundDown(int num, int multiple);
 
 private:
-    Collision *checkCollisionY(CollisionShape *cs, glm::vec3 distance);
+    Collision *checkCollisionY(glm::vec3 pos, CollisionShape *cs, glm::vec3 distance);
 
     QHash<Point, Chunk *> m_chunks;
     ChunkBuilder *m_chunkBuilder;

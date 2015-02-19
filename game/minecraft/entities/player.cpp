@@ -3,6 +3,7 @@
 
 #include <iostream>
 using namespace std;
+#include <glm/ext.hpp>
 
 Player::Player(ActionCamera *camera, glm::vec3 pos, World *world)
     : MovableEntity(pos)
@@ -17,11 +18,11 @@ Player::Player(ActionCamera *camera, glm::vec3 pos, World *world)
     m_offset = 0.f;
     setMass(1.f);
 
-    m_forceAmt = 5.f;
+    m_forceAmt = 8.f;
     m_jump = false;
     m_canJump = false;
 
-    CollisionShape *cs = new CollisionCylinder(glm::vec3(), glm::vec3(.98f, 1.98f, .98f), "player");
+    CollisionShape *cs = new CollisionCylinder(glm::vec3(), glm::vec3(.99f, 1.98f, .99f), "player");
     addCollisionShape(cs);
 
     RenderShape *rs = new RenderShape();
@@ -29,7 +30,7 @@ Player::Player(ActionCamera *camera, glm::vec3 pos, World *world)
     rs->color = glm::vec3(0, 1, 0);
     rs->shininess = 32.f;
     rs->transparency = 1.f;
-    rs->trans = glm::scale(glm::mat4(), glm::vec3(.98f, 1.98f, .98f));
+    rs->trans = glm::scale(glm::mat4(), glm::vec3(.99f, 1.98f, .99f));
     rs->texture = "";
     rs->repeatU = 1.f;
     rs->repeatV = 1.f;
@@ -49,14 +50,15 @@ void Player::onTick(float secs)
 
     glm::vec3 force = glm::vec3(0.f);
     if (m_wsad & 0b1000)
-        force.z += m_forceAmt;
+        force.z += 1;
     if (m_wsad & 0b0100)
-        force.z -= m_forceAmt;
+        force.z -= 1;
     if (m_wsad & 0b0010)
-        force.x -= m_forceAmt;
+        force.x -= 1;
     if (m_wsad & 0b0001)
-        force.x += m_forceAmt;
-//    if (m_up)
+        force.x += 1;
+    if (m_up)
+        applyForce(glm::vec3(0, (m_forceAmt * 1.5f + 13.f) * getMass(), 0));
 //        force.y += m_forceAmt;
 //    if (m_down)
 //        force.y -= m_forceAmt;
@@ -65,16 +67,22 @@ void Player::onTick(float secs)
 
     glm::vec3 thrust = glm::normalize(glm::vec3(look.x, 0.f, look.z)) * force.z;
     thrust += glm::normalize(glm::vec3(-look.z, 0.f, look.x)) * force.x;
+    if (glm::length2(thrust) > 0.00001)
+        thrust = glm::normalize(thrust) * m_forceAmt;
     thrust.y = force.y;
 
     glm::vec3 vel = thrust - m_vel;
     if (m_jump && m_canJump)
-        vel.y = m_forceAmt;
+        vel.y = 9.f;
     else
         vel.y = 0.f;
-    m_canJump = false;
 
-    applyImpulse(vel);
+    if (m_canJump)
+        applyImpulse(vel);
+    else
+        applyForce(vel);
+
+    m_canJump = false;
 }
 
 
@@ -90,7 +98,7 @@ void Player::onDrawTransparent(Graphics *)
 
 void Player::setCameraPos()
 {
-    m_camera->setCenter(getPosition());
+    m_camera->setCenter(getPosition() +  glm::vec3(0.f, .9f, 0.f));
 }
 
 
@@ -184,7 +192,7 @@ void Player::onKeyReleased(QKeyEvent *e)
         m_jump = false;
         break;
     case Qt::Key_Shift:
-        m_forceAmt = 5.f;
+        m_forceAmt = 8.f;
         break;
     default:
         break;
@@ -196,6 +204,8 @@ void Player::handleCollision(Collision *col)
         setPosition(getPosition() + col->mtv);
         if (col->impulse.x > 0)
             m_canJump = true;
+
+//        cout << glm::to_string(col->mtv) << endl;
 //        vel.y = 0;
 //        setVelocity(vel);
 //        cout << "player" <<endl;

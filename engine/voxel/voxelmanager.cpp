@@ -140,7 +140,7 @@ Collision *VoxelManager::predictCollision(MovableEntity *me, float secs)
 
     foreach(CollisionShape *cs, cshapes)
     {
-        col = checkCollisionY(cs, distance);
+        col = checkCollisionY(me->getPosition(), cs, distance);
         if (col)
         {
             col->e1 = me;
@@ -159,7 +159,7 @@ Collision *VoxelManager::predictCollision(MovableEntity *me, float secs)
     return col;
 }
 
-Collision *VoxelManager::checkCollisionY(CollisionShape *cs, glm::vec3 distance)
+Collision *VoxelManager::checkCollisionY(glm::vec3 pos, CollisionShape *cs, glm::vec3 distance)
 {
     Collision *col = new Collision();
     col->mtv = distance;
@@ -168,14 +168,16 @@ Collision *VoxelManager::checkCollisionY(CollisionShape *cs, glm::vec3 distance)
 //    if (glm::length2(p) > 0.00001f)
 //        return NULL;
 
+    float bump = 0.50001f;
+
     glm::vec3 dir = glm::vec3(
                 (distance.x >= 0 ? 1 : -1),
                 (distance.y >= 0 ? 1 : -1),
                 (distance.z >= 0 ? 1 : -1));
 
     glm::vec3 dim = cs->getDim() * .5f;
-    glm::vec3 pos = cs->getPos();
-    glm::vec3 dest = pos + distance;
+//    glm::vec3 pos = cs->getPos();
+    glm::vec3 dest = pos + glm::vec3(distance.x, 0, 0);
 
     glm::vec3 minBlocks = glm::round(pos - dim);
     glm::vec3 maxBlocks = glm::round(pos + dim);
@@ -197,7 +199,8 @@ Collision *VoxelManager::checkCollisionY(CollisionShape *cs, glm::vec3 distance)
                 if (c && c->getSingleBlock(x - bp.x, y - bp.y, z - bp.z))
                 {
                     col->mtv.x = farBlocks.x - ((pos.x + dim.x * dir.x));
-                    col->mtv.x += (col->mtv.x > 0.f ? -0.500001f : 0.500001f);
+                    col->mtv.x += (col->mtv.x > 0.f ? -bump : bump);
+
                     goto ENDX;
                 }
             }
@@ -205,6 +208,15 @@ Collision *VoxelManager::checkCollisionY(CollisionShape *cs, glm::vec3 distance)
     }
     ENDX:
     {}
+    pos.x += col->mtv.x;
+
+    dest = pos + glm::vec3(0, 0, distance.z);
+
+    minBlocks = glm::round(pos - dim);
+    maxBlocks = glm::round(pos + dim);
+
+    nearBlocks = glm::round(pos + dim * dir);
+    farBlocks = glm::round(dest + dim * dir);
 
     // check Z
     far = (int) (farBlocks.z + dir.z);
@@ -220,7 +232,8 @@ Collision *VoxelManager::checkCollisionY(CollisionShape *cs, glm::vec3 distance)
                 if (c && c->getSingleBlock(x - bp.x, y - bp.y, z - bp.z))
                 {
                     col->mtv.z = farBlocks.z - ((pos.z + dim.z * dir.z));
-                    col->mtv.z += (col->mtv.z > 0.f ? -0.500001f : 0.500001f);
+                    col->mtv.z += (col->mtv.z > 0.f ? -bump : bump);
+
                     goto ENDZ;
                 }
             }
@@ -228,6 +241,15 @@ Collision *VoxelManager::checkCollisionY(CollisionShape *cs, glm::vec3 distance)
     }
     ENDZ:
     {}
+    pos.z += col->mtv.z;
+
+    dest = pos + glm::vec3(0, distance.y, 0);
+
+    minBlocks = glm::round(pos - dim);
+    maxBlocks = glm::round(pos + dim);
+
+    nearBlocks = glm::round(pos + dim * dir);
+    farBlocks = glm::round(dest + dim * dir);
 
     // check Y
     far = (int) (farBlocks.y + dir.y);
@@ -243,7 +265,8 @@ Collision *VoxelManager::checkCollisionY(CollisionShape *cs, glm::vec3 distance)
                 if (c && c->getSingleBlock(x - bp.x, y - bp.y, z - bp.z))
                 {
                     col->mtv.y = farBlocks.y - ((pos.y + dim.y * dir.y));
-                    col->mtv.y += (col->mtv.y > 0.f ? -0.500001f : 0.500001f);
+                    col->mtv.y += (col->mtv.y > 0.f ? -bump : bump);
+
                     col->impulse.x = 1.f;
                     goto ENDY;
                 }
