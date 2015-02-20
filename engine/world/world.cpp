@@ -1,5 +1,5 @@
 #include "world.h"
-#include "voxelmanager.h"
+#include "manager.h"
 
 World::World()
 {
@@ -7,6 +7,7 @@ World::World()
     m_movableEntities.clear();
     m_collisions.clear();
     m_me2Delete.clear();
+    m_managers.clear();
 }
 
 World::~World()
@@ -17,6 +18,8 @@ World::~World()
         delete e;
     foreach(Collision *c, m_collisions)
         delete c;
+    foreach(Manager *m, m_managers)
+        delete m;
 }
 
 void World::addMovableEntity(MovableEntity *me)
@@ -50,6 +53,16 @@ bool World::removeStaticEntity(StaticEntity *se, bool clearMem)
     return result;
 }
 
+QList<MovableEntity *> World::getMovableEntities()
+{
+    return m_movableEntities;
+}
+
+QList<StaticEntity *> World::getStaticEntities()
+{
+    return m_staticEntities;
+}
+
 void World::onTick(float secs)
 {
     foreach(MovableEntity *me, m_me2Delete)
@@ -64,69 +77,78 @@ void World::onTick(float secs)
         e->onTick(secs);
     }
 
-    // collisions
-    detectCollisions(secs);
-    handleCollisions();
-}
-
-void World::detectCollisions(float secs)
-{
-    foreach(Collision *c, m_collisions)
-        delete c;
-    m_collisions.clear();
-
-    QList<Collision *> collisions;
-    Entity *e1, *e2;
-
-    int moveSize = m_movableEntities.size();
-    for (int i = 0; i < moveSize; i++)
-    {
-        e1 = m_movableEntities.value(i);
-
-        // check static entities
-        foreach(Entity *es, m_staticEntities)
-        {
-            collisions = es->collides(e1, secs);
-            if (collisions.size() > 0)
-                m_collisions.append(collisions);
-        }
-
-        // check other movable entities
-        for (int j = i + 1; j < moveSize; j++)
-        {
-            e2 = m_movableEntities.value(j);
-            collisions = e1->collides(e2, secs);
-            if (collisions.size() > 0)
-                m_collisions.append(collisions);
-        }
+    foreach (Manager *m, m_managers) {
+        m->manage(this, secs);
     }
+//    // collisions
+//    detectCollisions(secs);
+//    handleCollisions();
 }
 
-void World::handleCollisions()
-{
-    foreach(Collision *col, m_collisions)
-    {
-        col->e1->handleCollision(col);
+//void World::detectCollisions(float secs)
+//{
+//    foreach(Collision *c, m_collisions)
+//        delete c;
+//    m_collisions.clear();
 
-        // swap
-        Entity *tempE = col->e1;
-        col->e1 = col->e2;
-        col->e2 = tempE;
-        CollisionShape *tempS = col->c1;
-        col->c1 = col->c2;
-        col->c2 = tempS;
-        col->mtv *= -1.f;
-        col->impulse *= -1.f;
+//    QList<Collision *> collisions;
+//    Entity *e1, *e2;
 
-        col->e1->handleCollision(col);
-    }
+//    int moveSize = m_movableEntities.size();
+//    for (int i = 0; i < moveSize; i++)
+//    {
+//        e1 = m_movableEntities.value(i);
 
-}
+//        // check static entities
+//        foreach(Entity *es, m_staticEntities)
+//        {
+//            collisions = es->collides(e1, secs);
+//            if (collisions.size() > 0)
+//                m_collisions.append(collisions);
+//        }
+
+//        // check other movable entities
+//        for (int j = i + 1; j < moveSize; j++)
+//        {
+//            e2 = m_movableEntities.value(j);
+//            collisions = e1->collides(e2, secs);
+//            if (collisions.size() > 0)
+//                m_collisions.append(collisions);
+//        }
+//    }
+//}
+
+//void World::handleCollisions()
+//{
+//    foreach(Collision *col, m_collisions)
+//    {
+//        col->e1->handleCollision(col);
+
+//        // swap
+//        Entity *tempE = col->e1;
+//        col->e1 = col->e2;
+//        col->e2 = tempE;
+//        CollisionShape *tempS = col->c1;
+//        col->c1 = col->c2;
+//        col->c2 = tempS;
+//        col->mtv *= -1.f;
+//        col->impulse *= -1.f;
+
+//        col->e1->handleCollision(col);
+//    }
+
+//}
 
 void World::onDraw(Graphics *g)
 {
-//    if (m_vm)
-//        m_vm->onDraw(g);
+    foreach(Manager *m, m_managers)
+        if (m->isDrawable())
+        {
+            g->setGraphicsMode(m->getGraphicsMode());
+            m->onDraw(g);
+        }
+
+    g->setGraphicsMode(DEFAULT);
 
     foreach(Entity *e, m_staticEntities)
         e->onDrawOpaque(g);
@@ -141,8 +163,8 @@ void World::onDraw(Graphics *g)
         e->onDrawTransparent(g);
 }
 
-//void World::addManager(VoxelManager *vm)
-//{
-
-//}
+void World::addManager(Manager *m)
+{
+    m_managers.append(m);
+}
 

@@ -32,8 +32,7 @@ uniform vec3 allBlack = vec3(1.0);
 
 void main(){
 
-    texc = (subPos / subImages) + (texCoord / subImages); // for atlas
-//        texc = vec2(texCoord.x * repeatU, texCoord.y * repeatV);
+    texc = texCoord * repeatUV;
 
     vec4 position_cameraSpace = view * model * vec4(position, 1.0);
     vec4 normal_cameraSpace = vec4(normalize(mat3(transpose(inverse(view * model))) * normal), 0.0);

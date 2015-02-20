@@ -18,7 +18,7 @@ Player::Player(ActionCamera *camera, glm::vec3 pos, World *world)
     m_offset = 0.f;
     setMass(1.f);
 
-    m_forceAmt = 8.f;
+    m_jetMode = false;
     m_jump = false;
     m_canJump = false;
 
@@ -48,6 +48,10 @@ void Player::onTick(float secs)
 {
     MovableEntity::onTick(secs);
 
+    float forceAmt = 8.f;
+    if (m_jetMode)
+        forceAmt += 7.f;
+
     glm::vec3 force = glm::vec3(0.f);
     if (m_wsad & 0b1000)
         force.z += 1;
@@ -58,7 +62,7 @@ void Player::onTick(float secs)
     if (m_wsad & 0b0001)
         force.x += 1;
     if (m_up)
-        applyForce(glm::vec3(0, (m_forceAmt * 1.5f + 13.f) * getMass(), 0));
+        applyForce(glm::vec3(0, (forceAmt *1.5f) * getMass(), 0));
 //        force.y += m_forceAmt;
 //    if (m_down)
 //        force.y -= m_forceAmt;
@@ -68,19 +72,21 @@ void Player::onTick(float secs)
     glm::vec3 thrust = glm::normalize(glm::vec3(look.x, 0.f, look.z)) * force.z;
     thrust += glm::normalize(glm::vec3(-look.z, 0.f, look.x)) * force.x;
     if (glm::length2(thrust) > 0.00001)
-        thrust = glm::normalize(thrust) * m_forceAmt;
-    thrust.y = force.y;
+        thrust = glm::normalize(thrust) * forceAmt;
+//    thrust.y = force.y;
 
     glm::vec3 vel = thrust - m_vel;
     if (m_jump && m_canJump)
-        vel.y = 9.f;
+        vel.y = forceAmt;
+    else if (m_jetMode)
+        vel.y = 10.f * getMass();
     else
         vel.y = 0.f;
 
-    if (m_canJump)
-        applyImpulse(vel);
-    else
+    if (m_jetMode || !m_canJump)
         applyForce(vel);
+    else
+        applyImpulse(vel);
 
     m_canJump = false;
 }
@@ -125,13 +131,16 @@ void Player::onKeyPressed(QKeyEvent *e)
         m_wsad |= 0b0001;
         break;
     case Qt::Key_E:
-        m_up = true;
+//        m_up = true;
         break;
     case Qt::Key_Q:
         m_down = true;
         break;
     case Qt::Key_Space:
-        m_jump = true;
+        if (m_jetMode)
+            m_up = true;
+        else
+            m_jump = true;
         break;
     case Qt::Key_Minus:
     case Qt::Key_Underscore:
@@ -158,7 +167,12 @@ void Player::onKeyPressed(QKeyEvent *e)
         m_camera->setOffset(m_offset);
         break;
     case Qt::Key_Shift:
-        m_forceAmt = 15.f;
+        m_jetMode = true;
+        if (m_jump)
+        {
+            m_up = true;
+            m_jump = false;
+        }
         break;
     default:
         break;
@@ -190,9 +204,15 @@ void Player::onKeyReleased(QKeyEvent *e)
         break;
     case Qt::Key_Space:
         m_jump = false;
+        m_up = false;
         break;
     case Qt::Key_Shift:
-        m_forceAmt = 8.f;
+        m_jetMode = false;
+        if (m_up)
+        {
+            m_jump = true;
+            m_up = false;
+        }
         break;
     default:
         break;
@@ -202,13 +222,20 @@ void Player::onKeyReleased(QKeyEvent *e)
 void Player::handleCollision(Collision *col)
 {
         setPosition(getPosition() + col->mtv);
-        if (col->impulse.x > 0)
-            m_canJump = true;
 
-//        cout << glm::to_string(col->mtv) << endl;
-//        vel.y = 0;
-//        setVelocity(vel);
-//        cout << "player" <<endl;
+        glm::vec3 vel = getVelocity();
+
+        if (col->impulse.x > 0)
+            vel.x = 0;
+        if (col->impulse.y > 0)
+        {
+            vel.y = 0;
+            m_canJump = true;
+        }
+        if (col->impulse.z > 0)
+            vel.z = 0;
+
+        setVelocity(vel);
 }
 
 

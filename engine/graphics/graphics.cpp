@@ -182,13 +182,12 @@ void Graphics::setColor(float r, float g, float b, float transparency, float shi
 }
 
 
-void Graphics::setAtlas(const QString &key, glm::vec2 numSubImages)
+void Graphics::setAtlas(const QString &key)
 {
     GLint tex = m_textures.value(key);
 
     if (tex && key.length() > 0)
     {
-        glUniform2f(m_sparseLocs["subImages"], numSubImages.x, numSubImages.y);
         glUniform1i(m_sparseLocs["useTexture"], 1);
         glUniform1i(m_sparseLocs["tex"], 1);
 
@@ -197,7 +196,7 @@ void Graphics::setAtlas(const QString &key, glm::vec2 numSubImages)
         glActiveTexture(GL_TEXTURE0);
 
         m_usingAtlas = true;
-        m_subImages = numSubImages;
+//        m_subImages = numSubImages;
     }
     else
     {
@@ -209,7 +208,7 @@ void Graphics::setAtlas(const QString &key, glm::vec2 numSubImages)
 
 void Graphics::setAtlasPosition(float x, float y)
 {
-    glUniform2f(m_sparseLocs["subPos"], x, y);
+//    glUniform2f(m_sparseLocs["subPos"], x, y);
 }
 
 

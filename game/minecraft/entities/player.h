@@ -33,11 +33,10 @@ private:
     int m_wsad;
     bool m_up, m_down;
     bool m_canJump, m_jump;
+    bool m_jetMode;
 
     float m_offset;
     World *m_world;
-
-    float m_forceAmt;
 };
 
 #endif // PLAYER_H

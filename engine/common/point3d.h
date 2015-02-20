@@ -2,6 +2,7 @@
 #define POINT3D_H
 
 #include <QHash>
+#include <assert.h>
 
 struct Point
 {
@@ -19,6 +20,12 @@ struct Point
         this->x = x;
         this->y = y;
         this->z = z;
+    }
+
+    inline int operator [](int index)
+    {
+        assert(index >= 0 && index < 3);
+        switch (index) {case 0: return x; case 1: return y; case 2: return z; default: return -1; }
     }
 
 };

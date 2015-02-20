@@ -58,7 +58,7 @@ public:
     void setWorldColor(float r, float g, float b);
     void setColor(float r, float g, float b, float transparency, float shininess);
     void setTexture(const QString &key, float repeatU = 1.f, float repeatV = 1.f);
-    void setAtlas(const QString &key, glm::vec2 numSubImages);
+    void setAtlas(const QString &key);
     void setAtlasPosition(float x, float y);
     void setTransparentMode(bool on);
 

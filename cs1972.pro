@@ -98,7 +98,8 @@ HEADERS += \
     game/minecraft/gamescreens/gamescreen.h \
     game/minecraft/world/minecraftworld.h \
     game/minecraft/entities/player.h \
-    game/minecraft/world/mcchunkbuilder.h
+    game/minecraft/world/mcchunkbuilder.h \
+    engine/world/manager.h
 ### warmup
 #    game/warmup/gamescreens/menuscreen.h \
 #    game/warmup/gamescreens/gamescreen.h \

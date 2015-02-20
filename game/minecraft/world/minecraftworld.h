@@ -7,7 +7,7 @@
 class MinecraftWorld : public World
 {
 public:
-    MinecraftWorld(GLuint shader);
+    MinecraftWorld(VoxelManager *vm);
     virtual ~MinecraftWorld();
 
     virtual void onDraw(Graphics *g);
@@ -16,12 +16,6 @@ public:
 //    void addBlock(int x, int y, int z, char type);
 
     inline static glm::vec4 getCoords(int index, Point dim);
-
-protected:
-    virtual void detectCollisions(float secs);
-    virtual void handleCollisions();
-
-//    virtual Collision *predictCollision(MovableEntity *me, float secs);
 
 private:
     VoxelManager *m_vm;

@@ -2,7 +2,10 @@
 #include "camera.h"
 #include "application.h"
 #include "minecraftworld.h"
+#include "mcchunkbuilder.h"
 #include "player.h"
+
+#include <QTime>
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
@@ -14,7 +17,11 @@ GameScreen::GameScreen(Application *parent)
     : Screen(parent)
 {
     ActionCamera *cam = new ActionCamera();
-    m_world = new MinecraftWorld(m_parentApp->getShader(SPARSE));
+
+    VoxelManager *vm = new VoxelManager(cam, m_parentApp->getShader(SPARSE), Point(), Point(5, 1, 5),
+                                        Point(32, 32, 32), new MCChunkBuilder(QTime::currentTime().msec()));
+
+    m_world = new MinecraftWorld(vm);
     m_player = new Player(cam, glm::vec3(5.1f, 10.1f, 5.1f), m_world);
 
     m_world->addMovableEntity(m_player);
@@ -38,7 +45,16 @@ void GameScreen::onTick(float secs)
 
 void GameScreen::onRender(Graphics *g)
 {
-    g->setGraphicsMode(SPARSE);
+    g->setWorldColor(.1f, .1f, .1f);
+//    g->setGraphicsMode(SPARSE);
+    Light light;/*
+    light = new Light();*/
+    light.color = glm::vec3(1.f);
+    light.id = 1;
+    light.pos = glm::vec3(5, 5, 5);
+
+    g->addLight(light);
+
     m_world->onDraw(g);
 }
 

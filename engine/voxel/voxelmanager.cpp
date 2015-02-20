@@ -3,6 +3,7 @@
 #include <QHash>
 #include "movableentity.h"
 #include "collisionshape.h"
+#include "world.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
@@ -11,12 +12,14 @@
 using namespace std;
 #include <glm/ext.hpp>
 
-VoxelManager::VoxelManager(GLuint shader, Point center, Point dim, Point chunkSize, ChunkBuilder *cb)
+VoxelManager::VoxelManager(Camera *cam, GLuint shader, Point center, Point dim, Point chunkSize, ChunkBuilder *cb)
+    : Manager(SPARSE)
 {
+    m_camera = cam;
+    m_shader = shader;
     m_center = center;
     m_dim = dim;
     m_chunkSize = chunkSize;
-    m_shader = shader;
 
     m_chunkBuilder = cb;
 
@@ -64,8 +67,16 @@ QList<Chunk*> VoxelManager::getChunks()
 }
 
 
+void VoxelManager::setAtlas(QString atlasName)
+{
+    m_atlasName = atlasName;
+}
+
+
 void VoxelManager::onDraw(Graphics *g)
 {
+    g->setAtlas(m_atlasName);
+
     glm::mat4 frust = g->getFrustum();
 
     glm::vec4 planes[6];
@@ -131,6 +142,24 @@ void VoxelManager::onDraw(Graphics *g)
     }
 }
 
+void VoxelManager::manage(World *world, float onTickSecs)
+{
+    QList<Collision *> cols;
+    QList<MovableEntity *> mes = world->getMovableEntities();
+
+    Collision *col;
+    foreach(MovableEntity *me, mes)
+    {
+        col = predictCollision(me, onTickSecs);
+        if (col)
+            cols.append(col);
+    }
+
+    foreach(Collision *col, cols)
+        col->e1->handleCollision(col);
+
+}
+
 Collision *VoxelManager::predictCollision(MovableEntity *me, float secs)
 {
     QList<CollisionShape *> cshapes = me->getCollisionShapes();
@@ -140,7 +169,7 @@ Collision *VoxelManager::predictCollision(MovableEntity *me, float secs)
 
     foreach(CollisionShape *cs, cshapes)
     {
-        col = checkCollisionY(me->getPosition(), cs, distance);
+        col = checkCollision3D(cs, distance);
         if (col)
         {
             col->e1 = me;
@@ -159,16 +188,12 @@ Collision *VoxelManager::predictCollision(MovableEntity *me, float secs)
     return col;
 }
 
-Collision *VoxelManager::checkCollisionY(glm::vec3 pos, CollisionShape *cs, glm::vec3 distance)
+Collision *VoxelManager::checkCollision3D(CollisionShape *cs, glm::vec3 distance)
 {
-    Collision *col = new Collision();
+    Collision *col;
+    col = new Collision();
     col->mtv = distance;
-    col->impulse.x = -1.f;
-
-//    if (glm::length2(p) > 0.00001f)
-//        return NULL;
-
-    float bump = 0.50001f;
+    col->impulse = glm::vec3(-1.f);
 
     glm::vec3 dir = glm::vec3(
                 (distance.x >= 0 ? 1 : -1),
@@ -176,8 +201,45 @@ Collision *VoxelManager::checkCollisionY(glm::vec3 pos, CollisionShape *cs, glm:
                 (distance.z >= 0 ? 1 : -1));
 
     glm::vec3 dim = cs->getDim() * .5f;
-//    glm::vec3 pos = cs->getPos();
-    glm::vec3 dest = pos + glm::vec3(distance.x, 0, 0);
+    glm::vec3 pos = cs->getPos();
+    glm::vec3 dest;
+
+    if (abs(distance.x) < abs(distance.z))
+    {
+        // check x
+        dest= pos + glm::vec3(distance.x, 0, 0);
+        checkCollision1D(col, pos, dim, dest, dir.x, 0, 1, 2);
+        pos.x += col->mtv.x;
+
+        // check z
+        dest = pos + glm::vec3(0, 0, distance.z);
+        checkCollision1D(col, pos, dim, dest, dir.z, 2, 0, 1);
+        pos.z += col->mtv.z;
+    }
+    else
+    {
+        // check z
+        dest = pos + glm::vec3(0, 0, distance.z);
+        checkCollision1D(col, pos, dim, dest, dir.z, 2, 0, 1);
+        pos.z += col->mtv.z;
+
+        // check x
+        dest= pos + glm::vec3(distance.x, 0, 0);
+        checkCollision1D(col, pos, dim, dest, dir.x, 0, 1, 2);
+        pos.x += col->mtv.x;
+    }
+
+    // check y
+    dest = pos + glm::vec3(0, distance.y, 0);
+    checkCollision1D(col, pos, dim, dest, dir.y, 1, 2, 0);
+
+    return col;
+}
+
+void VoxelManager::checkCollision1D(Collision *col, glm::vec3 pos, glm::vec3 dim, glm::vec3 dest,
+                           float dir, int outer, int mid, int inner)
+{
+    float bump = 0.50001f;
 
     glm::vec3 minBlocks = glm::round(pos - dim);
     glm::vec3 maxBlocks = glm::round(pos + dim);
@@ -186,97 +248,32 @@ Collision *VoxelManager::checkCollisionY(glm::vec3 pos, CollisionShape *cs, glm:
     glm::vec3 farBlocks = glm::round(dest + dim * dir);
 
     // check X
-    int far = (int) (farBlocks.x + dir.x);
-    for (int x = (int) nearBlocks.x; x != far; x += (int) dir.x)
+    int far = (int) (farBlocks[outer] + dir);
+    for (int i = (int) nearBlocks[outer]; i != far; i += (int) dir)
     {
-        for (int y = (int) minBlocks.y; y <= maxBlocks.y; y++)
+        for (int j = (int) minBlocks[mid]; j <= maxBlocks[mid]; j++)
         {
-            for (int z = (int) minBlocks.z; z <= maxBlocks.z; z++)
+            for (int k = (int) minBlocks[inner]; k <= maxBlocks[inner]; k++)
             {
+                int x, y, z;
+                switch(outer) { case 0: x=i; break; case 1: y=i; break; case 2: z=i; break; }
+                switch(mid) { case 0: x=j; break; case 1: y=j; break; case 2: z=j; break; }
+                switch(inner) { case 0: x=k; break; case 1: y=k; break; case 2: z=k; break; }
+
                 Point bp = Point(roundDown(x, m_chunkSize.x), roundDown(y, m_chunkSize.y), roundDown(z, m_chunkSize.z));
                 Chunk *c = m_chunks.value(bp, NULL);
 
                 if (c && c->getSingleBlock(x - bp.x, y - bp.y, z - bp.z))
                 {
-                    col->mtv.x = farBlocks.x - ((pos.x + dim.x * dir.x));
-                    col->mtv.x += (col->mtv.x > 0.f ? -bump : bump);
+                    col->mtv[outer] = farBlocks[outer] - ((pos[outer] + dim[outer] * dir));
+                    col->mtv[outer] += (col->mtv[outer] > 0.f ? -bump : bump);
 
-                    goto ENDX;
+                    col->impulse[outer] = 1.f;
+                    return;
                 }
             }
         }
     }
-    ENDX:
-    {}
-    pos.x += col->mtv.x;
-
-    dest = pos + glm::vec3(0, 0, distance.z);
-
-    minBlocks = glm::round(pos - dim);
-    maxBlocks = glm::round(pos + dim);
-
-    nearBlocks = glm::round(pos + dim * dir);
-    farBlocks = glm::round(dest + dim * dir);
-
-    // check Z
-    far = (int) (farBlocks.z + dir.z);
-    for (int z = (int) nearBlocks.z; z != far; z += (int) dir.z)
-    {
-        for (int x = (int) minBlocks.x; x <= maxBlocks.x; x++)
-        {
-            for (int y = (int) minBlocks.y; y <= maxBlocks.y; y++)
-            {
-                Point bp = Point(roundDown(x, m_chunkSize.x), roundDown(y, m_chunkSize.y), roundDown(z, m_chunkSize.z));
-                Chunk *c = m_chunks.value(bp, NULL);
-
-                if (c && c->getSingleBlock(x - bp.x, y - bp.y, z - bp.z))
-                {
-                    col->mtv.z = farBlocks.z - ((pos.z + dim.z * dir.z));
-                    col->mtv.z += (col->mtv.z > 0.f ? -bump : bump);
-
-                    goto ENDZ;
-                }
-            }
-        }
-    }
-    ENDZ:
-    {}
-    pos.z += col->mtv.z;
-
-    dest = pos + glm::vec3(0, distance.y, 0);
-
-    minBlocks = glm::round(pos - dim);
-    maxBlocks = glm::round(pos + dim);
-
-    nearBlocks = glm::round(pos + dim * dir);
-    farBlocks = glm::round(dest + dim * dir);
-
-    // check Y
-    far = (int) (farBlocks.y + dir.y);
-    for (int y = (int) nearBlocks.y; y != far; y += (int) dir.y)
-    {
-        for (int x = (int) minBlocks.x; x <= maxBlocks.x; x++)
-        {
-            for (int z = (int) minBlocks.z; z <= maxBlocks.z; z++)
-            {
-                Point bp = Point(roundDown(x, m_chunkSize.x), roundDown(y, m_chunkSize.y), roundDown(z, m_chunkSize.z));
-                Chunk *c = m_chunks.value(bp, NULL);
-
-                if (c && c->getSingleBlock(x - bp.x, y - bp.y, z - bp.z))
-                {
-                    col->mtv.y = farBlocks.y - ((pos.y + dim.y * dir.y));
-                    col->mtv.y += (col->mtv.y > 0.f ? -bump : bump);
-
-                    col->impulse.x = 1.f;
-                    goto ENDY;
-                }
-            }
-        }
-    }
-    ENDY:
-    {}
-
-    return col;
 }
 
 int VoxelManager::roundDown(int num, int multiple)
