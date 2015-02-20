@@ -15,6 +15,13 @@ struct Point
         z = 0;
     }
 
+    Point(int i)
+    {
+        x = i;
+        y = i;
+        z = i;
+    }
+
     Point(int x, int y, int z)
     {
         this->x = x;

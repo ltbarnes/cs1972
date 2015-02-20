@@ -21,7 +21,7 @@ GameScreen::GameScreen(Application *parent)
     VoxelManager *vm = new VoxelManager(cam, m_parentApp->getShader(SPARSE), Point(), Point(5, 1, 5),
                                         Point(32, 32, 32), new MCChunkBuilder(QTime::currentTime().msec()));
 
-    m_world = new MinecraftWorld(vm);
+    m_world = new MinecraftWorld(cam, vm);
     m_player = new Player(cam, glm::vec3(5.1f, 10.1f, 5.1f), m_world);
 
     m_world->addMovableEntity(m_player);

@@ -5,11 +5,14 @@
 #include <iostream>
 using namespace std;
 
-MinecraftWorld::MinecraftWorld(VoxelManager *vm)
+MinecraftWorld::MinecraftWorld(Camera *cam, VoxelManager *vm)
 {
     m_vm = vm;
     m_vm->setAtlas("terrain.png");
     addManager(m_vm);
+
+    m_camera = cam;
+    m_selectedFace = glm::mat4();
 }
 
 
@@ -24,6 +27,33 @@ void MinecraftWorld::onTick(float secs)
 
     foreach (MovableEntity *me, m_movableEntities)
         me->applyForce(glm::vec3(0, -11.f * me->getMass(), 0));
+
+    float t;
+    int face;
+    glm::vec3 point = m_vm->castRay(glm::vec3(m_camera->getEye()), glm::vec3(m_camera->getLook()), t, face);
+
+    switch(face) {
+    case 0b100000: // +z
+        m_selectedFace = glm::mat4();
+        break;
+    case 0b010000: // +x
+        m_selectedFace = glm::rotate(glm::mat4(), glm::radians(90.f), glm::vec3(0, 1, 0));
+        break;
+    case 0b001000: // -z
+        m_selectedFace = glm::rotate(glm::mat4(), glm::radians(180.f), glm::vec3(0, 1, 0));
+        break;
+    case 0b000100: // -x
+        m_selectedFace = glm::rotate(glm::mat4(), glm::radians(-90.f), glm::vec3(0, 1, 0));
+        break;
+    case 0b000010: // +y
+        m_selectedFace = glm::rotate(glm::mat4(), glm::radians(-90.f), glm::vec3(1, 0, 0));
+        break;
+    case 0b000001: // -y
+        m_selectedFace = glm::rotate(glm::mat4(), glm::radians(90.f), glm::vec3(1, 0, 0));
+        break;
+    }
+
+        m_selectedFace[3] = glm::vec4(point, 1.f);
 }
 
 void MinecraftWorld::onDraw(Graphics *g)
@@ -39,6 +69,10 @@ void MinecraftWorld::onDraw(Graphics *g)
     g->addLight(light);
 
     World::onDraw(g);
+
+    // highlighted face
+    g->setColor(0, 0, 0, 1, 0);
+    g->drawQuad(m_selectedFace);
 }
 
 glm::vec4 MinecraftWorld::getCoords(int index, Point dim)

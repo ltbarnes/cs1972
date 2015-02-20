@@ -24,7 +24,7 @@ public:
     void addChunk(Point pnt);
 //    void addBlock(float x, float y, float z, char type);
 
-
+    glm::vec3 castRay(glm::vec3 p, glm::vec3 dir, float& t, int& face);
 
     inline int getIndex(int x, int y, int z);
     int roundDown(int num, int multiple);

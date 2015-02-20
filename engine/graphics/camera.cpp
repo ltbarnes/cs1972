@@ -45,10 +45,10 @@ glm::vec4 Camera::getLook()
     return m_look;
 }
 
-//glm::vec4 Camera::getEye()
-//{
-//    return m_eye;
-//}
+glm::vec4 Camera::getEye()
+{
+    return m_eye;
+}
 
 //float Camera::getThirdPersonDistance()
 //{

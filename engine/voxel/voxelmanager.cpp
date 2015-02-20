@@ -276,6 +276,24 @@ void VoxelManager::checkCollision1D(Collision *col, glm::vec3 pos, glm::vec3 dim
     }
 }
 
+glm::vec3 VoxelManager::castRay(glm::vec3 p, glm::vec3 dir, float &t, int &face)
+{
+    Point step = Point( (dir.x > 0 ? 1 : -1),
+                        (dir.y > 0 ? 1 : -1),
+                        (dir.z > 0 ? 1 : -1));
+
+    glm::vec3 tDelta = glm::vec3(1.f / dir.x, 1.f / dir.y, 1.f / dir.z);
+    Point point = Point((int) glm::round(p.x), (int) glm::round(p.y), (int) glm::round(p.z));
+
+    Point next = point + Point(1);
+    glm::vec3 tMax = glm::vec3(next.x - p.x, next.y - p.y, next.z - p.z) * tDelta;
+
+    t = 0;
+    face = 0b000010;
+
+    return glm::vec3(point.x, point.y, point.z);
+}
+
 int VoxelManager::roundDown(int num, int multiple)
 {
 //    if (multiple == 0)
