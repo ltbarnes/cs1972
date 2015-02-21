@@ -18,11 +18,11 @@ GameScreen::GameScreen(Application *parent)
 {
     ActionCamera *cam = new ActionCamera();
 
-    VoxelManager *vm = new VoxelManager(cam, m_parentApp->getShader(SPARSE), Point(), Point(5, 1, 5),
-                                        Point(32, 32, 32), new MCChunkBuilder(QTime::currentTime().msec()));
+    VoxelManager *vm = new VoxelManager(cam, m_parentApp->getShader(SPARSE), Point(7, 1, 7), Point(32, 32, 32),
+                                        new MCChunkBuilder(QTime::currentTime().msec()));
 
     m_world = new MinecraftWorld(cam, vm);
-    m_player = new Player(cam, glm::vec3(5.1f, 10.1f, 5.1f), m_world);
+    m_player = new Player(cam, glm::vec3(5.1f, 30.1f, 5.1f), m_world);
 
     m_world->addMovableEntity(m_player);
 
@@ -45,15 +45,14 @@ void GameScreen::onTick(float secs)
 
 void GameScreen::onRender(Graphics *g)
 {
-    g->setWorldColor(.1f, .1f, .1f);
-//    g->setGraphicsMode(SPARSE);
-    Light light;/*
-    light = new Light();*/
-    light.color = glm::vec3(1.f);
-    light.id = 1;
-    light.pos = glm::vec3(5, 5, 5);
+//    g->setWorldColor(.1f, .1f, .1f);
+////    g->setGraphicsMode(SPARSE);
+//    Light light;
+//    light.color = glm::vec3(1.f);
+//    light.id = 1;
+//    light.pos = glm::vec3(5, 5, 5);
 
-    g->addLight(light);
+//    g->addLight(light);
 
     m_world->onDraw(g);
 }

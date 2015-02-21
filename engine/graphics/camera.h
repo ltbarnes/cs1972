@@ -14,6 +14,7 @@ public:
     glm::mat4 getFrustumMatrix();
     glm::vec4 getLook();
     glm::vec4 getEye();
+//    glm::vec4 getFocus();
 
     void setAspectRatio(float a);
     void orientLook(glm::vec4 &eye, glm::vec4 &look, glm::vec4 &up);

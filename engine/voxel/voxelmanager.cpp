@@ -12,40 +12,37 @@
 using namespace std;
 #include <glm/ext.hpp>
 
-VoxelManager::VoxelManager(Camera *cam, GLuint shader, Point center, Point dim, Point chunkSize, ChunkBuilder *cb)
+VoxelManager::VoxelManager(Camera *cam, GLuint shader, Point dim, Point chunkSize, ChunkBuilder *cb)
     : Manager(SPARSE)
 {
     m_camera = cam;
     m_shader = shader;
-    m_center = center;
+//    m_center = center;
     m_dim = dim;
     m_chunkSize = chunkSize;
 
     m_chunkBuilder = cb;
 
-    m_min = Point(0, 0, 0);
-    m_max = Point(0, 0, 0);
+    glm::vec3 cent = glm::round(glm::vec3(m_camera->getEye()));
+    Point center = Point(roundDown(cent.x, m_chunkSize.x), roundDown(cent.y, m_chunkSize.y), roundDown(cent.z, m_chunkSize.z));
+    center = Point(center.x / m_chunkSize.x, center.y / m_chunkSize.y, center.z / m_chunkSize.z);
 
-    Point p;
-    for (int x = -m_dim.x; x < m_dim.x; x++)
-    {
-        for (int y = -m_dim.y; y < m_dim.y; y++)
-        {
-            for (int z = -m_dim.z; z < m_dim.z; z++)
-            {
-                p = Point(x, y, z) * m_chunkSize;
-                addChunk(p);
-            }
-        }
-    }
-//    addChunk(Point(-32, -32, -32));
+    m_min = center;
+    m_min.y -= dim.y;
+    m_max = center;
+    m_max.y += dim.y;
+
+    m_chunks.clear();
+    m_chunksToAdd.clear();
+    m_chunksToRemove.clear();
+
+    addBlocks(center.x, center.x, m_min.y, m_max.y, center.z, center.z);
 }
 
 VoxelManager::~VoxelManager()
 {
-    // world deletes them
-//    foreach(Chunk *chunk, m_chunks)
-//        delete chunk;
+    foreach(Chunk *chunk, m_chunks)
+        delete chunk;
 
     delete m_chunkBuilder;
 }
@@ -144,6 +141,18 @@ void VoxelManager::onDraw(Graphics *g)
 
 void VoxelManager::manage(World *world, float onTickSecs)
 {
+    checkCenterPosition();
+
+    foreach (Point p, m_chunksToRemove)
+    {
+        m_chunksToAdd.removeAll(p);
+        Chunk *c = m_chunks.take(p);
+        if (c)
+            delete c;
+    }
+    m_chunksToRemove.clear();
+
+
     QList<Collision *> cols;
     QList<MovableEntity *> mes = world->getMovableEntities();
 
@@ -157,6 +166,71 @@ void VoxelManager::manage(World *world, float onTickSecs)
 
     foreach(Collision *col, cols)
         col->e1->handleCollision(col);
+
+    if (!m_chunksToAdd.isEmpty())
+        addChunk(m_chunksToAdd.takeFirst());
+
+}
+
+void VoxelManager::checkCenterPosition()
+{
+    glm::vec3 cent = glm::round(glm::vec3(m_camera->getEye()));
+    Point center = Point(roundDown(cent.x, m_chunkSize.x), roundDown(cent.y, m_chunkSize.y), roundDown(cent.z, m_chunkSize.z));
+    center = Point(center.x / m_chunkSize.x, center.y / m_chunkSize.y, center.z / m_chunkSize.z);
+
+    Point diffMin = center - m_min;
+    Point diffMax = m_max - center;
+
+    if (diffMin.z < m_dim.z)
+    { m_min.z -= 1; addBlocks(m_min.x, m_max.x, m_min.y, m_max.y, m_min.z, m_min.z); }
+    else if (diffMin.z > m_dim.z + 1)
+    { removeBlocks(m_min.x, m_max.x, m_min.y, m_max.y, m_min.z, m_min.z); m_min.z += 1; }
+    if (diffMax.z < m_dim.z)
+    { m_max.z += 1; addBlocks(m_min.x, m_max.x, m_min.y, m_max.y, m_max.z, m_max.z); }
+    else if (diffMax.z > m_dim.z + 1)
+    { removeBlocks(m_min.x, m_max.x, m_min.y, m_max.y, m_max.z, m_max.z); m_max.z -= 1; }
+    if (diffMin.x < m_dim.x)
+    { m_min.x -= 1; addBlocks(m_min.x, m_min.x, m_min.y, m_max.y, m_min.z, m_max.z); }
+    else if (diffMin.x > m_dim.x + 1)
+    { removeBlocks(m_min.x, m_min.x, m_min.y, m_max.y, m_min.z, m_max.z); m_min.x += 1; }
+    if (diffMax.x < m_dim.x)
+    { m_max.x += 1; addBlocks(m_max.x, m_max.x, m_min.y, m_max.y, m_min.z, m_max.z); }
+    else if (diffMax.x > m_dim.x + 1)
+    { removeBlocks(m_max.x, m_max.x, m_min.y, m_max.y, m_min.z, m_max.z); m_max.x -= 1; }
+
+}
+
+void VoxelManager::addBlocks(int xmin, int xmax, int ymin, int ymax, int zmin, int zmax)
+{
+    Point p;
+    for (int y = ymin; y <= ymax; y++)
+    {
+        for (int z = zmin; z <= zmax; z++)
+        {
+            for (int x = xmin; x <= xmax; x++)
+            {
+                p = Point(x, y, z) * m_chunkSize;
+                if (!m_chunks.contains(p))
+                    m_chunksToAdd.append(p);
+            }
+        }
+    }
+}
+
+void VoxelManager::removeBlocks(int xmin, int xmax, int ymin, int ymax, int zmin, int zmax)
+{
+    Point p;
+    for (int y = ymin; y <= ymax; y++)
+    {
+        for (int z = zmin; z <= zmax; z++)
+        {
+            for (int x = xmin; x <= xmax; x++)
+            {
+                p = Point(x, y, z) * m_chunkSize;
+                    m_chunksToRemove.append(p);
+            }
+        }
+    }
 
 }
 
@@ -207,7 +281,7 @@ Collision *VoxelManager::checkCollision3D(CollisionShape *cs, glm::vec3 distance
     if (abs(distance.x) < abs(distance.z))
     {
         // check x
-        dest= pos + glm::vec3(distance.x, 0, 0);
+        dest = pos + glm::vec3(distance.x, 0, 0);
         checkCollision1D(col, pos, dim, dest, dir.x, 0, 1, 2);
         pos.x += col->mtv.x;
 
@@ -239,7 +313,12 @@ Collision *VoxelManager::checkCollision3D(CollisionShape *cs, glm::vec3 distance
 void VoxelManager::checkCollision1D(Collision *col, glm::vec3 pos, glm::vec3 dim, glm::vec3 dest,
                            float dir, int outer, int mid, int inner)
 {
-    float bump = 0.50001f;
+    float bump = 0.5001f;
+
+//    cout << "Pos: " << glm::to_string(pos) << endl;
+//    cout << "Dim: " << glm::to_string(dim) << endl;
+//    cout << glm::to_string(glm::length(pos - dim)) << endl;
+//    cout << glm::to_string(glm::length(pos + dim)) << endl;
 
     glm::vec3 minBlocks = glm::round(pos - dim);
     glm::vec3 maxBlocks = glm::round(pos + dim);
@@ -247,7 +326,8 @@ void VoxelManager::checkCollision1D(Collision *col, glm::vec3 pos, glm::vec3 dim
     glm::vec3 nearBlocks = glm::round(pos + dim * dir);
     glm::vec3 farBlocks = glm::round(dest + dim * dir);
 
-    // check X
+    Point bp;
+    Chunk *c;
     int far = (int) (farBlocks[outer] + dir);
     for (int i = (int) nearBlocks[outer]; i != far; i += (int) dir)
     {
@@ -260,13 +340,13 @@ void VoxelManager::checkCollision1D(Collision *col, glm::vec3 pos, glm::vec3 dim
                 switch(mid) { case 0: x=j; break; case 1: y=j; break; case 2: z=j; break; }
                 switch(inner) { case 0: x=k; break; case 1: y=k; break; case 2: z=k; break; }
 
-                Point bp = Point(roundDown(x, m_chunkSize.x), roundDown(y, m_chunkSize.y), roundDown(z, m_chunkSize.z));
-                Chunk *c = m_chunks.value(bp, NULL);
+                bp = Point(roundDown(x, m_chunkSize.x), roundDown(y, m_chunkSize.y), roundDown(z, m_chunkSize.z));
+                c = m_chunks.value(bp, NULL);
 
                 if (c && c->getSingleBlock(x - bp.x, y - bp.y, z - bp.z))
                 {
                     col->mtv[outer] = farBlocks[outer] - ((pos[outer] + dim[outer] * dir));
-                    col->mtv[outer] += (col->mtv[outer] > 0.f ? -bump : bump);
+                    col->mtv[outer] += (col->mtv[outer] >= 0.f ? -bump : bump);
 
                     col->impulse[outer] = 1.f;
                     return;

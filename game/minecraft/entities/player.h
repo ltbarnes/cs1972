@@ -3,13 +3,13 @@
 
 #include "movableentity.h"
 #include "actioncamera.h"
-#include "world.h"
+#include "minecraftworld.h"
 #include <QMouseEvent>
 
 class Player : public MovableEntity
 {
 public:
-    Player(ActionCamera *camera, glm::vec3 pos, World *world);
+    Player(ActionCamera *camera, glm::vec3 pos, MinecraftWorld *world);
     virtual ~Player();
 
     virtual void onTick(float secs);
@@ -36,7 +36,7 @@ private:
     bool m_jetMode;
 
     float m_offset;
-    World *m_world;
+    MinecraftWorld *m_world;
 };
 
 #endif // PLAYER_H

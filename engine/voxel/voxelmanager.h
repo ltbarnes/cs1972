@@ -12,7 +12,7 @@ class ChunkBuilder;
 class VoxelManager : public Manager
 {
 public:
-    VoxelManager(Camera *cam, GLuint shader, Point center, Point dim, Point chunkSize, ChunkBuilder *cb);
+    VoxelManager(Camera *cam, GLuint shader, Point dim, Point chunkSize, ChunkBuilder *cb);
     virtual ~VoxelManager();
 
     QList<Chunk*> getChunks();
@@ -30,6 +30,10 @@ public:
     int roundDown(int num, int multiple);
 
 private:
+    void checkCenterPosition();
+    void addBlocks(int xmin, int xmax, int ymin, int ymax, int zmin, int zmax);
+    void removeBlocks(int xmin, int xmax, int ymin, int ymax, int zmin, int zmax);
+
     Collision *predictCollision(MovableEntity *me, float secs);
     Collision *checkCollision3D(CollisionShape *cs, glm::vec3 distance);
     void checkCollision1D(Collision *col, glm::vec3 pos, glm::vec3 dim, glm::vec3 dest,
@@ -37,6 +41,9 @@ private:
 
     QHash<Point, Chunk *> m_chunks;
     ChunkBuilder *m_chunkBuilder;
+
+    QList<Point> m_chunksToAdd;
+    QList<Point> m_chunksToRemove;
 
     Point m_chunkSize;
     Point m_center, m_dim;

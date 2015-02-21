@@ -11,6 +11,6 @@ uniform float transparency = 1.0;
 void main(){
     vec3 texColor = texture(tex, texc).rgb;
     texColor = clamp(texColor + vec3(1-useTexture), vec3(0.0), vec3(1.0));
-    fragColor = vec4(texColor, transparency);
+    fragColor = vec4(texColor * .2, transparency);
 //    fragColor = vec4(1, 0, 0, 1);
 }

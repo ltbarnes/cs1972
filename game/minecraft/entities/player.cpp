@@ -5,7 +5,7 @@
 using namespace std;
 #include <glm/ext.hpp>
 
-Player::Player(ActionCamera *camera, glm::vec3 pos, World *world)
+Player::Player(ActionCamera *camera, glm::vec3 pos, MinecraftWorld *world)
     : MovableEntity(pos)
 {
     m_camera = camera;
@@ -23,11 +23,12 @@ Player::Player(ActionCamera *camera, glm::vec3 pos, World *world)
     m_canJump = false;
 
     CollisionShape *cs = new CollisionCylinder(glm::vec3(), glm::vec3(.99f, 1.98f, .99f), "player");
+    cs->updatePos(pos);
     addCollisionShape(cs);
 
     RenderShape *rs = new RenderShape();
     rs->type = CYLINDER;
-    rs->color = glm::vec3(0, 1, 0);
+    rs->color = glm::vec3(0, .2f, 0);
     rs->shininess = 32.f;
     rs->transparency = 1.f;
     rs->trans = glm::scale(glm::mat4(), glm::vec3(.99f, 1.98f, .99f));
@@ -45,8 +46,7 @@ Player::~Player()
 
 
 void Player::onTick(float secs)
-{
-    MovableEntity::onTick(secs);
+{   
 
     float forceAmt = 8.f;
     if (m_jetMode)
@@ -62,7 +62,7 @@ void Player::onTick(float secs)
     if (m_wsad & 0b0001)
         force.x += 1;
     if (m_up)
-        applyForce(glm::vec3(0, (forceAmt *1.5f) * getMass(), 0));
+        applyForce(glm::vec3(0, (forceAmt *1.5f) * 2.f, 0));
 //        force.y += m_forceAmt;
 //    if (m_down)
 //        force.y -= m_forceAmt;
@@ -77,9 +77,9 @@ void Player::onTick(float secs)
 
     glm::vec3 vel = thrust - m_vel;
     if (m_jump && m_canJump)
-        vel.y = forceAmt;
+        vel.y = forceAmt * 2.f;
     else if (m_jetMode)
-        vel.y = 10.f * getMass();
+        vel.y = 10.f * 2.f;
     else
         vel.y = 0.f;
 
@@ -89,6 +89,7 @@ void Player::onTick(float secs)
         applyImpulse(vel);
 
     m_canJump = false;
+    MovableEntity::onTick(secs);
 }
 
 
@@ -222,20 +223,24 @@ void Player::onKeyReleased(QKeyEvent *e)
 void Player::handleCollision(Collision *col)
 {
         setPosition(getPosition() + col->mtv);
+        // velocity is already zeroed when col is made
 
-        glm::vec3 vel = getVelocity();
-
-        if (col->impulse.x > 0)
-            vel.x = 0;
         if (col->impulse.y > 0)
-        {
-            vel.y = 0;
             m_canJump = true;
-        }
-        if (col->impulse.z > 0)
-            vel.z = 0;
 
-        setVelocity(vel);
+//        glm::vec3 vel = getVelocity();
+
+//        if (col->impulse.x > 0)
+//            vel.x = 0;
+//        if (col->impulse.y > 0)
+//        {
+//            vel.y = 0;
+//            m_canJump = true;
+//        }
+//        if (col->impulse.z > 0)
+//            vel.z = 0;
+
+//        setVelocity(vel);
 }
 
 

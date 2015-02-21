@@ -11,7 +11,7 @@ class CollisionShape
 public:
     CollisionShape(glm::vec3 pos, glm::vec3 dim, QString id)
     {
-        m_pos = pos;
+        m_posRel = pos;
         m_dim = dim;
         m_id = id;
         m_mass = 1.0;
@@ -19,7 +19,7 @@ public:
     }
     virtual ~CollisionShape() {}
 
-    void updatePos(glm::vec3 amount) { m_pos += amount; }
+    void updatePos(glm::vec3 ePos) { m_pos = ePos + m_posRel; }
     void setMass(float mass) { m_mass = mass; }
     void setReactable(bool reactable) { m_reactable = reactable; }
 
@@ -33,7 +33,7 @@ public:
     virtual Collision *collidesCylinder(CollisionCylinder *cc) = 0;
 
 protected:
-    glm::vec3 m_pos, m_dim;
+    glm::vec3 m_posRel, m_pos, m_dim;
     QString m_id;
     float m_mass;
     bool m_reactable;

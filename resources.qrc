@@ -17,11 +17,11 @@
     	<file alias="terrain.png">res/images/terrain.png</file>
     </qresource>
     <qresource prefix="/cubemap">
-    	<file alias="posx.png">res/cubemap/posx.png</file>
-    	<file alias="negx.png">res/cubemap/negx.png</file>
-    	<file alias="posy.png">res/cubemap/posy.png</file>
-    	<file alias="negy.png">res/cubemap/negy.png</file>
-    	<file alias="posz.png">res/cubemap/posz.png</file>
-    	<file alias="negz.png">res/cubemap/negz.png</file>
+    	<file alias="posx.jpg">res/cubemap/posx.jpg</file>
+    	<file alias="negx.jpg">res/cubemap/negx.jpg</file>
+    	<file alias="posy.jpg">res/cubemap/posy.jpg</file>
+    	<file alias="negy.jpg">res/cubemap/negy.jpg</file>
+    	<file alias="posz.jpg">res/cubemap/posz.jpg</file>
+    	<file alias="negz.jpg">res/cubemap/negz.jpg</file>
     </qresource>
 </RCC>
