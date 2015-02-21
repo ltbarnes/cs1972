@@ -109,7 +109,7 @@ void MCChunkBuilder::buildChunk(GLuint shader, Chunk *chunk, int *heightMap, Poi
                 if (y < -25)
                     type = STONE;
                 else if (y == heightMap[mapI] - 1)
-                    type = ORIGINAL;
+                    type = SNOW;
                 else
                     type = DIRT;
 
@@ -144,6 +144,16 @@ void MCChunkBuilder::addFaces(int* index, GLfloat *vertexData, glm::vec3 center,
                 uv = glm::vec2(2, 0);
             else if (sides & (1 << (5 - i)))
                 uv = glm::vec2(3, 0);
+        }
+        else if (type == SNOW)
+        {
+            if (sides & 0b10 && i == 4)
+                uv = glm::vec2(2, 4);
+            else if (sides * 0b1 && i == 5)
+                uv = glm::vec2(2, 0);
+            else if (sides & (1 << (5 - i)))
+                uv = glm::vec2(4, 4);
+
         }
         else if (type == GRASS)
             uv = glm::vec2(0, 0);

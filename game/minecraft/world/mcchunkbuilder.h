@@ -6,8 +6,8 @@
 
 enum BlockType
 {
-    AIR, ORIGINAL, GRASS, DIRT, STONE
-//   0,     1,       2,    3,     4
+    AIR, ORIGINAL, GRASS, DIRT, STONE, SNOW
+//   0,     1,       2,    3,     4     5
 };
 
 class MCChunkBuilder : public ChunkBuilder
