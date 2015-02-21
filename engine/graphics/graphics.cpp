@@ -305,33 +305,33 @@ void Graphics::addLight(const Light &light)
 }
 
 
-void Graphics::drawQuad(glm::mat4 trans)
+void Graphics::drawQuad(glm::mat4 trans, GLenum mode)
 {
-    m_quad->transformAndRender(m_currentShader, trans);
+    m_quad->transformAndRender(m_currentShader, trans, mode);
 }
 
 
-void Graphics::drawCone(glm::mat4 trans)
+void Graphics::drawCone(glm::mat4 trans, GLenum mode)
 {
-    m_cone->transformAndRender(m_currentShader, trans);
+    m_cone->transformAndRender(m_currentShader, trans, mode);
 }
 
 
-void Graphics::drawCube(glm::mat4 trans)
+void Graphics::drawCube(glm::mat4 trans, GLenum mode)
 {
-    m_cube->transformAndRender(m_currentShader, trans);
+    m_cube->transformAndRender(m_currentShader, trans, mode);
 }
 
 
-void Graphics::drawCyl(glm::mat4 trans)
+void Graphics::drawCyl(glm::mat4 trans, GLenum mode)
 {
-    m_cyl->transformAndRender(m_currentShader, trans);
+    m_cyl->transformAndRender(m_currentShader, trans, mode);
 }
 
 
-void Graphics::drawSphere(glm::mat4 trans)
+void Graphics::drawSphere(glm::mat4 trans, GLenum mode)
 {
-    m_sphere->transformAndRender(m_currentShader, trans);
+    m_sphere->transformAndRender(m_currentShader, trans, mode);
 }
 
 

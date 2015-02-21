@@ -70,11 +70,11 @@ public:
 
     void addLight(const Light &light);
 
-    void drawQuad(glm::mat4 trans);
-    void drawCone(glm::mat4 trans);
-    void drawCube(glm::mat4 trans);
-    void drawCyl(glm::mat4 trans);
-    void drawSphere(glm::mat4 trans);
+    void drawQuad(glm::mat4 trans, GLenum mode = GL_TRIANGLE_STRIP);
+    void drawCone(glm::mat4 trans, GLenum mode = GL_TRIANGLE_STRIP);
+    void drawCube(glm::mat4 trans, GLenum mode = GL_TRIANGLE_STRIP);
+    void drawCyl(glm::mat4 trans, GLenum mode = GL_TRIANGLE_STRIP);
+    void drawSphere(glm::mat4 trans, GLenum mode = GL_TRIANGLE_STRIP);
     void drawFaceCube(glm::mat4 trans, int info);
 
     static GLuint loadShaders(const char *vertex_file_path, const char *fragment_file_path);

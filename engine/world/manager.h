@@ -16,7 +16,7 @@ public:
     GraphicsMode getGraphicsMode() { return m_gm; }
 
     virtual void manage(World *world, float onTickSecs) = 0;
-    virtual void onDraw(Graphics *g) {}
+    virtual void onDraw(Graphics *) {}
 
 private:
     GraphicsMode m_gm;

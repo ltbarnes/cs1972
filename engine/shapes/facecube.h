@@ -12,7 +12,7 @@ public:
     virtual void calcVerts();
     virtual void updateGL(GLuint shader);
 
-    virtual void transformAndRender(GLuint shader, glm::mat4 trans, int faces);
+//    virtual void transformAndRender(GLuint shader, glm::mat4 trans, int faces);
 
 protected:
     void addFace(int *index, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 v4);

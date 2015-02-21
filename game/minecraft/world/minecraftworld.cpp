@@ -35,22 +35,28 @@ void MinecraftWorld::onTick(float secs)
     switch(face) {
     case 0b100000: // +z
         m_selectedFace = glm::mat4();
-        m_selectedFace = glm::scale(glm::mat4(), glm::vec3(1.1f));
+        point.z += .503f;
+//        m_selectedFace = glm::scale(glm::mat4(), glm::vec3(1.1f));
         break;
-    case 0b010000: // +x
-        m_selectedFace = glm::rotate(glm::mat4(), glm::radians(90.f), glm::vec3(0, 1, 0));
-        break;
-    case 0b001000: // -z
+    case 0b010000: // -z
         m_selectedFace = glm::rotate(glm::mat4(), glm::radians(180.f), glm::vec3(0, 1, 0));
+        point.z -= .503f;
+        break;
+    case 0b001000: // +x
+        m_selectedFace = glm::rotate(glm::mat4(), glm::radians(90.f), glm::vec3(0, 1, 0));
+        point.x += .503f;
         break;
     case 0b000100: // -x
         m_selectedFace = glm::rotate(glm::mat4(), glm::radians(-90.f), glm::vec3(0, 1, 0));
+        point.x -= .503f;
         break;
     case 0b000010: // +y
         m_selectedFace = glm::rotate(glm::mat4(), glm::radians(-90.f), glm::vec3(1, 0, 0));
+        point.y += .503f;
         break;
     case 0b000001: // -y
         m_selectedFace = glm::rotate(glm::mat4(), glm::radians(90.f), glm::vec3(1, 0, 0));
+        point.y -= .503f;
         break;
     }
 
@@ -69,11 +75,13 @@ void MinecraftWorld::onDraw(Graphics *g)
     g->setWorldColor(.1f, .4f, .1f);
     g->addLight(light);
 
+
+
     World::onDraw(g);
 
     // highlighted face
     g->setColor(0, 0, 0, 1, 0);
-    g->drawCube(m_selectedFace);
+    g->drawQuad(m_selectedFace, GL_LINES);
 }
 
 glm::vec4 MinecraftWorld::getCoords(int index, Point dim)

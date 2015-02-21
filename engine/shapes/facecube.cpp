@@ -118,21 +118,21 @@ void FaceCube::addVertexSparseT(int *i, glm::vec3 v, glm::vec2 tex)
 }
 
 
-void FaceCube::transformAndRender(GLuint shader, glm::mat4 trans, int info)
-{
-    glBindVertexArray(m_vaoID);
-    glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, glm::value_ptr(trans));
+//void FaceCube::transformAndRender(GLuint shader, glm::mat4 trans, int info)
+//{
+//    glBindVertexArray(m_vaoID);
+//    glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, glm::value_ptr(trans));
 
-    for (int i = 0; i < 6; i++)
-    {
-        if (info & (1 << (13 - i)))
-            glDrawArrays(GL_TRIANGLE_STRIP, (i * 4), 4);
+//    for (int i = 0; i < 6; i++)
+//    {
+//        if (info & (1 << (13 - i)))
+//            glDrawArrays(GL_TRIANGLE_STRIP, (i * 4), 4);
 
-    }
+//    }
 
 
-    glBindVertexArray(0);
-}
+//    glBindVertexArray(0);
+//}
 
 
 

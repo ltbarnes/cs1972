@@ -282,8 +282,6 @@ glm::vec3 VoxelManager::castRay(glm::vec3 p, glm::vec3 dir, float &t, int &face)
                         (dir.y > 0 ? 1 : -1),
                         (dir.z > 0 ? 1 : -1));
 
-//    cout << glm::to_string(dir) << endl;
-
     glm::vec3 tDelta = glm::abs(glm::vec3(1.f / dir.x, 1.f / dir.y, 1.f / dir.z));
     Point point = Point((int) glm::round(p.x), (int) glm::round(p.y), (int) glm::round(p.z));
 
@@ -303,25 +301,35 @@ glm::vec3 VoxelManager::castRay(glm::vec3 p, glm::vec3 dir, float &t, int &face)
             if(tMax.x < tMax.z) {
                 point.x += step.x;
                 tMax.x += tDelta.x;
+                face = 0b001000;
             } else {
                 point.z += step.z;
                 tMax.z += tDelta.z;
+                face = 0b100000;
             }
         } else {
             if(tMax.y < tMax.z) {
                 point.y += step.y;
                 tMax.y += tDelta.y;
+                face = 0b000010;
             } else {
                 point.z += step.z;
                 tMax.z += tDelta.z;
+                face = 0b100000;
             }
         }
         bp = Point(roundDown(point.x, m_chunkSize.x), roundDown(point.y, m_chunkSize.y), roundDown(point.z, m_chunkSize.z));
         c = m_chunks.value(bp, NULL);
     }
 
-    t = 0;
-    face = 0b100000;
+    t = 0.f;
+
+    if (step.z > 0 && face == 0b100000)
+        face = 0b010000;
+    else if (step.x > 0 && face == 0b001000)
+        face = 0b000100;
+    else if (step.y > 0 && face == 0b000010)
+        face = 0b000001;
 
     return glm::vec3(point.x , point.y, point.z);
 }
