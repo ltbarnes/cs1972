@@ -282,16 +282,48 @@ glm::vec3 VoxelManager::castRay(glm::vec3 p, glm::vec3 dir, float &t, int &face)
                         (dir.y > 0 ? 1 : -1),
                         (dir.z > 0 ? 1 : -1));
 
-    glm::vec3 tDelta = glm::vec3(1.f / dir.x, 1.f / dir.y, 1.f / dir.z);
+//    cout << glm::to_string(dir) << endl;
+
+    glm::vec3 tDelta = glm::abs(glm::vec3(1.f / dir.x, 1.f / dir.y, 1.f / dir.z));
     Point point = Point((int) glm::round(p.x), (int) glm::round(p.y), (int) glm::round(p.z));
 
-    Point next = point + Point(1);
-    glm::vec3 tMax = glm::vec3(next.x - p.x, next.y - p.y, next.z - p.z) * tDelta;
+    Point next = point + step;
+    glm::vec3 nextf = glm::vec3(next.x - .5f * step.x, next.y - .5f * step.y, next.z - .5f * step.z);
+    glm::vec3 tMax = glm::abs(nextf - p) * tDelta;
+
+    Point bp = Point(roundDown(point.x, m_chunkSize.x), roundDown(point.y, m_chunkSize.y), roundDown(point.z, m_chunkSize.z));
+    Chunk *c = m_chunks.value(bp, NULL);
+
+    while(c)
+    {
+        if (c->getSingleBlock(point.x - bp.x, point.y - bp.y, point.z - bp.z))
+            break;
+        if(tMax.x < tMax.y)
+        {
+            if(tMax.x < tMax.z) {
+                point.x += step.x;
+                tMax.x += tDelta.x;
+            } else {
+                point.z += step.z;
+                tMax.z += tDelta.z;
+            }
+        } else {
+            if(tMax.y < tMax.z) {
+                point.y += step.y;
+                tMax.y += tDelta.y;
+            } else {
+                point.z += step.z;
+                tMax.z += tDelta.z;
+            }
+        }
+        bp = Point(roundDown(point.x, m_chunkSize.x), roundDown(point.y, m_chunkSize.y), roundDown(point.z, m_chunkSize.z));
+        c = m_chunks.value(bp, NULL);
+    }
 
     t = 0;
-    face = 0b000010;
+    face = 0b100000;
 
-    return glm::vec3(point.x, point.y, point.z);
+    return glm::vec3(point.x , point.y, point.z);
 }
 
 int VoxelManager::roundDown(int num, int multiple)

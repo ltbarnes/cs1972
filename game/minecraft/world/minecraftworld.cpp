@@ -35,6 +35,7 @@ void MinecraftWorld::onTick(float secs)
     switch(face) {
     case 0b100000: // +z
         m_selectedFace = glm::mat4();
+        m_selectedFace = glm::scale(glm::mat4(), glm::vec3(1.1f));
         break;
     case 0b010000: // +x
         m_selectedFace = glm::rotate(glm::mat4(), glm::radians(90.f), glm::vec3(0, 1, 0));
@@ -72,7 +73,7 @@ void MinecraftWorld::onDraw(Graphics *g)
 
     // highlighted face
     g->setColor(0, 0, 0, 1, 0);
-    g->drawQuad(m_selectedFace);
+    g->drawCube(m_selectedFace);
 }
 
 glm::vec4 MinecraftWorld::getCoords(int index, Point dim)
