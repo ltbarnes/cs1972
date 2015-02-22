@@ -33,9 +33,9 @@ void main() {
 
     if (playerMode != 0)
     {
-        float intensity = .5;
+        float intensity = 1.25;
         if (playerMode == 2)
-            intensity = 1.0;
+            intensity = 2.5;
         float attenGlow = clamp(1.0 / (dist * .3), 0.0, 1.0);
         glow = (vec3(1, .5, 0) - tint * .5) * attenGlow * intensity;
     }

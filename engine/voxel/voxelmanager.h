@@ -22,7 +22,7 @@ public:
     virtual void onDraw(Graphics *g);
 
     void addChunk(Point pnt);
-//    void addBlock(float x, float y, float z, char type);
+    void addBlock(Point p);
 
     glm::vec3 castRay(glm::vec3 p, glm::vec3 dir, float& t, int& face);
 
@@ -46,7 +46,7 @@ private:
     QList<Point> m_chunksToRemove;
 
     Point m_chunkSize;
-    Point m_center, m_dim;
+    Point m_dim;
     Point m_max, m_min;
 
     GLuint m_shader;

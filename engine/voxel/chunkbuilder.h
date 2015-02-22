@@ -13,6 +13,7 @@ public:
     virtual ~ChunkBuilder() {}
 
     virtual Chunk *getChunk(GLuint shader, Point p, Point dim) = 0;
+    virtual void resetChunk(GLuint shader, Chunk* chunk) = 0;
 
 protected:
     int m_seed;

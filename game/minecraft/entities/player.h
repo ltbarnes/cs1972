@@ -33,7 +33,7 @@ private:
     ActionCamera *m_camera;
 
     int m_wsad;
-    bool m_up, m_down;
+    bool m_up;
     bool m_canJump, m_jump;
     bool m_jetMode;
 

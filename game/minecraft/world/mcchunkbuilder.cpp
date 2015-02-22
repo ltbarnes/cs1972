@@ -210,3 +210,9 @@ void MCChunkBuilder::addVertex(int *index, float *vertexData, glm::vec3 v, glm::
     vertexData[(*index)++] = tex.x;
     vertexData[(*index)++] = tex.y;
 }
+
+
+void MCChunkBuilder::resetChunk(GLuint shader, Chunk *chunk)
+{
+
+}

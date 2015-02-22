@@ -323,11 +323,6 @@ void VoxelManager::checkCollision1D(Collision *col, glm::vec3 pos, glm::vec3 dim
 {
     float bump = 0.5001f;
 
-//    cout << "Pos: " << glm::to_string(pos) << endl;
-//    cout << "Dim: " << glm::to_string(dim) << endl;
-//    cout << glm::to_string(glm::length(pos - dim)) << endl;
-//    cout << glm::to_string(glm::length(pos + dim)) << endl;
-
     glm::vec3 minBlocks = glm::round(pos - dim);
     glm::vec3 maxBlocks = glm::round(pos + dim);
 
@@ -434,18 +429,16 @@ int VoxelManager::roundDown(int num, int multiple)
     return num - r;
 }
 
-//void VoxelManager::addBlock(float x, float y, float z, char type)
-//{
-//    // add single block to chunk
-//    Point p;
-//    p.x = (x >= 0 ? x / m_chunkSize.x : x / m_chunkSize.x - m_chunkSize.x);
-//    p.y = (y >= 0 ? y / m_chunkSize.y : y / m_chunkSize.y - m_chunkSize.y);
-//    p.z = (z >= 0 ? z / m_chunkSize.z : z / m_chunkSize.z - m_chunkSize.z);
-
-//    Chunk *c = m_chunks.value(p);
-//    assert(c);
-//    c->addBlock(x, y, z, type);
-//}
+void VoxelManager::addBlock(Point p)
+{
+    Point bp = Point(roundDown(p.x, m_chunkSize.x), roundDown(p.y, m_chunkSize.y), roundDown(p.z, m_chunkSize.z));
+    Chunk *c = m_chunks.value(bp, NULL);
+    if (c)
+    {
+        c->addBlock(p - bp);
+        m_chunkBuilder->resetChunk(m_shader, c);
+    }
+}
 
 
 int VoxelManager::getIndex(int x, int y, int z)

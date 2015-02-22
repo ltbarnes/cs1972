@@ -14,7 +14,6 @@ Player::Player(ActionCamera *camera, glm::vec3 pos, MinecraftWorld *world)
 
     m_wsad = 0b0000;
     m_up = false;
-    m_down = false;
 
     m_offset = 15.f;
     setMass(1.f);
@@ -142,12 +141,6 @@ void Player::onKeyPressed(QKeyEvent *e)
     case Qt::Key_D:
         m_wsad |= 0b0001;
         break;
-    case Qt::Key_E:
-//        m_up = true;
-        break;
-    case Qt::Key_Q:
-        m_down = true;
-        break;
     case Qt::Key_Space:
         if (m_jetMode)
             m_up = true;
@@ -207,12 +200,6 @@ void Player::onKeyReleased(QKeyEvent *e)
         break;
     case Qt::Key_D:
         m_wsad &= 0b1110;
-        break;
-    case Qt::Key_E:
-        m_up = false;
-        break;
-    case Qt::Key_Q:
-        m_down = false;
         break;
     case Qt::Key_Space:
         m_jump = false;

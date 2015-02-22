@@ -19,7 +19,9 @@ public:
 
 private:
     VoxelManager *m_vm;
-    glm::mat4 m_selectedFace;
+    glm::mat4 m_selectedTrans;
+    Point m_selectedBlock;
+    Point m_selectedFace;
 
     Camera *m_camera;
 };

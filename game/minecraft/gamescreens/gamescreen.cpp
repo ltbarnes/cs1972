@@ -65,7 +65,8 @@ void GameScreen::onRender(Graphics *g)
 
     g->setGraphicsMode(SPARSE);
     g->setPlayer(pos, mode);
-    g->setTint(0, .5, 0);
+    g->setTint(.175f, .075f, .075f);
+//    g->setTint(0, .5, 0);
 
     if (mode == 0)
         g->resetParticles();
@@ -96,8 +97,6 @@ void GameScreen::onRender(Graphics *g)
     trans[3] = glm::vec4(l.x, l.y + 2, l.z, 1.f);
 
     g->drawCube(trans);
-
-//    cout << t.x << ", " << t.y << ", " << t.x << endl;
 }
 
 
@@ -106,6 +105,9 @@ void GameScreen::onRender(Graphics *g)
 void GameScreen::onKeyPressed(QKeyEvent *e)
 {
     m_player->onKeyPressed(e);
+
+    if (e->key() == Qt::Key_Backspace || e->key() == Qt::Key_Delete)
+        m_parentApp->popScreens(1);
 }
 
 void GameScreen::onKeyReleased(QKeyEvent *e)

@@ -3,6 +3,7 @@
 #include "application.h"
 #include "minecraftworld.h"
 #include "mcchunkbuilder.h"
+#include "voxelmanager.h"
 #include "player.h"
 
 #include <QTime>
@@ -22,7 +23,7 @@ CreateScreen::CreateScreen(Application *parent)
     VoxelManager *vm = new VoxelManager(m_cam, m_parentApp->getShader(SPARSE), Point(6, 2, 6), Point(32, 32, 32), m_cb);
 
     m_world = new MinecraftWorld(m_cam, vm);
-    m_pos = glm::vec3(.1f, m_cb->getHeightAt(0, 0) + 30, .1f);
+    m_pos = glm::vec3(.1f, std::min(m_cb->getHeightAt(0, 0) + 30, 95), .1f);
 
     this->setCamera(m_cam);
 

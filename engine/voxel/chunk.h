@@ -13,6 +13,7 @@ public:
     virtual ~Chunk();
 
     void init(GLuint shader, char *blocks, QSet<int> drawables, float *vertexData, int numVerts);
+    void setVBO(GLuint shader, float *vertexData, int numVerts);
 
     void updateBlock(int index, int drawable, char type);
     char *getBlocks(int *size);
@@ -23,7 +24,7 @@ public:
     Point getDimension();
     glm::vec4 getDimensionV();
 
-//    void addBlock(int x, int y, int z, int type);
+    void addBlock(Point);
 //    void removeBlock(int x, int y, int z);
 
     char getSingleBlock(int x, int y, int z);

@@ -13,6 +13,7 @@
 MinecraftMenu::MinecraftMenu(Application *parent)
     : Screen(parent)
 {
+    parent->setUseCubeMap(true);
 }
 
 MinecraftMenu::~MinecraftMenu()
