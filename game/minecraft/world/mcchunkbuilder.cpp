@@ -34,7 +34,10 @@ MCChunkBuilder::MCChunkBuilder(int seed)
     // bottom
     cube[20] = brf; cube[21] = blf; cube[22] = brb; cube[23] = blb;
 
-    m_noise = new PerlinNoise(1.f, 2.f, 2.f, 5, m_seed);
+    m_noise = new PerlinNoise(1.f, 2.f, 30.f, 5, m_seed);
+
+    m_tallest = Point(0, std::numeric_limits<int>::min(), 0);
+    m_smallest = Point(0, std::numeric_limits<int>::max(), 0);
 }
 
 
@@ -43,21 +46,42 @@ MCChunkBuilder::~MCChunkBuilder()
 }
 
 
+Point MCChunkBuilder::getTallest()
+{
+    return m_tallest;
+}
+
+
+Point MCChunkBuilder::getLowest()
+{
+    return m_smallest;
+}
+
+
+int MCChunkBuilder::getHeightAt(int x, int z)
+{
+    return (int) glm::round(m_noise->GetHeight(x / 1000.0, z / 1000.0));
+}
+
+
 Chunk *MCChunkBuilder::getChunk(GLuint shader, Point p, Point dim)
 {
     int size = dim.x * dim.z;
     int *hm = new int[size];
 
-//    float sqrt2 = glm::sqrt(2.f);
-
     int index = 0;
+    Point point;
     for (int k = 0; k < dim.z; k++)
     {
         for (int i = 0; i < dim.x; i++)
         {
-//            float x = ((p.x + i) * (p.x + i) + (p.z + k) * (p.z + k)) * .0002f + m_seed;
-//            hm[index++] = (int)glm::round((glm::cos(x) * glm::cos(sqrt2 * x)) * 10.f);
-            hm[index++] = (int) glm::round(m_noise->GetHeight((p.x + i) / 1000.0, (p.z + k) / 1000.0) * 17.f);
+            point = Point(p.x + i, 0, p.z + k);
+            point.y = (int) glm::round(m_noise->GetHeight(point.x / 1000.0, point.z / 1000.0));
+            hm[index++] = point.y;
+            if ((point.x * point.x + point.z * point.z) < 50000 && point.y > m_tallest.y)
+                m_tallest = point;
+            if (point.y < m_smallest.y)
+                m_smallest = point;
         }
     }
 

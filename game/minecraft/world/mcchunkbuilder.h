@@ -4,6 +4,8 @@
 #include "chunkbuilder.h"
 #include "perlinnoise.h"
 #include <glm/glm.hpp>
+#include "point3d.h"
+#include <QList>
 
 enum BlockType
 {
@@ -18,6 +20,9 @@ public:
     virtual ~MCChunkBuilder();
 
     virtual Chunk *getChunk(GLuint shader, Point p, Point dim);
+    Point getTallest();
+    Point getLowest();
+    int getHeightAt(int x, int z);
 
 private:
     void buildChunk(GLuint shader, Chunk *chunk, int *heightMap, Point dim);
@@ -26,6 +31,9 @@ private:
 
     glm::vec3 cube[24];
     PerlinNoise *m_noise;
+
+    Point m_tallest;
+    Point m_smallest;
 
 };
 

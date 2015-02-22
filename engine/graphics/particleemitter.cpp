@@ -44,9 +44,9 @@ void ParticleEmitter::resetParticle(unsigned i)
     particle.force.x = m_force.x + (rand() / (RAND_MAX * 1.f)) * m_fuzziness *.06f - m_fuzziness *.03f;
     particle.force.y = m_force.y + (rand() / (RAND_MAX * 1.f)) * m_fuzziness *.06f - m_fuzziness *.03f;
     particle.force.z = m_force.z + (rand() / (RAND_MAX * 1.f)) * m_fuzziness *.06f - m_fuzziness *.03f;
-    particle.dir.x = m_velocity.x + (rand() / (RAND_MAX * 1.f)) * m_fuzziness * .8f - m_fuzziness * .5f;
-    particle.dir.y = m_velocity.y + (rand() / (RAND_MAX * 1.f)) * m_fuzziness * .8f - m_fuzziness * .5f;
-    particle.dir.z = m_velocity.z + (rand() / (RAND_MAX * 1.f)) * m_fuzziness * .8f - m_fuzziness * .5f;
+    particle.dir.x = m_velocity.x + (rand() / (RAND_MAX * 1.f)) * 10.f - 5.f;
+    particle.dir.y = m_velocity.y + (rand() / (RAND_MAX * 1.f)) * 10.f - 5.f;
+    particle.dir.z = m_velocity.z + (rand() / (RAND_MAX * 1.f)) * 10.f - 5.f;
 }
 
 /**
@@ -90,8 +90,8 @@ void ParticleEmitter::drawParticlesVAO(GLuint shader, glm::vec3 source){
         std::cout << "You must call initGL() before you can draw!" << std::endl;
     } else{
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-//        glDepthMask(GL_FALSE);
         glEnable(GL_BLEND);
+
         // Bind the VAO
         glBindVertexArray(m_vao);
 
@@ -111,9 +111,7 @@ void ParticleEmitter::drawParticlesVAO(GLuint shader, glm::vec3 source){
         // Unbind the VAO
         glBindVertexArray(0);
 
-
         glDisable(GL_BLEND);
-//        glDepthMask(GL_TRUE);
     }
 }
 

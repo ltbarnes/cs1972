@@ -113,6 +113,7 @@ public:
     inline GLuint texture() { return m_textureID; }
 
     void setForce(glm::vec3 force) { m_force = force; }
+    void setFuzziness(float fuzziness) { m_fuzziness = fuzziness; }
 //    void setSource(glm::vec3 source) { m_source = source; }
 
 protected:

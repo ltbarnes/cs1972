@@ -379,9 +379,9 @@ void Graphics::drawFaceCube(glm::mat4 trans, int faces)
 }
 
 
-void Graphics::drawParticles(glm::vec3 source)
+void Graphics::drawParticles(glm::vec3 source, float fuzziness)
 {
-//    m_pe->setSource(source);
+    m_pe->setFuzziness(fuzziness);
     m_pe->drawParticlesVAO(m_currentShader, source);
 }
 

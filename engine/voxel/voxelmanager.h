@@ -52,6 +52,8 @@ private:
     GLuint m_shader;
     Camera *m_camera;
     QString m_atlasName;
+
+    float m_timer;
 };
 
 #endif // VOXELMANAGER_H

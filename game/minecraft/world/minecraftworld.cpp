@@ -25,8 +25,8 @@ void MinecraftWorld::onTick(float secs)
 {
     World::onTick(secs);
 
-    foreach (MovableEntity *me, m_movableEntities)
-        me->applyForce(glm::vec3(0, -11.f * me->getMass(), 0));
+//    foreach (MovableEntity *me, m_movableEntities)
+//        me->applyForce(glm::vec3(0, -11.f * me->getMass(), 0));
 
     float t;
     int face;
@@ -60,7 +60,7 @@ void MinecraftWorld::onTick(float secs)
         break;
     }
 
-        m_selectedFace[3] = glm::vec4(point, 1.f);
+    m_selectedFace[3] = glm::vec4(point, 1.f);
 }
 
 void MinecraftWorld::onDraw(Graphics *g)
@@ -69,8 +69,20 @@ void MinecraftWorld::onDraw(Graphics *g)
 
     Light light;
     light.color = glm::vec3(1.f, 0.f, 0.f);
-    light.posDir = glm::vec3(2, -.5f, 0);
+    light.posDir = glm::vec3(0, -1, 0);
     light.id = 1;
+
+    // temp lights for viewing
+    Light light2;
+    light2.color = glm::vec3(1.f, 1.f, 1.f);
+    light2.posDir = glm::vec3(-1, 1, -1);
+    light2.id = 2;
+    Light light3;
+    light3.color = glm::vec3(1.f, 1.f, 1.f);
+    light3.posDir = glm::vec3(1, 1, 1);
+    light3.id = 3;
+    g->addLight(light2);
+    g->addLight(light3);
 
     g->setWorldColor(.1f, .4f, .1f);
     g->addLight(light);
@@ -91,7 +103,7 @@ glm::vec4 MinecraftWorld::getCoords(int index, Point dim)
 }
 
 
-//void MinecraftWorld::addBlock(int x, int y, int z, char type)
-//{
+void MinecraftWorld::addBlock()
+{
 //    m_vm->addBlock(x, y, z, type);
-//}
+}

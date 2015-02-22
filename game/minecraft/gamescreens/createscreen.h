@@ -1,17 +1,17 @@
-#ifndef GAMESCREEN_H
-#define GAMESCREEN_H
+#ifndef CREATESCREEN_H
+#define CREATESCREEN_H
 
 #include "screen.h"
 
 class MinecraftWorld;
-class Player;
 class MCChunkBuilder;
+class ActionCamera;
 
-class GameScreen : public Screen
+class CreateScreen : public Screen
 {
 public:
-    GameScreen(Application *parent);
-    virtual ~GameScreen();
+    CreateScreen(Application *parent);
+    virtual ~CreateScreen();
 
     // update and render
     virtual void onTick(float secs);
@@ -31,11 +31,13 @@ public:
 
 private:
     MinecraftWorld *m_world;
-    Player *m_player;
     MCChunkBuilder *m_cb;
 
-    float totalSecs;
-    int count;
+    ActionCamera *m_cam;
+
+    int m_movement;
+    bool m_moveSlow;
+    glm::vec3 m_pos;
 };
 
-#endif // GAMESCREEN_H
+#endif // CREATESCREEN_H

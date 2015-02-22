@@ -2,6 +2,7 @@
 #include "camera.h"
 #include "application.h"
 #include "gamescreen.h"
+#include "createscreen.h"
 
 #include <cstdlib>
 
@@ -38,6 +39,9 @@ void MinecraftMenu::onKeyPressed(QKeyEvent *e)
     {
     case Qt::Key_Return:
         m_parentApp->addScreen(new GameScreen(m_parentApp));
+        break;
+    case Qt::Key_C:
+        m_parentApp->addScreen(new CreateScreen(m_parentApp));
         break;
     default:
         break;

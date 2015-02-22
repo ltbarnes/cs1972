@@ -16,7 +16,7 @@ Player::Player(ActionCamera *camera, glm::vec3 pos, MinecraftWorld *world)
     m_up = false;
     m_down = false;
 
-    m_offset = 0.f;
+    m_offset = 15.f;
     setMass(1.f);
 
     m_jetMode = false;

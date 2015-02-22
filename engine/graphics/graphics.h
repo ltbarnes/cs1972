@@ -80,7 +80,7 @@ public:
     void drawCyl(glm::mat4 trans, GLenum mode = GL_TRIANGLE_STRIP);
     void drawSphere(glm::mat4 trans, GLenum mode = GL_TRIANGLE_STRIP);
     void drawFaceCube(glm::mat4 trans, int info);
-    void drawParticles(glm::vec3 source);
+    void drawParticles(glm::vec3 source, float fuzziness);
 
     void resetParticles();
     void setParticleForce(glm::vec3 force);

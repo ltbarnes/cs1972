@@ -17,18 +17,22 @@ GameScreen::GameScreen(Application *parent)
     : Screen(parent)
 {
     ActionCamera *cam = new ActionCamera();
+    m_cb = new MCChunkBuilder(QTime::currentTime().msec());
 
-    VoxelManager *vm = new VoxelManager(cam, m_parentApp->getShader(SPARSE), Point(7, 2, 7), Point(32, 32, 32),
-                                        new MCChunkBuilder(QTime::currentTime().msec()));
+    VoxelManager *vm = new VoxelManager(cam, m_parentApp->getShader(SPARSE), Point(6, 2, 6), Point(32, 32, 32), m_cb);
 
     m_world = new MinecraftWorld(cam, vm);
-    m_player = new Player(cam, glm::vec3(5.1f, 30.1f, 5.1f), m_world);
+    glm::vec3 playerPos = glm::vec3(.1f, m_cb->getHeightAt(0, 0) + 10, .1f);
+    m_player = new Player(cam, playerPos, m_world);
 
     m_world->addMovableEntity(m_player);
 
     this->setCamera(cam);
 
     m_parentApp->setUseCubeMap(true);
+
+    count = 0;
+    totalSecs = 0;
 }
 
 GameScreen::~GameScreen()
@@ -36,9 +40,20 @@ GameScreen::~GameScreen()
     delete m_world;
 }
 
+
 // update and render
 void GameScreen::onTick(float secs)
 {
+    secs = glm::min(secs, .03f);
+//    totalSecs += secs;
+//    count++;
+//    if (count > 100)
+//    {
+//        cout << (totalSecs / count) << endl;
+//        count = 0;
+//        totalSecs = 0;
+//    }
+
     m_world->onTick(secs);
     m_player->setCameraPos();
 }
@@ -50,23 +65,39 @@ void GameScreen::onRender(Graphics *g)
 
     g->setGraphicsMode(SPARSE);
     g->setPlayer(pos, mode);
-    g->setTint(1, 1, 1);
+    g->setTint(0, .5, 0);
 
     if (mode == 0)
         g->resetParticles();
     else
     {
-        if (mode == 1)
+        float fuzziness = 50.f;
+        if (mode == 1) {
             g->setParticleForce(glm::vec3(0, -22, 0));
-        else if (mode == 2)
+        } else if (mode == 2) {
+            fuzziness = 200.f;
             g->setParticleForce(glm::vec3(0, -45, 0));
+        }
 
         pos.y -= 1.f;
-        g->drawParticles(pos);
+        g->drawParticles(pos, fuzziness);
     }
 
-
     m_world->onDraw(g);
+
+    Point t = m_cb->getTallest();
+    glm::mat4 trans = glm::mat4();
+    trans[3] = glm::vec4(t.x, t.y, t.z, 1.f);
+
+    g->setColor(1, 0, 0, 1, 0);
+    g->drawCube(trans);
+
+    Point l = m_cb->getLowest();
+    trans[3] = glm::vec4(l.x, l.y + 2, l.z, 1.f);
+
+    g->drawCube(trans);
+
+//    cout << t.x << ", " << t.y << ", " << t.x << endl;
 }
 
 

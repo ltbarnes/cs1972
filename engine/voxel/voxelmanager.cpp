@@ -37,6 +37,8 @@ VoxelManager::VoxelManager(Camera *cam, GLuint shader, Point dim, Point chunkSiz
     m_chunksToRemove.clear();
 
     addBlocks(center.x, center.x, m_min.y, m_max.y, center.z, center.z);
+
+    m_timer = -.1;
 }
 
 VoxelManager::~VoxelManager()
@@ -73,7 +75,8 @@ void VoxelManager::setAtlas(QString atlasName)
 void VoxelManager::onDraw(Graphics *g)
 {
     g->setAtlas(m_atlasName);
-    g->setTint(.15f, .065f, .065f);
+//    g->setTint(.15f, .065f, .065f);
+//    g->setTint(0, .5, 0);
 
     glm::mat4 frust = g->getFrustum();
 
@@ -142,6 +145,9 @@ void VoxelManager::onDraw(Graphics *g)
 
 void VoxelManager::manage(World *world, float onTickSecs)
 {
+    if (m_timer > 0)
+        m_timer -= onTickSecs;
+
     checkCenterPosition();
 
     foreach (Point p, m_chunksToRemove)
@@ -155,6 +161,7 @@ void VoxelManager::manage(World *world, float onTickSecs)
 
 
     QList<Collision *> cols;
+    cols.clear();
     QList<MovableEntity *> mes = world->getMovableEntities();
 
     Collision *col;

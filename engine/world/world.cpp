@@ -77,6 +77,7 @@ void World::onTick(float secs)
         e->onTick(secs);
     }
 
+//    assert(0);
     foreach (Manager *m, m_managers) {
         m->manage(this, secs);
     }

@@ -13,7 +13,7 @@ public:
     virtual void onDraw(Graphics *g);
     virtual void onTick(float secs);
 
-//    void addBlock(int x, int y, int z, char type);
+    void addBlock();
 
     inline static glm::vec4 getCoords(int index, Point dim);
 
