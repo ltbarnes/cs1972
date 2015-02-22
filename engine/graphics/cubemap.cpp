@@ -66,6 +66,10 @@ void CubeMap::setCube(float radius)
     glEnableVertexAttribArray (0);
     glBindBuffer (GL_ARRAY_BUFFER, m_vboID);
     glVertexAttribPointer (0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+    // Clean up -- unbind things.
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 

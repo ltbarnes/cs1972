@@ -10,6 +10,7 @@ Player::Player(ActionCamera *camera, glm::vec3 pos, MinecraftWorld *world)
 {
     m_camera = camera;
     m_world = world;
+    m_camera->setOffset(15.f);
 
     m_wsad = 0b0000;
     m_up = false;
@@ -42,6 +43,16 @@ Player::Player(ActionCamera *camera, glm::vec3 pos, MinecraftWorld *world)
 
 Player::~Player()
 {
+}
+
+
+int Player::getMode()
+{
+    if (m_jetMode && m_up)
+        return 2;
+    if (m_jetMode)
+        return 1;
+    return 0;
 }
 
 
@@ -146,8 +157,8 @@ void Player::onKeyPressed(QKeyEvent *e)
     case Qt::Key_Minus:
     case Qt::Key_Underscore:
         m_offset += 1.f;
-        if (m_offset > 30.f)
-            m_offset = 30.f;
+        if (m_offset > 15.f)
+            m_offset = 15.f;
         m_camera->setOffset(m_offset);
         break;
     case Qt::Key_Plus:
@@ -164,7 +175,7 @@ void Player::onKeyPressed(QKeyEvent *e)
         break;
     case Qt::Key_ParenLeft:
     case Qt::Key_9:
-        m_offset = 30.f;
+        m_offset = 15.f;
         m_camera->setOffset(m_offset);
         break;
     case Qt::Key_Shift:

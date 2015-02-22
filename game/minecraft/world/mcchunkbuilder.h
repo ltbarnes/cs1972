@@ -2,6 +2,7 @@
 #define MCCHUNKBUILDER_H
 
 #include "chunkbuilder.h"
+#include "perlinnoise.h"
 #include <glm/glm.hpp>
 
 enum BlockType
@@ -24,6 +25,7 @@ private:
     void addVertex(int *index, float *vertexData, glm::vec3 v, glm::vec2 tex);
 
     glm::vec3 cube[24];
+    PerlinNoise *m_noise;
 
 };
 

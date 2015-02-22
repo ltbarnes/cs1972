@@ -53,6 +53,8 @@ void Application::popScreens(int num)
 
 void Application::onTick(float secs)
 {
+    m_g->update();
+
     if (m_currentScreen)
         m_currentScreen->onTick(secs);
 }

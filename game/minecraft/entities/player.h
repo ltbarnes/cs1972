@@ -18,6 +18,8 @@ public:
 
     void setCameraPos();
 
+    int getMode();
+
     // mouse events
     virtual void onMouseMoved(QMouseEvent *e, float deltaX, float deltaY);
 

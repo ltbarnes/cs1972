@@ -14,7 +14,8 @@ uniform mat4 model;
 
 // Light data
 const int MAX_LIGHTS = 10;
-uniform vec3 lightPositions[MAX_LIGHTS];    // For point lights
+//uniform int lightTypes[MAX_LIGHTS];         // 0 for point, 1 for directional
+uniform vec3 lightPositions[MAX_LIGHTS];    // pos for point lights dir for direction
 uniform vec3 lightAttenuations[MAX_LIGHTS]; // Constant, linear, and quadratic term
 uniform vec3 lightColors[MAX_LIGHTS];
 
@@ -37,15 +38,13 @@ void main(){
     vec4 position_cameraSpace = view * model * vec4(position, 1.0);
     vec4 normal_cameraSpace = vec4(normalize(mat3(transpose(inverse(view * model))) * normal), 0.0);
 
-    vec4 position_worldSpace = model * vec4(position, 1.0);
-    vec4 normal_worldSpace = vec4(normalize(mat3(transpose(inverse(model))) * normal), 0.0);
-
     gl_Position = projection * position_cameraSpace;
 
     color = world_color * diffuse_color; // Add ambient component
 
     for (int i = 0; i < MAX_LIGHTS; i++) {
         // Point Light
+//        if (lightTypes[i] == 0)
         vec4 vertexToLight = normalize(view * vec4(-lightPositions[i], 0));// - position_cameraSpace);
 
         if (transparency < 1.0)

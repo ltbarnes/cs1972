@@ -34,6 +34,8 @@ Graphics::Graphics()
     m_defaultLocs.clear();
     m_sparseLocs.clear();
     m_cubeLocs.clear();
+
+    m_pe = new ParticleEmitter();
 }
 
 Graphics::~Graphics()
@@ -48,6 +50,8 @@ Graphics::~Graphics()
 
     // skybox
     delete m_cubeMap;
+
+    delete m_pe;
 }
 
 void Graphics::init()
@@ -81,6 +85,10 @@ void Graphics::init()
     m_sparseLocs["view"] = glGetUniformLocation(m_sparseShader, "view");
     m_sparseLocs["envMap"] = glGetUniformLocation(m_sparseShader, "envMap");
 
+    m_sparseLocs["tint"] = glGetUniformLocation(m_sparseShader, "tint");
+    m_sparseLocs["player"] = glGetUniformLocation(m_sparseShader, "player");
+    m_sparseLocs["playerMode"] = glGetUniformLocation(m_sparseShader, "playerMode");
+
     m_sparseLocs["tex"] = glGetUniformLocation(m_sparseShader, "tex");
     m_sparseLocs["useTexture"] = glGetUniformLocation(m_sparseShader, "useTexture");
     m_sparseLocs["transparency"] = glGetUniformLocation(m_sparseShader, "transparency");
@@ -110,6 +118,13 @@ void Graphics::init()
     loadTexturesFromDirectory();
 
     m_currentShader = m_defaultShader;
+    m_pe->initGL(glGetAttribLocation(m_sparseShader, "position"));
+}
+
+
+void Graphics::update()
+{
+    m_pe->updateParticles();
 }
 
 
@@ -182,6 +197,12 @@ void Graphics::setColor(float r, float g, float b, float transparency, float shi
 }
 
 
+void Graphics::setTint(float r, float g, float b)
+{
+    glUniform3f(m_sparseLocs["tint"], r, g, b);
+}
+
+
 void Graphics::setAtlas(const QString &key)
 {
     GLint tex = m_textures.value(key);
@@ -208,7 +229,7 @@ void Graphics::setAtlas(const QString &key)
 
 void Graphics::setAtlasPosition(float x, float y)
 {
-//    glUniform2f(m_sparseLocs["subPos"], x, y);
+    glUniform2f(m_sparseLocs["subPos"], x, y);
 }
 
 
@@ -252,6 +273,13 @@ glm::mat4 Graphics::getFrustum()
 }
 
 
+void Graphics::setPlayer(glm::vec3 player, int mode)
+{
+    glUniform3fv(m_sparseLocs["player"], 1, glm::value_ptr(player));
+    glUniform1i(m_sparseLocs["playerMode"], mode);
+}
+
+
 void Graphics::useCubeMap(bool use)
 {
     m_useCubeMap = use;
@@ -281,6 +309,16 @@ void Graphics::drawCubeMap(Camera *camera)
 }
 
 
+void Graphics::resetParticles()
+{
+    m_pe->resetParticles();
+}
+
+
+void Graphics::setParticleForce(glm::vec3 force)
+{
+    m_pe->setForce(force);
+}
 
 
 
@@ -297,7 +335,7 @@ void Graphics::addLight(const Light &light)
     std::string indexString = "[" + os.str() + "]"; // e.g. [0], [1], etc.
 
     glUniform3fv(glGetUniformLocation(m_defaultShader, ("lightPositions" + indexString).c_str()), 1,
-            glm::value_ptr(light.pos));
+            glm::value_ptr(light.posDir));
     glUniform3fv(glGetUniformLocation(m_defaultShader, ("lightColors" + indexString).c_str()), 1,
                 glm::value_ptr(light.color));
     glUniform3fv(glGetUniformLocation(m_defaultShader, ("lightAttenuations" + indexString).c_str()), 1,
@@ -340,6 +378,12 @@ void Graphics::drawFaceCube(glm::mat4 trans, int faces)
     m_faceCube->transformAndRender(m_currentShader, trans, faces);
 }
 
+
+void Graphics::drawParticles(glm::vec3 source)
+{
+//    m_pe->setSource(source);
+    m_pe->drawParticlesVAO(m_currentShader, source);
+}
 
 
 

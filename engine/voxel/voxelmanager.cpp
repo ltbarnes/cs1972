@@ -73,6 +73,7 @@ void VoxelManager::setAtlas(QString atlasName)
 void VoxelManager::onDraw(Graphics *g)
 {
     g->setAtlas(m_atlasName);
+    g->setTint(.15f, .065f, .065f);
 
     glm::mat4 frust = g->getFrustum();
 

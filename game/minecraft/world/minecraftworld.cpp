@@ -68,14 +68,12 @@ void MinecraftWorld::onDraw(Graphics *g)
     g->setGraphicsMode(DEFAULT);
 
     Light light;
-    light.color = glm::vec3(1.f);
-    light.pos = glm::vec3(2, -1, 0);
+    light.color = glm::vec3(1.f, 0.f, 0.f);
+    light.posDir = glm::vec3(2, -.5f, 0);
     light.id = 1;
 
     g->setWorldColor(.1f, .4f, .1f);
     g->addLight(light);
-
-
 
     World::onDraw(g);
 

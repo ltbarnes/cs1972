@@ -12,6 +12,7 @@
 #include "cylinder.h"
 #include "sphere.h"
 #include "facecube.h"
+#include "particleemitter.h"
 
 enum GraphicsMode
 {
@@ -37,12 +38,11 @@ struct RenderShape
 // Data for a single light
 struct Light
 {
-   int id;
-
-   glm::vec3 color;
-   glm::vec3 pos;       // Not applicable to directional lights
-
-   glm::vec3 function;  // Attenuation function
+    int id;
+    int type;
+    glm::vec3 color;
+    glm::vec3 posDir;   // position for point, direction for directional
+    glm::vec3 function; // Attenuation function
 };
 
 class Graphics
@@ -50,6 +50,8 @@ class Graphics
 public:
     Graphics();
     ~Graphics();
+
+    void update();
 
     void init();
     void setCamera(Camera *camera);
@@ -59,8 +61,10 @@ public:
     void setColor(float r, float g, float b, float transparency, float shininess);
     void setTexture(const QString &key, float repeatU = 1.f, float repeatV = 1.f);
     void setAtlas(const QString &key);
+    void setTint(float r, float g, float b);
     void setAtlasPosition(float x, float y);
     void setTransparentMode(bool on);
+    void setPlayer(glm::vec3 player, int mode);
 
     glm::mat4 getFrustum();
 
@@ -76,6 +80,10 @@ public:
     void drawCyl(glm::mat4 trans, GLenum mode = GL_TRIANGLE_STRIP);
     void drawSphere(glm::mat4 trans, GLenum mode = GL_TRIANGLE_STRIP);
     void drawFaceCube(glm::mat4 trans, int info);
+    void drawParticles(glm::vec3 source);
+
+    void resetParticles();
+    void setParticleForce(glm::vec3 force);
 
     static GLuint loadShaders(const char *vertex_file_path, const char *fragment_file_path);
 
@@ -116,6 +124,7 @@ private:
     glm::vec2 m_subImages;
 
     glm::mat4 m_frustum;
+    ParticleEmitter *m_pe;
 };
 
 #endif // GRAPHICS_H

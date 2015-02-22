@@ -18,7 +18,7 @@ GameScreen::GameScreen(Application *parent)
 {
     ActionCamera *cam = new ActionCamera();
 
-    VoxelManager *vm = new VoxelManager(cam, m_parentApp->getShader(SPARSE), Point(7, 1, 7), Point(32, 32, 32),
+    VoxelManager *vm = new VoxelManager(cam, m_parentApp->getShader(SPARSE), Point(7, 2, 7), Point(32, 32, 32),
                                         new MCChunkBuilder(QTime::currentTime().msec()));
 
     m_world = new MinecraftWorld(cam, vm);
@@ -45,14 +45,26 @@ void GameScreen::onTick(float secs)
 
 void GameScreen::onRender(Graphics *g)
 {
-//    g->setWorldColor(.1f, .1f, .1f);
-////    g->setGraphicsMode(SPARSE);
-//    Light light;
-//    light.color = glm::vec3(1.f);
-//    light.id = 1;
-//    light.pos = glm::vec3(5, 5, 5);
+    int mode = m_player->getMode();
+    glm::vec3 pos = m_player->getPosition();
 
-//    g->addLight(light);
+    g->setGraphicsMode(SPARSE);
+    g->setPlayer(pos, mode);
+    g->setTint(1, 1, 1);
+
+    if (mode == 0)
+        g->resetParticles();
+    else
+    {
+        if (mode == 1)
+            g->setParticleForce(glm::vec3(0, -22, 0));
+        else if (mode == 2)
+            g->setParticleForce(glm::vec3(0, -45, 0));
+
+        pos.y -= 1.f;
+        g->drawParticles(pos);
+    }
+
 
     m_world->onDraw(g);
 }

@@ -1,4 +1,5 @@
 #include "mcchunkbuilder.h"
+#include "perlinnoise.h"
 #include "chunk.h"
 
 //#include <iostream>
@@ -32,6 +33,8 @@ MCChunkBuilder::MCChunkBuilder(int seed)
     cube[16] = trb; cube[17] = tlb; cube[18] = trf; cube[19] = tlf;
     // bottom
     cube[20] = brf; cube[21] = blf; cube[22] = brb; cube[23] = blb;
+
+    m_noise = new PerlinNoise(1.f, 2.f, 2.f, 5, m_seed);
 }
 
 
@@ -45,16 +48,16 @@ Chunk *MCChunkBuilder::getChunk(GLuint shader, Point p, Point dim)
     int size = dim.x * dim.z;
     int *hm = new int[size];
 
-    float sqrt2 = glm::sqrt(2.f);
+//    float sqrt2 = glm::sqrt(2.f);
 
     int index = 0;
     for (int k = 0; k < dim.z; k++)
     {
         for (int i = 0; i < dim.x; i++)
         {
-            float x = ((p.x + i) * (p.x + i) + (p.z + k) * (p.z + k)) * .0002f + m_seed;
-            hm[index++] = (int)glm::round((glm::cos(x) * glm::cos(sqrt2 * x)) * 10.f);
-//            hm[index++] = 1;
+//            float x = ((p.x + i) * (p.x + i) + (p.z + k) * (p.z + k)) * .0002f + m_seed;
+//            hm[index++] = (int)glm::round((glm::cos(x) * glm::cos(sqrt2 * x)) * 10.f);
+            hm[index++] = (int) glm::round(m_noise->GetHeight((p.x + i) / 1000.0, (p.z + k) / 1000.0) * 17.f);
         }
     }
 

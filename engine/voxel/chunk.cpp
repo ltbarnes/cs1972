@@ -169,8 +169,9 @@ QSet<int> Chunk::getDrawables()
     return m_drawables;
 }
 
-void Chunk::onDraw(Graphics *)
+void Chunk::onDraw(Graphics *g)
 {
+//    g->setColor(1, 1, 1, 1, 0);
     glBindVertexArray(m_vaoID);
     glDrawArrays(GL_TRIANGLES, 0, m_numVerts);
     glBindVertexArray(0);
