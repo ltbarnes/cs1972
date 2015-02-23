@@ -62,11 +62,12 @@ void GameScreen::onRender(Graphics *g)
 {
     int mode = m_player->getMode();
     glm::vec3 pos = m_player->getPosition();
+    glm::vec3 look = glm::vec3(m_camera->getLook());
 
     g->setGraphicsMode(SPARSE);
     g->setPlayer(pos, mode);
-    g->setTint(.175f, .075f, .075f);
-//    g->setTint(0, .5, 0);
+//    g->setTint(.175f, .075f, .075f); // dark
+    g->setTint(0, .5, 0); // green
 
     if (mode == 0)
         g->resetParticles();
@@ -80,8 +81,9 @@ void GameScreen::onRender(Graphics *g)
             g->setParticleForce(glm::vec3(0, -45, 0));
         }
 
-        pos.y -= 1.f;
-        g->drawParticles(pos, fuzziness);
+        look.y = 0;
+        look = glm::normalize(look) * .503f;
+        g->drawParticles(pos - look, fuzziness);
     }
 
     m_world->onDraw(g);
@@ -120,9 +122,16 @@ void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
     m_player->onMouseMoved(e, deltaX, deltaY);
 }
 
+void GameScreen::onMousePressed(QMouseEvent *e)
+{
+    if (e->button() == Qt::LeftButton)
+        m_world->addBlock();
+    else if (e->button() == Qt::RightButton)
+        m_world->removeBlock();
+}
 
-// unused in menu
-void GameScreen::onMousePressed(QMouseEvent *) {}
+
+// unused in game
 void GameScreen::onMouseReleased(QMouseEvent *) {}
 void GameScreen::onMouseDragged(QMouseEvent *, float, float) {}
 void GameScreen::onMouseWheel(QWheelEvent *) {}

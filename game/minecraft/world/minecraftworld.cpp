@@ -114,6 +114,15 @@ glm::vec4 MinecraftWorld::getCoords(int index, Point dim)
 void MinecraftWorld::addBlock()
 {
     Point p = m_selectedBlock + m_selectedFace;
+    glm::vec3 pv = glm::vec3(p.x, p.y, p.z);
+    foreach (MovableEntity *me, m_movableEntities)
+    {
+        glm::vec3 pos = me->getPosition();
+        pos.y = 0; pv.y = 0;
+        if (glm::distance(glm::round(pos), pv) < 0.0001f)
+            return;
+    }
+
     m_vm->addBlock(p);
 }
 

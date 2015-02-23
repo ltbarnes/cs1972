@@ -60,7 +60,9 @@ SOURCES += \
     game/minecraft/world/mcchunkbuilder.cpp \
     engine/common/perlinnoise.cpp \
     engine/graphics/particleemitter.cpp \
-    game/minecraft/gamescreens/createscreen.cpp
+    game/minecraft/gamescreens/createscreen.cpp \
+    game/minecraft/entities/ally.cpp \
+    game/minecraft/entities/enemy.cpp
 ### warmup
 #    game/warmup/gamescreens/menuscreen.cpp \
 #    game/warmup/gamescreens/gamescreen.cpp \
@@ -105,7 +107,9 @@ HEADERS += \
     engine/world/manager.h \
     engine/common/perlinnoise.h \
     engine/graphics/particleemitter.h \
-    game/minecraft/gamescreens/createscreen.h
+    game/minecraft/gamescreens/createscreen.h \
+    game/minecraft/entities/ally.h \
+    game/minecraft/entities/enemy.h
 ### warmup
 #    game/warmup/gamescreens/menuscreen.h \
 #    game/warmup/gamescreens/gamescreen.h \
