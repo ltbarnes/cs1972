@@ -24,7 +24,13 @@ View::View(QGLFormat format, QWidget *parent) : QGLWidget(format, parent)
     m_app = new Application();
 
     m_mouseDown = false;
-    m_fpsInit = false   ;
+
+    m_fpsInit = false;
+    fps = 0;
+
+    freq = 200;
+    counter = 0;
+    totalfps = 0.f;
 }
 
 View::~View()
@@ -81,9 +87,6 @@ void View::initializeGL()
     QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
 }
 
-int freq = 200;
-int counter = 0;
-float totalfps = 0.f;
 
 void View::paintGL()
 {

@@ -2,6 +2,7 @@
 #define GAMESCREEN_H
 
 #include "screen.h"
+#include "point3d.h"
 
 class MinecraftWorld;
 class Player;
@@ -33,6 +34,10 @@ private:
     MinecraftWorld *m_world;
     Player *m_player;
     MCChunkBuilder *m_cb;
+
+    Point m_safety;
+
+
 
     float totalSecs;
     int count;

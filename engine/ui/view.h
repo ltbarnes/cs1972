@@ -45,7 +45,11 @@ private:
     Application *m_app;
 
     bool m_mouseDown;
+
     bool m_fpsInit;
+    int freq;
+    int counter;
+    float totalfps;
 };
 
 #endif // VIEW_H

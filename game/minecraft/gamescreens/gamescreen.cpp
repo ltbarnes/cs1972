@@ -31,6 +31,8 @@ GameScreen::GameScreen(Application *parent)
 
     m_parentApp->setUseCubeMap(true);
 
+    m_safety = Point(0, std::numeric_limits<int>::min(), 0);
+
     count = 0;
     totalSecs = 0;
 }
@@ -56,6 +58,8 @@ void GameScreen::onTick(float secs)
 
     m_world->onTick(secs);
     m_player->setCameraPos();
+
+//    m_safety = crawl(m_safety);
 }
 
 void GameScreen::onRender(Graphics *g)
@@ -66,8 +70,8 @@ void GameScreen::onRender(Graphics *g)
 
     g->setGraphicsMode(SPARSE);
     g->setPlayer(pos, mode);
-//    g->setTint(.175f, .075f, .075f); // dark
-    g->setTint(0, .5, 0); // green
+    g->setTint(.175f, .075f, .075f); // dark
+//    g->setTint(0, .5, 0); // green
 
     if (mode == 0)
         g->resetParticles();

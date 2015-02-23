@@ -39,7 +39,7 @@ void main() {
         float attenGlow = clamp(1.0 / (dist * .3), 0.0, 1.0);
         glow = (vec3(1, .5, 0) - tint * .5) * attenGlow * intensity;
     }
-    float atten = clamp(1.0 / (dist * .01), 0.0, 1.0);
+    float atten = clamp(1.0 / (dist * .02), 0.0, 1.0);
     tnt = tint * atten + glow;
 
     gl_Position = projection * view * model * vec4(position, 1.0);

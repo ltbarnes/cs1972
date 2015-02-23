@@ -31,7 +31,7 @@ void MinecraftWorld::onTick(float secs)
         me->applyForce(glm::vec3(0, -11.f * me->getMass(), 0));
 
     float t;
-    int face;
+    int face = 0;
     glm::vec3 point = m_vm->castRay(glm::vec3(m_camera->getEye()), glm::vec3(m_camera->getLook()), t, face);
     m_selectedBlock = Point((int)point.x, (int)point.y, (int)point.z);
 

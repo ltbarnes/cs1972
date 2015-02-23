@@ -364,6 +364,9 @@ void VoxelManager::checkCollision1D(Collision *col, glm::vec3 pos, glm::vec3 dim
 
 glm::vec3 VoxelManager::castRay(glm::vec3 p, glm::vec3 dir, float &t, int &face)
 {
+    t = 0;
+    face = 0;
+
     Point step = Point( (dir.x > 0 ? 1 : -1),
                         (dir.y > 0 ? 1 : -1),
                         (dir.z > 0 ? 1 : -1));

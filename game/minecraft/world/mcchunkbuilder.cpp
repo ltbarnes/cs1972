@@ -271,17 +271,6 @@ void MCChunkBuilder::resetChunk(GLuint shader, Chunk *chunk, Point dim)
     }
 
     chunk->setVBO(shader, drawables, vertexData, numVerts / 5);
-
-//    for (int z = 0; z < 4; z++)
-//        for (int x = 0; x < 3; x++)
-//            for (int y = 0; y < 2; y++)
-//            {
-//                cout << Chunk::getIndex(x, y, z, Point(3, 2, 4)) << endl;
-//            }
-//    for (int i = 0; i < 24; i++)
-//    {
-//        Point p = Chunk::getPoint(i, Point(3, 2, 4));
-//        cout << p.x << ", " << p.y << ", " << p.z << endl;
-//    }
+    delete[] vertexData;
 
 }
