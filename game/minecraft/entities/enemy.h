@@ -7,6 +7,7 @@ class Enemy : public MovableEntity
 {
 public:
     Enemy();
+    virtual ~Enemy();
 };
 
 #endif // ENEMY_H

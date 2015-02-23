@@ -7,6 +7,7 @@ class Ally : public MovableEntity
 {
 public:
     Ally();
+    virtual ~Ally();
 };
 
 #endif // ALLY_H

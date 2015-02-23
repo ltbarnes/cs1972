@@ -3,3 +3,9 @@
 Ally::Ally()
 {
 }
+
+
+Ally::~Ally()
+{
+}
+
