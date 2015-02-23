@@ -2,8 +2,8 @@
 #include "perlinnoise.h"
 #include "chunk.h"
 
-//#include <iostream>
-//using namespace std;
+#include <iostream>
+using namespace std;
 //#include <glm/ext.hpp>
 
 
@@ -154,6 +154,7 @@ void MCChunkBuilder::buildChunk(GLuint shader, Chunk *chunk, int *heightMap, Poi
         }
     }
     chunk->init(shader, blocks, drawables, vertexData, numVerts / 5);
+    delete[] vertexData;
 }
 
 void MCChunkBuilder::addFaces(int* index, GLfloat *vertexData, glm::vec3 center, int sides, BlockType type)
@@ -212,7 +213,80 @@ void MCChunkBuilder::addVertex(int *index, float *vertexData, glm::vec3 v, glm::
 }
 
 
-void MCChunkBuilder::resetChunk(GLuint shader, Chunk *chunk)
+void MCChunkBuilder::resetChunk(GLuint shader, Chunk *chunk, Point dim)
 {
+    int size;
+    char *blocks = chunk->getBlocks(size);
+    QSet<int> drawables = chunk->getDrawables();
+
+    Point bp = chunk->getLocation();
+
+    // 6 per face * 6 faces per block * num total possible blocks
+    int numVerts = 36 * dim.x * dim.y * dim.z;
+    size = numVerts * 5; // three points and two tex coords
+    GLfloat *vertexData = new GLfloat[size];
+
+    numVerts = 0;
+    BlockType type = ORIGINAL;
+
+    QList<int> toRemove;
+    Point p;
+    char faces;
+
+    foreach (int i, drawables)
+    {
+        p = Chunk::getPoint(i, dim);
+        faces = 0;
+        if (p.z + 1 >= dim.z || !blocks[Chunk::getIndex(p.x, p.y, p.z + 1, dim)])
+            faces |= (1 << 5);
+        if (p.x + 1 >= dim.x || !blocks[Chunk::getIndex(p.x + 1, p.y, p.z, dim)])
+            faces |= (1 << 4);
+        if (p.z - 1 < 0 || !blocks[Chunk::getIndex(p.x, p.y, p.z - 1, dim)])
+            faces |= (1 << 3);
+        if (p.x - 1 < 0 || !blocks[Chunk::getIndex(p.x - 1, p.y, p.z, dim)])
+            faces |= (1 << 2);
+        if (p.y + 1 >= dim.y || !blocks[Chunk::getIndex(p.x, p.y + 1, p.z, dim)])
+            faces |= (1 << 1);
+        if (p.y - 1 < 0 || !blocks[Chunk::getIndex(p.x, p.y - 1, p.z, dim)])
+            faces |= (1);
+
+        if (p.y + bp.y < -25)
+            type = STONE;
+        else if (faces & 0b10)
+            type = SNOW;
+        else
+            type = DIRT;
+
+        if (faces)
+        {
+//            drawables.insert(index);
+//            p = bp + p;
+            addFaces(&numVerts, vertexData, glm::vec3(p.x, p.y, p.z), faces, type);
+        }
+        else
+        {
+            cout << "AHAHAHA" << endl;
+            toRemove.append(i);
+        }
+        blocks[i] = type;
+    }
+    foreach (int i, toRemove)
+    {
+        drawables.remove(i);
+    }
+
+    chunk->setVBO(shader, drawables, vertexData, numVerts / 5);
+
+//    for (int z = 0; z < 4; z++)
+//        for (int x = 0; x < 3; x++)
+//            for (int y = 0; y < 2; y++)
+//            {
+//                cout << Chunk::getIndex(x, y, z, Point(3, 2, 4)) << endl;
+//            }
+//    for (int i = 0; i < 24; i++)
+//    {
+//        Point p = Chunk::getPoint(i, Point(3, 2, 4));
+//        cout << p.x << ", " << p.y << ", " << p.z << endl;
+//    }
 
 }

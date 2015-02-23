@@ -146,6 +146,9 @@ void CreateScreen::onKeyReleased(QKeyEvent *e)
     case Qt::Key_Space:
         m_world->addBlock();
         break;
+    case Qt::Key_R:
+        m_world->removeBlock();
+        break;
     case Qt::Key_Backspace:
     case Qt::Key_Delete:
         m_parentApp->popScreens(1);

@@ -23,6 +23,7 @@ public:
 
     void addChunk(Point pnt);
     void addBlock(Point p);
+    void removeBlock(Point p);
 
     glm::vec3 castRay(glm::vec3 p, glm::vec3 dir, float& t, int& face);
 

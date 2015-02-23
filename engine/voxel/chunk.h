@@ -13,10 +13,10 @@ public:
     virtual ~Chunk();
 
     void init(GLuint shader, char *blocks, QSet<int> drawables, float *vertexData, int numVerts);
-    void setVBO(GLuint shader, float *vertexData, int numVerts);
+    void setVBO(GLuint shader, QSet<int> drawables, float *vertexData, int numVerts);
 
     void updateBlock(int index, int drawable, char type);
-    char *getBlocks(int *size);
+    char *getBlocks(int& size);
     QSet<int> getDrawables();
 
     Point getLocation();
@@ -24,15 +24,16 @@ public:
     Point getDimension();
     glm::vec4 getDimensionV();
 
-    void addBlock(Point);
-//    void removeBlock(int x, int y, int z);
+    void addBlock(Point p);
+    void removeBlock(Point p);
 
     char getSingleBlock(int x, int y, int z);
 
     void onTick(float secs);
     void onDraw(Graphics *g);
 
-    inline static int getIndex(int x, int y, int z, Point dim);
+    static int getIndex(int x, int y, int z, Point dim);
+    static Point getPoint(int index, Point dim);
     inline int getNeighbor(Point block, Point dir);
 
 //    virtual QList<Collision *> collides(Entity *e, float secs);

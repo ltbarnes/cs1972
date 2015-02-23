@@ -17,7 +17,6 @@ VoxelManager::VoxelManager(Camera *cam, GLuint shader, Point dim, Point chunkSiz
 {
     m_camera = cam;
     m_shader = shader;
-//    m_center = center;
     m_dim = dim;
     m_chunkSize = chunkSize;
 
@@ -436,7 +435,18 @@ void VoxelManager::addBlock(Point p)
     if (c)
     {
         c->addBlock(p - bp);
-        m_chunkBuilder->resetChunk(m_shader, c);
+        m_chunkBuilder->resetChunk(m_shader, c, m_chunkSize);
+    }
+}
+
+void VoxelManager::removeBlock(Point p)
+{
+    Point bp = Point(roundDown(p.x, m_chunkSize.x), roundDown(p.y, m_chunkSize.y), roundDown(p.z, m_chunkSize.z));
+    Chunk *c = m_chunks.value(bp, NULL);
+    if (c)
+    {
+        c->removeBlock(p - bp);
+        m_chunkBuilder->resetChunk(m_shader, c, m_chunkSize);
     }
 }
 

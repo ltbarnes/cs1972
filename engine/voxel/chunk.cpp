@@ -41,13 +41,13 @@ Chunk::~Chunk()
 void Chunk::init(GLuint shader, char *blocks, QSet<int> drawables, float *vertexData, int numVerts)
 {
     m_blocks = blocks;
-    m_drawables = QSet<int>(drawables);
-    setVBO(shader, vertexData, numVerts);
+    setVBO(shader, drawables, vertexData, numVerts);
 }
 
 
-void Chunk::setVBO(GLuint shader, float *vertexData, int numVerts)
+void Chunk::setVBO(GLuint shader, QSet<int> drawables, float *vertexData, int numVerts)
 {
+    m_drawables = QSet<int>(drawables);
     m_numVerts = numVerts;
 
     if (m_vaoID)
@@ -103,7 +103,36 @@ void Chunk::updateBlock(int index, int drawable, char type)
 
 void Chunk::addBlock(Point p)
 {
+    assert(p.x >= 0 && p.x < m_dim.x);
+    assert(p.y >= 0 && p.y < m_dim.y);
+    assert(p.z >= 0 && p.z < m_dim.z);
     m_drawables.insert(getIndex(p.x, p.y, p.z, m_dim));
+    m_blocks[getIndex(p.x, p.y, p.z, m_dim)] = 1; // temporary, gets reset in chunk builder
+    m_size++;
+}
+
+
+void Chunk::removeBlock(Point p)
+{
+    assert(p.x >= 0 && p.x < m_dim.x);
+    assert(p.y >= 0 && p.y < m_dim.y);
+    assert(p.z >= 0 && p.z < m_dim.z);
+    m_drawables.remove(getIndex(p.x, p.y, p.z, m_dim));
+    m_blocks[getIndex(p.x, p.y, p.z, m_dim)] = 0;
+    m_size--;
+
+    if (p.z + 1 < m_dim.z && m_blocks[Chunk::getIndex(p.x, p.y, p.z + 1, m_dim)])
+        m_drawables.insert(Chunk::getIndex(p.x, p.y, p.z + 1, m_dim));
+    if (p.x + 1 < m_dim.x && m_blocks[Chunk::getIndex(p.x + 1, p.y, p.z, m_dim)])
+        m_drawables.insert(Chunk::getIndex(p.x + 1, p.y, p.z, m_dim));
+    if (p.z - 1 >= 0 && m_blocks[Chunk::getIndex(p.x, p.y, p.z - 1, m_dim)])
+        m_drawables.insert(Chunk::getIndex(p.x, p.y, p.z - 1, m_dim));
+    if (p.x - 1 >= 0 && m_blocks[Chunk::getIndex(p.x - 1, p.y, p.z, m_dim)])
+        m_drawables.insert(Chunk::getIndex(p.x - 1, p.y, p.z, m_dim));
+    if (p.x + 1 < m_dim.y && m_blocks[Chunk::getIndex(p.x, p.y + 1, p.z, m_dim)])
+        m_drawables.insert(Chunk::getIndex(p.x, p.y + 1, p.z, m_dim));
+    if (p.x - 1 >= 0 && m_blocks[Chunk::getIndex(p.x, p.y - 1, p.z, m_dim)])
+        m_drawables.insert(Chunk::getIndex(p.x, p.y - 1, p.z, m_dim));
 }
 
 
@@ -115,15 +144,6 @@ int Chunk::getNeighbor(Point block, Point dir)
         return 0;
     return m_blocks[(getIndex(n.x, n.y, n.z, m_dim))];
 }
-
-
-//void Chunk::removeBlock(int x, int y, int z)
-//{
-//    int index = getIndex(m_p.x - x, m_p.y - y, m_p.z - z, m_dim);
-//    m_blocks[index] = 0;
-
-//     // check neighbors
-//}
 
 void Chunk::onTick(float) {}
 
@@ -147,9 +167,9 @@ glm::vec4 Chunk::getDimensionV()
     return glm::vec4(m_dim.x, m_dim.y, m_dim.z, 0.f);
 }
 
-char* Chunk::getBlocks(int *size)
+char* Chunk::getBlocks(int &size)
 {
-    *size = m_size;
+    size = m_size;
     return m_blocks;
 }
 
@@ -159,9 +179,8 @@ QSet<int> Chunk::getDrawables()
     return m_drawables;
 }
 
-void Chunk::onDraw(Graphics *g)
+void Chunk::onDraw(Graphics *)
 {
-//    g->setColor(1, 1, 1, 1, 0);
     glBindVertexArray(m_vaoID);
     glDrawArrays(GL_TRIANGLES, 0, m_numVerts);
     glBindVertexArray(0);
@@ -183,6 +202,16 @@ char Chunk::getSingleBlock(int x, int y, int z)
 int Chunk::getIndex(int x, int y, int z, Point dim)
 {
     return z*dim.y*dim.x + x*dim.y + y;
+}
+
+
+Point Chunk::getPoint(int index, Point dim)
+{
+    Point p;
+    p.y = index % dim.y;
+    p.x = (index / dim.y) % dim.x;
+    p.z = index / (dim.y * dim.x);
+    return p;
 }
 
 

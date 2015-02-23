@@ -14,6 +14,7 @@ public:
     virtual void onTick(float secs);
 
     void addBlock();
+    void removeBlock();
 
     inline static glm::vec4 getCoords(int index, Point dim);
 

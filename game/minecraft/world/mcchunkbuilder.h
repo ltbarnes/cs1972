@@ -20,7 +20,7 @@ public:
     virtual ~MCChunkBuilder();
 
     virtual Chunk *getChunk(GLuint shader, Point p, Point dim);
-    virtual void resetChunk(GLuint shader, Chunk *chunk);
+    virtual void resetChunk(GLuint shader, Chunk *chunk, Point dim);
 
     Point getTallest();
     Point getLowest();

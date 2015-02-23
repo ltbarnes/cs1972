@@ -116,3 +116,9 @@ void MinecraftWorld::addBlock()
     Point p = m_selectedBlock + m_selectedFace;
     m_vm->addBlock(p);
 }
+
+
+void MinecraftWorld::removeBlock()
+{
+    m_vm->removeBlock(m_selectedBlock);
+}
