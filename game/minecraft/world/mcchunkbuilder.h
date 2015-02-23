@@ -9,8 +9,8 @@
 
 enum BlockType
 {
-    AIR, ORIGINAL, GRASS, DIRT, STONE, SNOW
-//   0,     1,       2,    3,     4     5
+    AIR, ORIGINAL, GRASS, DIRT, STONE, SNOW, CRYSTAL
+//   0,     1,       2,    3,     4     5       6
 };
 
 class MCChunkBuilder : public ChunkBuilder
@@ -22,9 +22,8 @@ public:
     virtual Chunk *getChunk(GLuint shader, Point p, Point dim);
     virtual void resetChunk(GLuint shader, Chunk *chunk, Point dim);
 
-    Point getTallest();
-    Point getLowest();
     int getHeightAt(int x, int z);
+    float getFloatHeightAt(int x, int z);
 
 private:
     void buildChunk(GLuint shader, Chunk *chunk, int *heightMap, Point dim);
@@ -33,9 +32,6 @@ private:
 
     glm::vec3 cube[24];
     PerlinNoise *m_noise;
-
-    Point m_tallest;
-    Point m_smallest;
 
 };
 

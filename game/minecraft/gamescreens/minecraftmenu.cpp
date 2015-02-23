@@ -39,6 +39,8 @@ void MinecraftMenu::onKeyPressed(QKeyEvent *e)
     switch(e->key())
     {
     case Qt::Key_Return:
+    case Qt::Key_Enter:
+    case Qt::Key_Shift:
         m_parentApp->addScreen(new GameScreen(m_parentApp));
         break;
     case Qt::Key_C:

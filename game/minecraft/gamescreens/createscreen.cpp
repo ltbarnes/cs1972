@@ -22,7 +22,7 @@ CreateScreen::CreateScreen(Application *parent)
 
     VoxelManager *vm = new VoxelManager(m_cam, m_parentApp->getShader(SPARSE), Point(6, 2, 6), Point(32, 32, 32), m_cb);
 
-    m_world = new MinecraftWorld(m_cam, vm);
+    m_world = new MinecraftWorld(m_cam, vm, true);
     m_pos = glm::vec3(.1f, std::min(m_cb->getHeightAt(0, 0) + 30, 95), .1f);
 
     this->setCamera(m_cam);
@@ -143,12 +143,6 @@ void CreateScreen::onKeyReleased(QKeyEvent *e)
     case Qt::Key_Shift:
         m_moveSlow = false;
         break;
-    case Qt::Key_Space:
-        m_world->addBlock();
-        break;
-    case Qt::Key_R:
-        m_world->removeBlock();
-        break;
     case Qt::Key_Backspace:
     case Qt::Key_Delete:
         m_parentApp->popScreens(1);
@@ -164,9 +158,15 @@ void CreateScreen::onMouseMoved(QMouseEvent *, float deltaX, float deltaY)
     m_cam->pitch(deltaY / 10.f);
 }
 
+void CreateScreen::onMousePressed(QMouseEvent *e)
+{
+    if (e->button() == Qt::LeftButton)
+        m_world->addBlock();
+    else if (e->button() == Qt::RightButton)
+        m_world->removeBlock();
+}
 
-// unused in menu
-void CreateScreen::onMousePressed(QMouseEvent *) {}
+// unused in game
 void CreateScreen::onMouseReleased(QMouseEvent *) {}
 void CreateScreen::onMouseDragged(QMouseEvent *, float, float) {}
 void CreateScreen::onMouseWheel(QWheelEvent *) {}

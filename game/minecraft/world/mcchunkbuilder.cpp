@@ -35,9 +35,6 @@ MCChunkBuilder::MCChunkBuilder(int seed)
     cube[20] = brf; cube[21] = blf; cube[22] = brb; cube[23] = blb;
 
     m_noise = new PerlinNoise(1.f, 2.f, 30.f, 5, m_seed);
-
-    m_tallest = Point(0, std::numeric_limits<int>::min(), 0);
-    m_smallest = Point(0, std::numeric_limits<int>::max(), 0);
 }
 
 
@@ -47,21 +44,15 @@ MCChunkBuilder::~MCChunkBuilder()
 }
 
 
-Point MCChunkBuilder::getTallest()
-{
-    return m_tallest;
-}
-
-
-Point MCChunkBuilder::getLowest()
-{
-    return m_smallest;
-}
-
-
 int MCChunkBuilder::getHeightAt(int x, int z)
 {
-    return (int) glm::round(m_noise->GetHeight(x / 1000.0, z / 1000.0));
+    return (int) glm::round(getFloatHeightAt(x, z));
+}
+
+
+float MCChunkBuilder::getFloatHeightAt(int x, int z)
+{
+    return m_noise->GetHeight(x / 1000.0, z / 1000.0);
 }
 
 
@@ -79,10 +70,6 @@ Chunk *MCChunkBuilder::getChunk(GLuint shader, Point p, Point dim)
             point = Point(p.x + i, 0, p.z + k);
             point.y = (int) glm::round(m_noise->GetHeight(point.x / 1000.0, point.z / 1000.0));
             hm[index++] = point.y;
-            if ((point.x * point.x + point.z * point.z) < 50000 && point.y > m_tallest.y)
-                m_tallest = point;
-            if (point.y < m_smallest.y)
-                m_smallest = point;
         }
     }
 
@@ -135,7 +122,7 @@ void MCChunkBuilder::buildChunk(GLuint shader, Chunk *chunk, int *heightMap, Poi
                     sides |= (1);
 
                 if (y < -25)
-                    type = STONE;
+                    type = CRYSTAL;
                 else if (y == heightMap[mapI] - 1)
                     type = SNOW;
                 else
@@ -190,6 +177,8 @@ void MCChunkBuilder::addFaces(int* index, GLfloat *vertexData, glm::vec3 center,
             uv = glm::vec2(2, 0);
         else if(type == STONE)
             uv = glm::vec2(1, 0);
+        else if (type == CRYSTAL)
+            uv = glm::vec2(3, 3);
 
         if (sides & (1 << (5 - i)))
         {

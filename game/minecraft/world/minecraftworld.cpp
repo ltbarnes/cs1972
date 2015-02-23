@@ -5,7 +5,7 @@
 #include <iostream>
 using namespace std;
 
-MinecraftWorld::MinecraftWorld(Camera *cam, VoxelManager *vm)
+MinecraftWorld::MinecraftWorld(Camera *cam, VoxelManager *vm, bool create)
 {
     m_vm = vm;
     m_vm->setAtlas("terrain.png");
@@ -15,6 +15,8 @@ MinecraftWorld::MinecraftWorld(Camera *cam, VoxelManager *vm)
     m_selectedTrans = glm::mat4();
     m_selectedBlock = Point();
     m_selectedFace = Point();
+
+    m_createMode = create;
 }
 
 
@@ -30,45 +32,49 @@ void MinecraftWorld::onTick(float secs)
     foreach (MovableEntity *me, m_movableEntities)
         me->applyForce(glm::vec3(0, -11.f * me->getMass(), 0));
 
-    float t;
-    int face = 0;
-    glm::vec3 point = m_vm->castRay(glm::vec3(m_camera->getEye()), glm::vec3(m_camera->getLook()), t, face);
-    m_selectedBlock = Point((int)point.x, (int)point.y, (int)point.z);
+    if (m_createMode)
+    {
+        float t;
+        int face = 0;
+        glm::vec3 point = m_vm->castRay(glm::vec3(m_camera->getEye()), glm::vec3(m_camera->getLook()), t, face);
+        m_selectedBlock = Point((int)point.x, (int)point.y, (int)point.z);
 
-    switch(face) {
-    case 0b100000: // +z
-        m_selectedTrans = glm::mat4();
-        point.z += .503f;
-        m_selectedFace = Point(0, 0, 1);
-        break;
-    case 0b010000: // -z
-        m_selectedTrans = glm::rotate(glm::mat4(), glm::radians(180.f), glm::vec3(0, 1, 0));
-        point.z -= .503f;
-        m_selectedFace = Point(0, 0,-1);
-        break;
-    case 0b001000: // +x
-        m_selectedTrans = glm::rotate(glm::mat4(), glm::radians(90.f), glm::vec3(0, 1, 0));
-        point.x += .503f;
-        m_selectedFace = Point(1, 0, 0);
-        break;
-    case 0b000100: // -x
-        m_selectedTrans = glm::rotate(glm::mat4(), glm::radians(-90.f), glm::vec3(0, 1, 0));
-        point.x -= .503f;
-        m_selectedFace = Point(-1, 0, 0);
-        break;
-    case 0b000010: // +y
-        m_selectedTrans = glm::rotate(glm::mat4(), glm::radians(-90.f), glm::vec3(1, 0, 0));
-        point.y += .503f;
-        m_selectedFace = Point(0, 1, 0);
-        break;
-    case 0b000001: // -y
-        m_selectedTrans = glm::rotate(glm::mat4(), glm::radians(90.f), glm::vec3(1, 0, 0));
-        point.y -= .503f;
-        m_selectedFace = Point(0,-1, 0);
-        break;
+        switch(face)
+        {
+        case 0b100000: // +z
+            m_selectedTrans = glm::mat4();
+            point.z += .503f;
+            m_selectedFace = Point(0, 0, 1);
+            break;
+        case 0b010000: // -z
+            m_selectedTrans = glm::rotate(glm::mat4(), glm::radians(180.f), glm::vec3(0, 1, 0));
+            point.z -= .503f;
+            m_selectedFace = Point(0, 0,-1);
+            break;
+        case 0b001000: // +x
+            m_selectedTrans = glm::rotate(glm::mat4(), glm::radians(90.f), glm::vec3(0, 1, 0));
+            point.x += .503f;
+            m_selectedFace = Point(1, 0, 0);
+            break;
+        case 0b000100: // -x
+            m_selectedTrans = glm::rotate(glm::mat4(), glm::radians(-90.f), glm::vec3(0, 1, 0));
+            point.x -= .503f;
+            m_selectedFace = Point(-1, 0, 0);
+            break;
+        case 0b000010: // +y
+            m_selectedTrans = glm::rotate(glm::mat4(), glm::radians(-90.f), glm::vec3(1, 0, 0));
+            point.y += .503f;
+            m_selectedFace = Point(0, 1, 0);
+            break;
+        case 0b000001: // -y
+            m_selectedTrans = glm::rotate(glm::mat4(), glm::radians(90.f), glm::vec3(1, 0, 0));
+            point.y -= .503f;
+            m_selectedFace = Point(0,-1, 0);
+            break;
+        }
+
+        m_selectedTrans[3] = glm::vec4(point, 1.f);
     }
-
-    m_selectedTrans[3] = glm::vec4(point, 1.f);
 }
 
 void MinecraftWorld::onDraw(Graphics *g)
@@ -97,9 +103,12 @@ void MinecraftWorld::onDraw(Graphics *g)
 
     World::onDraw(g);
 
-    // highlighted face
-    g->setColor(0, 0, 0, 1, 0);
-    g->drawQuad(m_selectedTrans, GL_LINES);
+    if (m_createMode)
+    {
+        // highlighted face
+        g->setColor(0, 0, 0, 1, 0);
+        g->drawQuad(m_selectedTrans, GL_LINES);
+    }
 }
 
 glm::vec4 MinecraftWorld::getCoords(int index, Point dim)

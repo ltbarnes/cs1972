@@ -3,6 +3,8 @@
 
 #include "screen.h"
 #include "point3d.h"
+#include "ally.h"
+#include "enemy.h"
 
 class MinecraftWorld;
 class Player;
@@ -31,16 +33,23 @@ public:
     virtual void onKeyReleased(QKeyEvent *e);
 
 private:
+    Point climb(Point p);
+    Point descend(Point p);
+
+    void scan();
+    void placeAlly(Point p);
+
     MinecraftWorld *m_world;
     Player *m_player;
     MCChunkBuilder *m_cb;
 
     Point m_safety;
+    int m_crawling, m_scanning;
 
+    QList<Point> m_allies;
+    QList<Enemy *> m_enemies;
 
-
-    float totalSecs;
-    int count;
+    Point m_neighbors[8];
 };
 
 #endif // GAMESCREEN_H

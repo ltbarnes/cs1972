@@ -4,7 +4,6 @@
 #include "minecraftworld.h"
 #include "mcchunkbuilder.h"
 #include "player.h"
-
 #include <QTime>
 
 #define GLM_FORCE_RADIANS
@@ -12,6 +11,11 @@
 
 #include <iostream>
 using namespace std;
+
+
+#define MAX_ALLIES 1
+#define MAX_ENEMIES 10
+
 
 GameScreen::GameScreen(Application *parent)
     : Screen(parent)
@@ -21,8 +25,8 @@ GameScreen::GameScreen(Application *parent)
 
     VoxelManager *vm = new VoxelManager(cam, m_parentApp->getShader(SPARSE), Point(6, 2, 6), Point(32, 32, 32), m_cb);
 
-    m_world = new MinecraftWorld(cam, vm);
-    glm::vec3 playerPos = glm::vec3(.1f, m_cb->getHeightAt(0, 0) + 10, .1f);
+    m_world = new MinecraftWorld(cam, vm, false);
+    glm::vec3 playerPos = glm::vec3(.1f, m_cb->getHeightAt(0, 0) + 70, .1f);
     m_player = new Player(cam, playerPos, m_world);
 
     m_world->addMovableEntity(m_player);
@@ -31,10 +35,21 @@ GameScreen::GameScreen(Application *parent)
 
     m_parentApp->setUseCubeMap(true);
 
-    m_safety = Point(0, std::numeric_limits<int>::min(), 0);
+    m_safety = Point(std::numeric_limits<int>::min());
+    m_crawling = -1;
+    m_scanning = -1;
 
-    count = 0;
-    totalSecs = 0;
+    m_neighbors[0] = Point( 0, 0, 1);
+    m_neighbors[1] = Point( 1, 0, 1);
+    m_neighbors[2] = Point( 1, 0, 0);
+    m_neighbors[3] = Point( 1, 0,-1);
+    m_neighbors[4] = Point( 0, 0,-1);
+    m_neighbors[5] = Point(-1, 0,-1);
+    m_neighbors[6] = Point(-1, 0, 0);
+    m_neighbors[7] = Point(-1, 0, 1);
+
+    m_allies.clear();
+    m_enemies.clear();
 }
 
 GameScreen::~GameScreen()
@@ -46,20 +61,134 @@ GameScreen::~GameScreen()
 // update and render
 void GameScreen::onTick(float secs)
 {
-    secs = glm::min(secs, .03f);
-//    totalSecs += secs;
-//    count++;
-//    if (count > 100)
-//    {
-//        cout << (totalSecs / count) << endl;
-//        count = 0;
-//        totalSecs = 0;
-//    }
+    secs = glm::min(secs, .05f);
 
     m_world->onTick(secs);
     m_player->setCameraPos();
 
-//    m_safety = crawl(m_safety);
+    if (m_crawling >= 0)
+    {
+        if (m_crawling-- == 0)
+        {
+            Point old = m_safety;
+            m_safety = climb(m_safety);
+            if (old == m_safety)
+            {
+                if (m_allies.size() < 3)
+                    m_scanning = std::max(0, (m_safety.y + 25) * 20);
+            }
+            else
+                m_crawling = 5;
+        }
+    }
+
+    if (m_scanning >= 0)
+    {
+        if (m_scanning % 5 == 0)
+        {
+            cout << "scanning" << endl;
+            scan();
+        }
+
+        if (m_scanning-- == 0)
+        {
+            cout << "nothing" << endl;
+            cout << m_allies.size() << endl;
+        }
+//        scan();
+    }
+}
+
+void GameScreen::scan()
+{
+    int r = m_safety.y * 20;
+    Point p;
+    p.x = rand() % (r * 2) - r;
+    p.z = rand() % (r * 2) - r;
+    p = p + m_safety;
+
+    Point old = Point(std::numeric_limits<int>::min());
+    while (old != p)
+    {
+        old = p;
+        p = descend(old);
+    }
+    if (p.y < -25)
+    {
+        Point diff;
+        foreach (Point a, m_allies)
+        {
+            diff = p - a;
+            if (diff.x*diff.x + diff.y*diff.y + diff.z*diff.z < 2500)
+                return;
+        }
+        placeAlly(p);
+        cout << "found one" << endl;
+        if (m_allies.size() >= MAX_ALLIES)
+        {
+            m_scanning = -1;
+            cout << "found 'em all" << endl;
+        }
+    }
+}
+
+
+void GameScreen::placeAlly(Point p)
+{
+    m_allies.append(p);
+
+//    for (int i = 0; i < 1; i++)
+//    {
+//        int r = 30;
+//        Point e;
+//        e.x = rand() % (r * 2) - r;
+//        e.z = rand() % (r * 2) - r;
+//        e.y = m_cb->getHeightAt(e.x, e.z);
+//        m_world->addMovableEntity(new Enemy(glm::vec3(p.x, p.y + 10, p.z)));
+//    }
+}
+
+
+Point GameScreen::climb(Point p)
+{
+    float height = m_cb->getFloatHeightAt(p.x, p.z);
+    float bestHeight = height;
+    Point bestP = p;
+
+    Point next;
+    for (int i = 0; i < 8; i++)
+    {
+        next = p + m_neighbors[i];
+        height = m_cb->getFloatHeightAt(next.x, next.z);
+        if (height > bestHeight)
+        {
+            bestHeight = height;
+            bestP = next;
+            bestP.y = (int) glm::round(bestHeight);
+        }
+    }
+    return bestP;
+}
+
+Point GameScreen::descend(Point p)
+{
+    float height = m_cb->getFloatHeightAt(p.x, p.z);
+    float bestHeight = height;
+    Point bestP = p;
+
+    Point next;
+    for (int i = 0; i < 8; i++)
+    {
+        next = p + m_neighbors[i];
+        height = m_cb->getFloatHeightAt(next.x, next.z);
+        if (height < bestHeight)
+        {
+            bestHeight = height;
+            bestP = next;
+            bestP.y = (int) glm::round(bestHeight);
+        }
+    }
+    return bestP;
 }
 
 void GameScreen::onRender(Graphics *g)
@@ -92,19 +221,22 @@ void GameScreen::onRender(Graphics *g)
 
     m_world->onDraw(g);
 
-    Point t = m_cb->getTallest();
+//    Point t = m_cb->getTallest();
+    Point t = m_safety;
     glm::mat4 trans = glm::mat4();
-    trans[3] = glm::vec4(t.x, t.y, t.z, 1.f);
+    trans[3] = glm::vec4(t.x, t.y + 1, t.z, 1.f);
 
-    g->setColor(1, 0, 0, 1, 0);
-    g->drawCube(trans);
+    g->setColor(0, 0, 1, 1, 64);
+    g->drawSphere(trans);
 
-    Point l = m_cb->getLowest();
-    trans[3] = glm::vec4(l.x, l.y + 2, l.z, 1.f);
+    g->setColor(0, 1, 0, 1, 0);
+    foreach(Point v, m_allies)
+    {
+        trans[3] = glm::vec4(v.x, v.y + 2, v.z, 1.f);
 
-    g->drawCube(trans);
+        g->drawCone(trans);
+    }
 }
-
 
 
 // key events
@@ -119,6 +251,27 @@ void GameScreen::onKeyPressed(QKeyEvent *e)
 void GameScreen::onKeyReleased(QKeyEvent *e)
 {
     m_player->onKeyReleased(e);
+
+    if (e->key() == Qt::Key_E)
+    {
+        m_scanning = -1;
+        glm::vec3 pos = glm::round(m_player->getPosition());
+        m_safety = Point((int) pos.x, 0, (int) pos.z);
+        m_crawling = 1;
+    }
+
+//    if (e->key() == Qt::Key_Q)
+//    {
+//        glm::vec3 pos = glm::round(m_player->getPosition());
+//        Point victim = Point((int) pos.x, 0, (int) pos.z);
+//        Point old = Point(std::numeric_limits<int>::min());
+//        while (old != victim)
+//        {
+//            old = victim;
+//            victim = descend(old);
+//        }
+//        m_victims.append(victim);
+//    }
 }
 
 void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
@@ -126,12 +279,12 @@ void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
     m_player->onMouseMoved(e, deltaX, deltaY);
 }
 
-void GameScreen::onMousePressed(QMouseEvent *e)
+void GameScreen::onMousePressed(QMouseEvent *)
 {
-    if (e->button() == Qt::LeftButton)
-        m_world->addBlock();
-    else if (e->button() == Qt::RightButton)
-        m_world->removeBlock();
+//    if (e->button() == Qt::LeftButton)
+//        m_world->addBlock();
+//    else if (e->button() == Qt::RightButton)
+//        m_world->removeBlock();
 }
 
 

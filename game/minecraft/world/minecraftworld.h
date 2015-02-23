@@ -7,7 +7,7 @@
 class MinecraftWorld : public World
 {
 public:
-    MinecraftWorld(Camera *cam, VoxelManager *vm);
+    MinecraftWorld(Camera *cam, VoxelManager *vm, bool create);
     virtual ~MinecraftWorld();
 
     virtual void onDraw(Graphics *g);
@@ -25,6 +25,8 @@ private:
     Point m_selectedFace;
 
     Camera *m_camera;
+
+    bool m_createMode;
 };
 
 #endif // MINECRAFTWORLD_H

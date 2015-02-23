@@ -13,11 +13,12 @@ Player::Player(ActionCamera *camera, glm::vec3 pos, MinecraftWorld *world)
     m_camera->setOffset(15.f);
 
     m_wsad = 0b0000;
-    m_up = false;
 
     m_offset = 15.f;
     setMass(1.f);
+    setVelocity(glm::vec3(0, -20, 0));
 
+    m_up = false;
     m_jetMode = false;
     m_jump = false;
     m_canJump = false;
@@ -73,9 +74,6 @@ void Player::onTick(float secs)
         force.x += 1;
     if (m_up)
         applyForce(glm::vec3(0, (forceAmt *1.5f) * 2.f, 0));
-//        force.y += m_forceAmt;
-//    if (m_down)
-//        force.y -= m_forceAmt;
 
     glm::vec4 look = m_camera->getLook();
 
