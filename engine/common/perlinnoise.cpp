@@ -1,4 +1,4 @@
-#include "PerlinNoise.h"
+#include "perlinnoise.h"
 
 /*
  * Taken from gamernb via stack overflow

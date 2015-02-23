@@ -43,6 +43,7 @@ MCChunkBuilder::MCChunkBuilder(int seed)
 
 MCChunkBuilder::~MCChunkBuilder()
 {
+    delete m_noise;
 }
 
 
@@ -258,16 +259,10 @@ void MCChunkBuilder::resetChunk(GLuint shader, Chunk *chunk, Point dim)
             type = DIRT;
 
         if (faces)
-        {
-//            drawables.insert(index);
-//            p = bp + p;
             addFaces(&numVerts, vertexData, glm::vec3(p.x, p.y, p.z), faces, type);
-        }
         else
-        {
-            cout << "AHAHAHA" << endl;
             toRemove.append(i);
-        }
+
         blocks[i] = type;
     }
     foreach (int i, toRemove)

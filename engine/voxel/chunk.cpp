@@ -22,9 +22,7 @@ Chunk::Chunk(Point p, Point dim)
     m_blocks = 0;
     m_vaoID = 0;
     m_vboID = 0;
-    m_blocks = new char[m_size];
-    for (int i = 0; i < m_size; i++)
-        m_blocks[i] = 0;
+    m_blocks = 0; // gets set in init
 }
 
 Chunk::~Chunk()
