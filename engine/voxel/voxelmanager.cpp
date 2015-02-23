@@ -172,7 +172,10 @@ void VoxelManager::manage(World *world, float onTickSecs)
     }
 
     foreach(Collision *col, cols)
+    {
         col->e1->handleCollision(col);
+        delete col;
+    }
 
     if (!m_chunksToAdd.isEmpty())
         addChunk(m_chunksToAdd.takeFirst());
@@ -263,6 +266,7 @@ Collision *VoxelManager::predictCollision(MovableEntity *me, float secs)
             if (diff.z > 0.0000001f)
                 vel.z = 0;
             me->setVelocity(vel);
+            break;
         }
     }
 
