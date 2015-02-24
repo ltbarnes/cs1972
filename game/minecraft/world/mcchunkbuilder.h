@@ -9,8 +9,8 @@
 
 enum BlockType
 {
-    AIR, ORIGINAL, GRASS, DIRT, STONE, SNOW, CRYSTAL
-//   0,     1,       2,    3,     4     5       6
+    AIR, ORIGINAL, GRASS, DIRT, STONE, SNOW, CRYSTAL, COAL
+//   0,     1,       2,    3,     4     5       6      7
 };
 
 class MCChunkBuilder : public ChunkBuilder
@@ -32,6 +32,7 @@ private:
 
     glm::vec3 cube[24];
     PerlinNoise *m_noise;
+    PerlinNoise *m_terrain;
 
 };
 

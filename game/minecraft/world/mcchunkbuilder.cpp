@@ -34,7 +34,8 @@ MCChunkBuilder::MCChunkBuilder(int seed)
     // bottom
     cube[20] = brf; cube[21] = blf; cube[22] = brb; cube[23] = blb;
 
-    m_noise = new PerlinNoise(1.f, 2.f, 30.f, 5, m_seed);
+    m_noise = new PerlinNoise(1.f, 3.f, 30.f, 5, m_seed);
+    m_terrain = new PerlinNoise(1.f, 10.f, 30.f, 5, m_seed * 2);
 }
 
 
@@ -103,6 +104,7 @@ void MCChunkBuilder::buildChunk(GLuint shader, Chunk *chunk, int *heightMap, Poi
         {
             int mapI = z*w + x;
 
+            bool terrain = m_terrain->GetHeight((p.x + x) / 1000.0, (p.z + z) / 1000.0) > 0.f;
             numBlocks = glm::clamp(heightMap[mapI], p.y, p.y + dim.y);
             for (int y = p.y; y < numBlocks; y++)
             {
@@ -122,9 +124,19 @@ void MCChunkBuilder::buildChunk(GLuint shader, Chunk *chunk, int *heightMap, Poi
                     sides |= (1);
 
                 if (y < -25)
-                    type = CRYSTAL;
+                {
+                    if (terrain)
+                        type = CRYSTAL;
+                    else
+                        type = COAL;
+                }
                 else if (y == heightMap[mapI] - 1)
-                    type = SNOW;
+                {
+                    if (terrain)
+                        type = SNOW;
+                    else
+                        type = DIRT;
+                }
                 else
                     type = DIRT;
 
@@ -152,33 +164,42 @@ void MCChunkBuilder::addFaces(int* index, GLfloat *vertexData, glm::vec3 center,
 
     for (int i = 0; i < 6; i++)
     {
-        if (type == ORIGINAL)
+        switch(type)
         {
+        case ORIGINAL:
             if (sides & 0b10 && i == 4)
                 uv = glm::vec2(0, 0);
             else if (sides * 0b1 && i == 5)
                 uv = glm::vec2(2, 0);
             else if (sides & (1 << (5 - i)))
                 uv = glm::vec2(3, 0);
-        }
-        else if (type == SNOW)
-        {
+            break;
+        case SNOW:
             if (sides & 0b10 && i == 4)
                 uv = glm::vec2(2, 4);
             else if (sides * 0b1 && i == 5)
                 uv = glm::vec2(2, 0);
             else if (sides & (1 << (5 - i)))
                 uv = glm::vec2(4, 4);
-
-        }
-        else if (type == GRASS)
+            break;
+        case GRASS:
             uv = glm::vec2(0, 0);
-        else if(type == DIRT)
+            break;
+        case DIRT:
             uv = glm::vec2(2, 0);
-        else if(type == STONE)
+            break;
+        case STONE:
             uv = glm::vec2(1, 0);
-        else if (type == CRYSTAL)
+            break;
+        case CRYSTAL:
             uv = glm::vec2(3, 3);
+            break;
+        case COAL:
+            uv = glm::vec2(2, 2);
+            break;
+        default:
+            break;
+        }
 
         if (sides & (1 << (5 - i)))
         {
@@ -226,6 +247,8 @@ void MCChunkBuilder::resetChunk(GLuint shader, Chunk *chunk, Point dim)
     foreach (int i, drawables)
     {
         p = Chunk::getPoint(i, dim);
+        bool terrain = m_terrain->GetHeight((p.x + bp.x) / 1000.0, (p.z + bp.z) / 1000.0) > 0.f;
+
         faces = 0;
         if (p.z + 1 >= dim.z || !blocks[Chunk::getIndex(p.x, p.y, p.z + 1, dim)])
             faces |= (1 << 5);
@@ -241,9 +264,19 @@ void MCChunkBuilder::resetChunk(GLuint shader, Chunk *chunk, Point dim)
             faces |= (1);
 
         if (p.y + bp.y < -25)
-            type = STONE;
+        {
+            if (terrain)
+                type = CRYSTAL;
+            else
+                type = COAL;
+        }
         else if (faces & 0b10)
-            type = SNOW;
+        {
+            if (terrain)
+                type = SNOW;
+            else
+                type = DIRT;
+        }
         else
             type = DIRT;
 
