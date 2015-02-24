@@ -32,21 +32,25 @@ public:
     virtual void onKeyPressed(QKeyEvent *e);
     virtual void onKeyReleased(QKeyEvent *e);
 
+
 private:
     Point climb(Point p);
     Point descend(Point p);
 
     void scan();
-    void placeAlly(Point p);
+    void placeEnemies(Point p);
+
+    void display2D(Graphics *g);
 
     MinecraftWorld *m_world;
     Player *m_player;
     MCChunkBuilder *m_cb;
 
     Point m_safety;
+    bool m_safetyStuck;
     int m_crawling, m_scanning;
 
-    QList<Point> m_allies;
+    Point m_ally;
     QList<Enemy *> m_enemies;
 
     Point m_neighbors[8];

@@ -18,6 +18,9 @@ public:
 
     void setCameraPos();
 
+    void grabAlly();
+    bool hasAlly();
+
     int getMode();
 
     // mouse events

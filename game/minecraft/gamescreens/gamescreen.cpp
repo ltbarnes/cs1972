@@ -5,6 +5,7 @@
 #include "mcchunkbuilder.h"
 #include "player.h"
 #include <QTime>
+#include <glm/ext.hpp>
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
@@ -35,7 +36,7 @@ GameScreen::GameScreen(Application *parent)
 
     m_parentApp->setUseCubeMap(true);
 
-    m_safety = Point(std::numeric_limits<int>::min());
+    m_safety = Point(0, std::numeric_limits<int>::min(), 0);
     m_crawling = -1;
     m_scanning = -1;
 
@@ -48,8 +49,9 @@ GameScreen::GameScreen(Application *parent)
     m_neighbors[6] = Point(-1, 0, 0);
     m_neighbors[7] = Point(-1, 0, 1);
 
-    m_allies.clear();
+    m_ally = Point(0, std::numeric_limits<int>::min(), 0);
     m_enemies.clear();
+    m_safetyStuck = false;
 }
 
 GameScreen::~GameScreen()
@@ -74,7 +76,7 @@ void GameScreen::onTick(float secs)
             m_safety = climb(m_safety);
             if (old == m_safety)
             {
-                if (m_allies.size() < 3)
+                if (m_ally.y == std::numeric_limits<int>::min())
                     m_scanning = std::max(0, (m_safety.y + 25) * 20);
             }
             else
@@ -93,10 +95,14 @@ void GameScreen::onTick(float secs)
         if (m_scanning-- == 0)
         {
             cout << "nothing" << endl;
-            cout << m_allies.size() << endl;
         }
-//        scan();
     }
+
+    glm::vec3 pos = m_player->getPosition();
+    glm::vec3 vec = glm::vec3(m_safety.x - pos.x, m_safety.y - pos.y, m_safety.z - pos.z);
+
+    if (m_player->hasAlly() && glm::length2(vec) < 1.f)
+        m_parentApp->popScreens(1);
 }
 
 void GameScreen::scan()
@@ -116,36 +122,37 @@ void GameScreen::scan()
     if (p.y < -25)
     {
         Point diff;
-        foreach (Point a, m_allies)
-        {
-            diff = p - a;
-            if (diff.x*diff.x + diff.y*diff.y + diff.z*diff.z < 2500)
-                return;
-        }
-        placeAlly(p);
+//        foreach (Point a, m_allies)
+//        {
+        diff = p - m_ally;
+        if (diff.x*diff.x + diff.y*diff.y + diff.z*diff.z < 2500)
+            return;
+//        }
+        m_ally = p;
         cout << "found one" << endl;
-        if (m_allies.size() >= MAX_ALLIES)
+        if (m_ally.y != std::numeric_limits<int>::min())
         {
             m_scanning = -1;
+            m_safetyStuck = true;
             cout << "found 'em all" << endl;
         }
     }
 }
 
 
-void GameScreen::placeAlly(Point p)
+void GameScreen::placeEnemies(Point p)
 {
-    m_allies.append(p);
 
-//    for (int i = 0; i < 1; i++)
-//    {
-//        int r = 30;
-//        Point e;
-//        e.x = rand() % (r * 2) - r;
-//        e.z = rand() % (r * 2) - r;
-//        e.y = m_cb->getHeightAt(e.x, e.z);
-//        m_world->addMovableEntity(new Enemy(glm::vec3(p.x, p.y + 10, p.z)));
-//    }
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        int r = 30;
+        Point e;
+        e.x = rand() % (r * 2) - r;
+        e.z = rand() % (r * 2) - r;
+        e = p + e;
+        e.y = m_cb->getHeightAt(e.x, e.z);
+        m_world->addMovableEntity(new Enemy(glm::vec3(e.x, e.y + 10, e.z)));
+    }
 }
 
 
@@ -230,12 +237,54 @@ void GameScreen::onRender(Graphics *g)
     g->drawSphere(trans);
 
     g->setColor(0, 1, 0, 1, 0);
-    foreach(Point v, m_allies)
+    if (!m_player->hasAlly())
     {
+        Point v = m_ally;
         trans[3] = glm::vec4(v.x, v.y + 2, v.z, 1.f);
 
         g->drawCone(trans);
     }
+
+    display2D(g);
+}
+
+
+void GameScreen::display2D(Graphics *g)
+{
+    glm::mat4 trans = glm::mat4();
+    GLuint shader = g->setGraphicsMode(DEFAULT);
+    glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, glm::value_ptr(trans));
+    glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, glm::value_ptr(trans));
+
+    glm::vec3 look = glm::vec3(m_camera->getLook());
+    glm::vec3 pos = m_player->getPosition();
+    glm::vec2 vec = glm::vec2();
+    if (m_player->hasAlly() || m_ally.y == std::numeric_limits<int>::min())
+    {
+        vec = glm::vec2(m_safety.x - pos.x, m_safety.z - pos.z);
+        g->setColor(0, 0, 1, 1, 0);
+    }
+    else if (m_ally.y != std::numeric_limits<int>::min())
+    {
+        vec = glm::vec2(m_ally.x - pos.x, m_ally.z - pos.z);
+        g->setColor(0, 1, 0, 1, 0);
+    }
+
+    if (glm::length2(vec) > 2500.f)
+    {
+        vec = glm::normalize(vec);
+        glm::vec2 up = glm::normalize(glm::vec2(look.x, look.z));
+
+        float dot = glm::dot(up, vec);
+        float det = up.x*vec.y - up.y*vec.x;
+        float angle = std::atan2(det, dot);
+        trans = glm::rotate(glm::mat4(), -angle, glm::vec3(0, 0, 1));
+        trans *= glm::translate(glm::mat4(), glm::vec3(0, .9f, 0));
+        trans *= glm::scale(glm::mat4(), glm::vec3(.05f));
+
+        g->drawCone(trans);
+    }
+
 }
 
 
@@ -254,24 +303,20 @@ void GameScreen::onKeyReleased(QKeyEvent *e)
 
     if (e->key() == Qt::Key_E)
     {
-        m_scanning = -1;
-        glm::vec3 pos = glm::round(m_player->getPosition());
-        m_safety = Point((int) pos.x, 0, (int) pos.z);
-        m_crawling = 1;
+        glm::vec3 pos = m_player->getPosition();
+        if (glm::length2(glm::vec3(m_ally.x - pos.x, m_ally.y - pos.y, m_ally.z - pos.z)) < 10)
+        {
+            m_player->grabAlly();
+        }
+        else if (!m_safetyStuck)
+        {
+            m_scanning = -1;
+            glm::vec3 pos = glm::round(m_player->getPosition());
+            m_safety = Point((int) pos.x, 0, (int) pos.z);
+            m_crawling = 1;
+        }
     }
 
-//    if (e->key() == Qt::Key_Q)
-//    {
-//        glm::vec3 pos = glm::round(m_player->getPosition());
-//        Point victim = Point((int) pos.x, 0, (int) pos.z);
-//        Point old = Point(std::numeric_limits<int>::min());
-//        while (old != victim)
-//        {
-//            old = victim;
-//            victim = descend(old);
-//        }
-//        m_victims.append(victim);
-//    }
 }
 
 void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
@@ -279,16 +324,10 @@ void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
     m_player->onMouseMoved(e, deltaX, deltaY);
 }
 
-void GameScreen::onMousePressed(QMouseEvent *)
-{
-//    if (e->button() == Qt::LeftButton)
-//        m_world->addBlock();
-//    else if (e->button() == Qt::RightButton)
-//        m_world->removeBlock();
-}
 
 
 // unused in game
+void GameScreen::onMousePressed(QMouseEvent *) {}
 void GameScreen::onMouseReleased(QMouseEvent *) {}
 void GameScreen::onMouseDragged(QMouseEvent *, float, float) {}
 void GameScreen::onMouseWheel(QWheelEvent *) {}

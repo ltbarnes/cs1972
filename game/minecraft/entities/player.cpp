@@ -45,6 +45,15 @@ Player::~Player()
 {
 }
 
+void Player::grabAlly()
+{
+    setMass(5.f);
+}
+
+bool Player::hasAlly()
+{
+    return getMass() > 3.f;
+}
 
 int Player::getMode()
 {
@@ -97,7 +106,12 @@ void Player::onTick(float secs)
         applyImpulse(vel);
 
     m_canJump = false;
-    MovableEntity::onTick(secs);
+
+    // movable entity stuff
+    m_vel += (m_force * secs / m_mass) + m_impulse * 1.f / m_mass;
+
+    m_force = glm::vec3(0.f);
+    m_impulse = glm::vec3(0.f);
 }
 
 
@@ -223,20 +237,6 @@ void Player::handleCollision(Collision *col)
 
         if (col->impulse.y > 0)
             m_canJump = true;
-
-//        glm::vec3 vel = getVelocity();
-
-//        if (col->impulse.x > 0)
-//            vel.x = 0;
-//        if (col->impulse.y > 0)
-//        {
-//            vel.y = 0;
-//            m_canJump = true;
-//        }
-//        if (col->impulse.z > 0)
-//            vel.z = 0;
-
-//        setVelocity(vel);
 }
 
 

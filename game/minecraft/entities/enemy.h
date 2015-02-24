@@ -9,7 +9,8 @@ public:
     Enemy(glm::vec3 pos);
     virtual ~Enemy();
 
-    void onTick(float secs);
+    virtual void onTick(float secs);
+    virtual void handleCollision(Collision *col);
 
 };
 

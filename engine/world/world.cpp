@@ -77,10 +77,11 @@ void World::onTick(float secs)
         e->onTick(secs);
     }
 
-//    assert(0);
     foreach (Manager *m, m_managers) {
         m->manage(this, secs);
     }
+//    if (m_movableEntities.size() > 1)
+//        assert(0);
 //    // collisions
 //    detectCollisions(secs);
 //    handleCollisions();
