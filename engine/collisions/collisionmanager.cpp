@@ -16,8 +16,8 @@ void CollisionManager::manage(World *world, float onTickSecs)
     QList<Collision *> cols = detectCollisions(world, onTickSecs);
     handleCollisions(cols);
 
-//    foreach (Collision * col, cols)
-//        delete col;
+        foreach (Collision * col, cols)
+            delete col;
 }
 
 //void World::detectCollisions(float secs)

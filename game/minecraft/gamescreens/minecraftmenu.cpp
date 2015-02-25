@@ -13,7 +13,6 @@
 MinecraftMenu::MinecraftMenu(Application *parent)
     : Screen(parent)
 {
-    parent->setUseCubeMap(true);
 }
 
 MinecraftMenu::~MinecraftMenu()
@@ -26,6 +25,8 @@ void MinecraftMenu::onTick(float) {}
 
 void MinecraftMenu::onRender(Graphics *g)
 {
+    m_parentApp->setUseCubeMap(true);
+
     g->setGraphicsMode(DEFAULT);
     g->setColor(1.f, 1.f, 1.f, 1.f, 1.f);
     g->setWorldColor(1.f, 1.f, 1.f);
