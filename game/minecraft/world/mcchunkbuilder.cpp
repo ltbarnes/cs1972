@@ -42,6 +42,7 @@ MCChunkBuilder::MCChunkBuilder(int seed)
 MCChunkBuilder::~MCChunkBuilder()
 {
     delete m_noise;
+    delete m_terrain;
 }
 
 

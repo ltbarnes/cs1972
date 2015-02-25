@@ -29,6 +29,8 @@ CreateScreen::CreateScreen(Application *parent)
 
     m_parentApp->setUseCubeMap(false);
     m_movement = 0;
+
+    m_moveSlow = false;
 }
 
 CreateScreen::~CreateScreen()
