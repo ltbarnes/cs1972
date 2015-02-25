@@ -61,6 +61,7 @@ SOURCES += \
     game/minecraft/gamescreens/minecraftmenu.cpp \
     game/minecraft/gamescreens/gamescreen.cpp \
     game/minecraft/gamescreens/createscreen.cpp \
+    game/minecraft/gamescreens/gameoverscreen.cpp \
     game/minecraft/world/minecraftworld.cpp \
     game/minecraft/world/mcchunkbuilder.cpp \
     game/minecraft/entities/player.cpp \
@@ -110,6 +111,7 @@ HEADERS += \
     game/minecraft/gamescreens/minecraftmenu.h \
     game/minecraft/gamescreens/gamescreen.h \
     game/minecraft/gamescreens/createscreen.h \
+    game/minecraft/gamescreens/gameoverscreen.h \
     game/minecraft/world/minecraftworld.h \
     game/minecraft/world/mcchunkbuilder.h \
     game/minecraft/entities/player.h \

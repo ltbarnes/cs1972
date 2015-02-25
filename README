@@ -1,36 +1,60 @@
-Project: Minecraft 2
+Project: Minecraft 3
 Student: Logan Barnes (ltbarnes)
 
 
-Common Engine Requirements
-========================================
-[ ] Camera or graphics object supports view frustum culling of axis-aligned bounding boxes
-	### in engine/voxel/voxelmanager the graphics object is used to cull the chunks
+COMPILED USING QT 5.2.0!!!
+
 
 Voxel Engine Requirements
 ========================================
-[ ] Collision detection and sliding response with collided blocks for arbitrary size axis-asligned bounding boxes
-	### engine/voxel/voxelmanager handles collisions with chunks
-[ ] Per-chunk Vertex Buffer Objects
-	### game/world/mcchunkbuilder creates the vbo then gives it to the chunk in the init() function
+[ ] Analytic voxel-based raycasting
+	### engine/voxel/voxelmanager had a castray method used in the game/world/minecraftworld class.
+[ ] Automated chunk streaming 
+	### all handled in the engine/voxel/voxelmanager class.
+	[ ] Chunks within a certain distance of a selected focus point are automatically loaded into the game
+	[ ] Loaded chunks outside a certain distance are unloaded from the game
+		### checkCenterPosition() within VoxelManager uses the camera eye point to accomplish loading and unloading chunks.
+
 
 Game Requirements
 ========================================
-[ ] Movement and view controls must the same as warmup (including gravity and jumping)
-	### handled in the game/entities/player class
-[ ] The world must consists of a 10x2x10 grid of size C = 32 chunks
-	### set in the game/world/minecraftworld constructor
-[ ] The game must run at 40+ FPS on department machines: this requirement overrides the standard 30+ FPS requirement
+[ ] Addition and removal of blocks
+	### This functionality didn't seem to fit in the game so there is a separate create mode showing this capability
+	[ ] Ray shot from the camera eye extending along the look vector
+		### handled in game/world/minecraftworld onTick() method.
+	[ ] Visual highlighting of the nearest intersected face
+		### selectedFace stored in game/world/minecraftworld. Easily seen in create mode.
+	[ ] Targeted block can be removed
+	[ ] Block can be added to the empty block adjacent to the targeted face
+	[ ] Addition or removal of blocks updates the appropriate VBO's
+		### addition and removal are passed from the minecraftworld to the VoxelManager to the game/world/mcchunkbuilder where the vbo is recreated and passed to the respective chunk.
+[ ] Continuous chunk streaming
+	[ ] Chunks within 2 chunks of the player must be in memory
+		### uses a radius of 6 passed to the engine/voxel/voxelmanager constructor.
+	[ ] Chunks further than this distance must be unloaded from memory (you do not need to save changes to unloaded chunks)
+		### handled in the checkCenterPosition() method of VoxelManager.
+	[ ] Initialization of newly visible chunks must be spread across multiple frames or performed in a separate thread
+		### the VoxelManager loads a single chunk at the end of its manage() method which is called once per tick.
+[ ] Simplistic enemies
+	[ ] Spawn either at the beginning of the game or at intervals during play
+		### game/entities/enemy are ghosts that spawn and disappear around the player
+	[ ] Collide and interact with both the world and the player
+		### collisions are detected and handled in the game/world/mccollisionmanager
+	[ ] No complex AI required, but cannot remain stationary or jump in place
+		### ghosts move toward the last location where light was seen and damage the player if contact is made.
+[ ] It must be possible to restart the game without quitting the program
+	### press backspace
+[ ] The game must have at least two screens
+	### has a menu, create, game, and gameover screen all located in game/gamescreens
 
 
 Issues:
 	
-	-Z face collisions can be a little glitchy since x is handled first.
-	-Collision abstractions are a mess
+	-Raycasting doesn't work when the camera is outside the chunks. Not a problem for games when the player is constrained to the world but becomes an issue when using a free cam for creation and such.
 	-FPS prints to the console.
 	-Compiled with Qt5.2.0
 
 
 ~Hours:
-15
+  48
 

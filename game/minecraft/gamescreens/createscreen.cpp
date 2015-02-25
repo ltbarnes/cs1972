@@ -20,7 +20,7 @@ CreateScreen::CreateScreen(Application *parent)
     m_cam = new ActionCamera();
     m_cb = new MCChunkBuilder(QTime::currentTime().msec());
 
-    VoxelManager *vm = new VoxelManager(m_cam, m_parentApp->getShader(SPARSE), Point(6, 2, 6), Point(32, 32, 32), m_cb);
+    VoxelManager *vm = new VoxelManager(m_cam, m_parentApp->getShader(SPARSE), Point(7, 2, 7), Point(32, 32, 32), m_cb);
 
     m_world = new MinecraftWorld(m_cam, vm, true);
     m_pos = glm::vec3(.1f, std::min(m_cb->getHeightAt(0, 0) + 30, 95), .1f);

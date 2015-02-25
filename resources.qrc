@@ -8,12 +8,10 @@
         <file alias="sparse.frag">shaders/sparse.frag</file>
     </qresource>
     <qresource prefix="/images">
-    	<file alias="grass.png">res/images/grass.png</file>
-        <file alias="snow.jpg">res/images/snow.jpg</file>
-        <file alias="enter.jpg">res/images/enter.jpg</file>
+    	<file alias="debris.png">res/images/debris.png</file>
+        <file alias="deploy.png">res/images/deploy.png</file>
+        <file alias="ghost.png">res/images/ghost.png</file>
         <file alias="win.jpg">res/images/win.jpg</file>
-        <file alias="lose.jpg">res/images/lose.jpg</file>
-        <file alias="pig.png">res/images/pig.png</file>
     	<file alias="terrain.png">res/images/terrain.png</file>
     </qresource>
     <qresource prefix="/cubemap">

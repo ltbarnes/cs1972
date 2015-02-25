@@ -1,9 +1,6 @@
 #include "player.h"
 #include "collisioncylinder.h"
-
-#include <iostream>
-using namespace std;
-#include <glm/ext.hpp>
+#include <glm/gtx/norm.hpp>
 
 Player::Player(ActionCamera *camera, glm::vec3 pos, MinecraftWorld *world)
     : MovableEntity(pos)

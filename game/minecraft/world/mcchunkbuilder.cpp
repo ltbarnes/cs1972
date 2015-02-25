@@ -48,7 +48,7 @@ MCChunkBuilder::~MCChunkBuilder()
 
 int MCChunkBuilder::getHeightAt(int x, int z)
 {
-    return (int) glm::round(getFloatHeightAt(x, z));
+    return std::max(-63, (int) glm::round(getFloatHeightAt(x, z)));
 }
 
 
@@ -70,7 +70,7 @@ Chunk *MCChunkBuilder::getChunk(GLuint shader, Point p, Point dim)
         for (int i = 0; i < dim.x; i++)
         {
             point = Point(p.x + i, 0, p.z + k);
-            point.y = (int) glm::round(m_noise->GetHeight(point.x / 1000.0, point.z / 1000.0));
+            point.y = getHeightAt(point.x, point.z);
             hm[index++] = point.y;
         }
     }
@@ -124,7 +124,9 @@ void MCChunkBuilder::buildChunk(GLuint shader, Chunk *chunk, int *heightMap, Poi
                 if (y == p.y)
                     sides |= (1);
 
-                if (y < -25)
+                if (y <= -64)
+                    type = OIL;
+                else if (y < -25)
                 {
                     if (terrain)
                         type = CRYSTAL;
@@ -198,6 +200,9 @@ void MCChunkBuilder::addFaces(int* index, GLfloat *vertexData, glm::vec3 center,
         case COAL:
             uv = glm::vec2(2, 2);
             break;
+        case OIL:
+            uv = glm::vec2(5, 2);
+            break;
         default:
             break;
         }
@@ -264,7 +269,9 @@ void MCChunkBuilder::resetChunk(GLuint shader, Chunk *chunk, Point dim)
         if (p.y - 1 < 0 || !blocks[Chunk::getIndex(p.x, p.y - 1, p.z, dim)])
             faces |= (1);
 
-        if (p.y + bp.y < -25)
+        if (p.y + bp.y <= -64)
+            type = OIL;
+        else if (p.y + bp.y < -25)
         {
             if (terrain)
                 type = CRYSTAL;

@@ -30,8 +30,8 @@ void MinecraftMenu::onRender(Graphics *g)
     g->setGraphicsMode(DEFAULT);
     g->setColor(1.f, 1.f, 1.f, 1.f, 1.f);
     g->setWorldColor(1.f, 1.f, 1.f);
-    g->setTexture("enter.jpg");
-    g->drawQuad(glm::scale(glm::mat4(), glm::vec3(2, 1.5f, 0)));
+    g->setTexture("deploy.png");
+    g->drawQuad(glm::scale(glm::mat4(), glm::vec3(2.5f, 1.5f, 0)));
 }
 
 // key events
@@ -41,7 +41,6 @@ void MinecraftMenu::onKeyPressed(QKeyEvent *e)
     {
     case Qt::Key_Return:
     case Qt::Key_Enter:
-    case Qt::Key_Shift:
         m_parentApp->addScreen(new GameScreen(m_parentApp));
         break;
     case Qt::Key_C:

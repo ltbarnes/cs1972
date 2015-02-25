@@ -1,11 +1,7 @@
 #include "enemy.h"
 #include "collisioncylinder.h"
 
-#include <glm/common.hpp>
-#include <glm/ext.hpp>
-
-#include <iostream>
-using namespace std;
+#include <glm/gtx/norm.hpp>
 
 Enemy::Enemy(glm::vec3 pos)
     : MovableEntity(pos)
@@ -66,10 +62,6 @@ void Enemy::onTick(float secs)
     else
         m_stuckTime = 0.f;
 
-//    cout << !m_lights.isEmpty() << endl;
-//    cout << glm::length2(pos - m_oldPos) << endl;
-//    cout << m_stuckTime << endl;
-
     m_oldPos = pos;
 
     float dist2;
@@ -84,7 +76,7 @@ void Enemy::onTick(float secs)
             dir = diff;
         }
     }
-    if (glm::length(dir) > 0.00001f)
+    if (glm::length2(dir) > 0.00001f)
         applyImpulse(glm::normalize(dir) * .1f);
 
 

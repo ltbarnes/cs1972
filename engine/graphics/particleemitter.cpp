@@ -1,9 +1,12 @@
 #include "particleemitter.h"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
 #include <cstdlib>
-
 #include <iostream>
+
+
+#define GLM_FORCE_RADIANS
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
+
 
 ParticleEmitter::ParticleEmitter(glm::vec3 color, glm::vec3 velocity,
                                  glm::vec3 force, float scale, float fuzziness, float speed,

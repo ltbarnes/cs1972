@@ -29,7 +29,6 @@ Entity::~Entity()
 
 void Entity::setPosition(glm::vec3 pos)
 {
-    glm::vec3 diff = pos - m_pos;
     m_pos = pos;
     foreach(CollisionShape *cs, m_collisionShapes)
         cs->updatePos(m_pos);

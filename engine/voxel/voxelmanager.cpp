@@ -8,10 +8,6 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
 
-#include <iostream>
-using namespace std;
-#include <glm/ext.hpp>
-
 VoxelManager::VoxelManager(Camera *cam, GLuint shader, Point dim, Point chunkSize, ChunkBuilder *cb)
     : Manager(SPARSE)
 {

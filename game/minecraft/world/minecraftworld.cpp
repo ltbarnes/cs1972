@@ -87,18 +87,6 @@ void MinecraftWorld::onDraw(Graphics *g)
     light.id = 1;
     light.type = 1;
 
-//    // temp lights for viewing
-//    Light light2;
-//    light2.color = glm::vec3(1.f, 1.f, 1.f);
-//    light2.posDir = glm::vec3(-1, 1, -1);
-//    light2.id = 2;
-//    Light light3;
-//    light3.color = glm::vec3(1.f, 1.f, 1.f);
-//    light3.posDir = glm::vec3(1, 1, 1);
-//    light3.id = 3;
-//    g->addLight(light2);
-//    g->addLight(light3);
-
     g->setWorldColor(.1f, .4f, .1f);
     g->addLight(light);
 
@@ -124,15 +112,6 @@ glm::vec4 MinecraftWorld::getCoords(int index, Point dim)
 void MinecraftWorld::addBlock()
 {
     Point p = m_selectedBlock + m_selectedFace;
-    glm::vec3 pv = glm::vec3(p.x, p.y, p.z);
-    foreach (MovableEntity *me, m_movableEntities)
-    {
-        glm::vec3 pos = me->getPosition();
-        pos.y = 0; pv.y = 0;
-        if (glm::distance(glm::round(pos), pv) < 0.0001f)
-            return;
-    }
-
     m_vm->addBlock(p);
 }
 

@@ -5,17 +5,15 @@
 #include "mcchunkbuilder.h"
 #include "player.h"
 #include "mccollisionmanager.h"
+#include "gameoverscreen.h"
 #include <QTime>
-#include <glm/ext.hpp>
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/norm.hpp>
 
-#include <iostream>
-using namespace std;
 
-
-//const int MAX_ALLIES = 1;
 const int MAX_ENEMIES = 20;
 const int ENEMY_RADIUS = 50;
 
@@ -58,7 +56,6 @@ GameScreen::GameScreen(Application *parent)
     m_enemies.clear();
     m_safetyStuck = false;
 
-//    m_startTimer =
     m_jetPackLight = new Light();
     m_jetPackLight->type = 0;
     m_jetPackLight->color = glm::vec3(1.f, .5f, 0.f);
@@ -84,6 +81,7 @@ GameScreen::~GameScreen()
 
 void GameScreen::initEnemies(glm::vec3 player)
 {
+    //    m_startTimer =
     glm::vec3 e;
     Enemy * enemy;
     for (int i = 0; i < MAX_ENEMIES; i++)
@@ -128,33 +126,24 @@ void GameScreen::onTick(float secs)
     if (m_scanning >= 0)
     {
         if (m_scanning % 5 == 0)
-        {
-            cout << "scanning" << endl;
             scan();
-        }
-
-        if (m_scanning-- == 0)
-        {
-            cout << "nothing" << endl;
-        }
     }
 
     glm::vec3 pos = m_player->getPosition();
     glm::vec3 vec = glm::vec3(m_safety.x - pos.x, m_safety.y - pos.y, m_safety.z - pos.z);
 
     if (m_player->hasAlly() && glm::length2(vec) < 10.f)
-        m_parentApp->popScreens(1);
+        m_parentApp->addScreen(new GameOverScreen(m_parentApp, 0));
     else if (m_player->getPosition().y > 150.f)
-        m_parentApp->popScreens(1);
+        m_parentApp->addScreen(new GameOverScreen(m_parentApp, 1));
     else if (m_player->getHealth() <= 0)
-        m_parentApp->popScreens(1);
+        m_parentApp->addScreen(new GameOverScreen(m_parentApp, 2));
 }
 
 void GameScreen::scan()
 {
     int r = glm::max(1, m_safety.y * 20);
-//    cout << m_safety.y << endl;
-//    assert(0);
+
     Point p;
     p.x = rand() % (r * 2) - r;
     p.z = rand() % (r * 2) - r;
@@ -169,20 +158,16 @@ void GameScreen::scan()
     if (p.y < -25)
     {
         Point diff;
-//        foreach (Point a, m_allies)
-//        {
+
         diff = p - m_ally;
         if (diff.x*diff.x + diff.y*diff.y + diff.z*diff.z < 2500)
             return;
-//        }
+
         m_ally = p;
-        cout << "found one" << endl;
-        if (m_ally.y != std::numeric_limits<int>::min())
-        {
-            m_scanning = -1;
-            m_safetyStuck = true;
-            cout << "found 'em all" << endl;
-        }
+        m_ally.y = std::max(m_ally.y, -63);
+
+        m_scanning = -1;
+        m_safetyStuck = true;
     }
 }
 
