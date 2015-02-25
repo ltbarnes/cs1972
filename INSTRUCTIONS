@@ -44,3 +44,15 @@ Controls:
 
 		Enabling jetback mode won't lift you off the ground but it will slow your descent.
 		To gain altitude use the boost (but be careful not to jet too high).
+
+
+
+	Create Mode:
+
+	 WASD 			- 		horizontal movement
+	  E 			- 				up
+	  Q 			- 			   down
+	 Shift(hold) 	- 	   slow down all movement
+	 Left Click 	- 			 add block
+	 Right Click 	- 		   remove block
+
