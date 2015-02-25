@@ -45,7 +45,7 @@ void MCCollisionManager::handleCollisions(QList<Collision* > cols)
     foreach (Collision *c, cols)
     {
         if (c->c1->getID() == "player")
-            dynamic_cast<Player*>(c->e1)->decreaseHealth(40);
+            dynamic_cast<Player*>(c->e1)->decreaseHealth(51);
     }
 }
 

@@ -19,7 +19,7 @@ Enemy::Enemy(glm::vec3 pos)
     rs->type = CUBE;
     rs->color = glm::vec3(1, 0, 0);
     rs->shininess = 32.f;
-    rs->transparency = 1.f;
+    rs->transparency = .1f;
     rs->trans = glm::scale(glm::mat4(), glm::vec3(.99f, 1.98f, .99f));
     rs->texture = "";
     rs->repeatU = 1.f;

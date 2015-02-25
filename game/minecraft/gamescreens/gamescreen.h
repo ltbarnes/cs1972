@@ -57,6 +57,7 @@ private:
     Point m_neighbors[8];
 
     Light *m_jetPackLight;
+    Light *m_hudLight;
 };
 
 #endif // GAMESCREEN_H

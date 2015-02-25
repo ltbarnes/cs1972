@@ -65,12 +65,19 @@ GameScreen::GameScreen(Application *parent)
     m_jetPackLight->posDir = glm::vec3();
     m_jetPackLight->id = 2;
 
+    m_hudLight = new Light();
+    m_hudLight->type = 1;
+    m_hudLight->color = glm::vec3(1);
+    m_hudLight->posDir = glm::vec3(0, 0, -1);
+    m_hudLight->id = 3;
+
     initEnemies(playerPos);
 }
 
 GameScreen::~GameScreen()
 {
     delete m_jetPackLight;
+    delete m_hudLight;
     delete m_world;
 }
 
@@ -137,15 +144,17 @@ void GameScreen::onTick(float secs)
 
     if (m_player->hasAlly() && glm::length2(vec) < 10.f)
         m_parentApp->popScreens(1);
-    if (m_player->getPosition().y > 150.f)
+    else if (m_player->getPosition().y > 150.f)
         m_parentApp->popScreens(1);
-    if (m_player->getHealth() <= 0)
+    else if (m_player->getHealth() <= 0)
         m_parentApp->popScreens(1);
 }
 
 void GameScreen::scan()
 {
-    int r = m_safety.y * 20;
+    int r = glm::max(1, m_safety.y * 20);
+//    cout << m_safety.y << endl;
+//    assert(0);
     Point p;
     p.x = rand() % (r * 2) - r;
     p.z = rand() % (r * 2) - r;
@@ -263,13 +272,10 @@ void GameScreen::onRender(Graphics *g)
     horizLook.y = 0;
     horizLook = glm::normalize(horizLook);
 
-    cout << mode << endl;
-
-
     if (mode > 0)
     {
         g->setGraphicsMode(DEFAULT);
-        m_jetPackLight->posDir = pos - horizLook * .6f;
+        m_jetPackLight->posDir = pos - horizLook * .7f;
         g->addLight(*m_jetPackLight);
     }
 
@@ -295,7 +301,6 @@ void GameScreen::onRender(Graphics *g)
 
     m_world->onDraw(g);
 
-//    Point t = m_cb->getTallest();
     Point t = m_safety;
     glm::mat4 trans = glm::mat4();
     trans[3] = glm::vec4(t.x, t.y + 1, t.z, 1.f);
@@ -312,6 +317,7 @@ void GameScreen::onRender(Graphics *g)
         g->drawCone(trans);
     }
 
+    g->addLight(*m_hudLight);
     display2D(g);
 }
 
@@ -380,6 +386,7 @@ void GameScreen::onKeyReleased(QKeyEvent *e)
             m_scanning = -1;
             glm::vec3 pos = glm::round(m_player->getPosition());
             m_safety = Point((int) pos.x, 0, (int) pos.z);
+            m_safety.y = m_cb->getHeightAt(m_safety.x, m_safety.z);
             m_crawling = 1;
         }
     }
