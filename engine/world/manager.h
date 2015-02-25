@@ -1,9 +1,10 @@
 #ifndef MANAGER_H
 #define MANAGER_H
 
+#include "graphics.h"
+
 class World;
 class Graphics;
-enum GraphicsMode;
 
 class Manager
 {

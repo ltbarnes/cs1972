@@ -38,11 +38,28 @@ Player::Player(ActionCamera *camera, glm::vec3 pos, MinecraftWorld *world)
     rs->repeatV = 1.f;
 
     addRenderShape(rs);
+
+    m_health = 100;
+    m_healthTimer = -1.f;
 }
 
 
 Player::~Player()
 {
+}
+
+void Player::decreaseHealth(int amount)
+{
+    if (m_healthTimer < 0)
+    {
+        m_health -= amount;
+        m_healthTimer = 1.f;
+    }
+}
+
+int Player::getHealth()
+{
+    return m_health;
 }
 
 void Player::grabAlly()
@@ -66,7 +83,9 @@ int Player::getMode()
 
 
 void Player::onTick(float secs)
-{   
+{
+    if (m_healthTimer >= 0.f)
+        m_healthTimer -= secs;
 
     float forceAmt = 8.f;
     if (m_jetMode)
@@ -90,7 +109,6 @@ void Player::onTick(float secs)
     thrust += glm::normalize(glm::vec3(-look.z, 0.f, look.x)) * force.x;
     if (glm::length2(thrust) > 0.00001)
         thrust = glm::normalize(thrust) * forceAmt;
-//    thrust.y = force.y;
 
     glm::vec3 vel = thrust - m_vel;
     if (m_jump && m_canJump)

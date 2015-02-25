@@ -85,18 +85,19 @@ void MinecraftWorld::onDraw(Graphics *g)
     light.color = glm::vec3(1.f, 0.f, 0.f);
     light.posDir = glm::vec3(0, -1, 0);
     light.id = 1;
+    light.type = 1;
 
-    // temp lights for viewing
-    Light light2;
-    light2.color = glm::vec3(1.f, 1.f, 1.f);
-    light2.posDir = glm::vec3(-1, 1, -1);
-    light2.id = 2;
-    Light light3;
-    light3.color = glm::vec3(1.f, 1.f, 1.f);
-    light3.posDir = glm::vec3(1, 1, 1);
-    light3.id = 3;
-    g->addLight(light2);
-    g->addLight(light3);
+//    // temp lights for viewing
+//    Light light2;
+//    light2.color = glm::vec3(1.f, 1.f, 1.f);
+//    light2.posDir = glm::vec3(-1, 1, -1);
+//    light2.id = 2;
+//    Light light3;
+//    light3.color = glm::vec3(1.f, 1.f, 1.f);
+//    light3.posDir = glm::vec3(1, 1, 1);
+//    light3.id = 3;
+//    g->addLight(light2);
+//    g->addLight(light3);
 
     g->setWorldColor(.1f, .4f, .1f);
     g->addLight(light);

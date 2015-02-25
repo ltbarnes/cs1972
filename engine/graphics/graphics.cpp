@@ -334,6 +334,7 @@ void Graphics::addLight(const Light &light)
     os << light.id;
     std::string indexString = "[" + os.str() + "]"; // e.g. [0], [1], etc.
 
+    glUniform1i(glGetUniformLocation(m_defaultShader, ("lightTypes" + indexString).c_str()), light.type);
     glUniform3fv(glGetUniformLocation(m_defaultShader, ("lightPositions" + indexString).c_str()), 1,
             glm::value_ptr(light.posDir));
     glUniform3fv(glGetUniformLocation(m_defaultShader, ("lightColors" + indexString).c_str()), 1,

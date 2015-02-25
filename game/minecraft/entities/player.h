@@ -20,6 +20,8 @@ public:
 
     void grabAlly();
     bool hasAlly();
+    void decreaseHealth(int amount);
+    int getHealth();
 
     int getMode();
 
@@ -42,6 +44,9 @@ private:
 
     float m_offset;
     MinecraftWorld *m_world;
+
+    int m_health;
+    float m_healthTimer;
 };
 
 #endif // PLAYER_H

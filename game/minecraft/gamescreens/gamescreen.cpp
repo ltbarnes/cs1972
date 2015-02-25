@@ -4,6 +4,7 @@
 #include "minecraftworld.h"
 #include "mcchunkbuilder.h"
 #include "player.h"
+#include "mccollisionmanager.h"
 #include <QTime>
 #include <glm/ext.hpp>
 
@@ -14,15 +15,18 @@
 using namespace std;
 
 
-#define MAX_ALLIES 1
-#define MAX_ENEMIES 10
+//const int MAX_ALLIES = 1;
+const int MAX_ENEMIES = 20;
+const int ENEMY_RADIUS = 50;
 
 
 GameScreen::GameScreen(Application *parent)
     : Screen(parent)
 {
     ActionCamera *cam = new ActionCamera();
-    m_cb = new MCChunkBuilder(QTime::currentTime().msec());
+    int seed = QTime::currentTime().msec();
+    m_cb = new MCChunkBuilder(seed);
+    cout << "Using seed: " << seed << endl;
 
     VoxelManager *vm = new VoxelManager(cam, m_parentApp->getShader(SPARSE), Point(6, 2, 6), Point(32, 32, 32), m_cb);
 
@@ -31,6 +35,7 @@ GameScreen::GameScreen(Application *parent)
     m_player = new Player(cam, playerPos, m_world);
 
     m_world->addMovableEntity(m_player);
+    m_world->addManager(new MCCollisionManager());
 
     this->setCamera(cam);
 
@@ -52,11 +57,38 @@ GameScreen::GameScreen(Application *parent)
     m_ally = Point(0, std::numeric_limits<int>::min(), 0);
     m_enemies.clear();
     m_safetyStuck = false;
+
+//    m_startTimer =
+    m_jetPackLight = new Light();
+    m_jetPackLight->type = 0;
+    m_jetPackLight->color = glm::vec3(1.f, .5f, 0.f);
+    m_jetPackLight->posDir = glm::vec3();
+    m_jetPackLight->id = 2;
+
+    initEnemies(playerPos);
 }
 
 GameScreen::~GameScreen()
 {
+    delete m_jetPackLight;
     delete m_world;
+}
+
+
+void GameScreen::initEnemies(glm::vec3 player)
+{
+    glm::vec3 e;
+    Enemy * enemy;
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        e.x = rand() % (ENEMY_RADIUS * 2) - ENEMY_RADIUS;
+        e.z = rand() % (ENEMY_RADIUS * 2) - ENEMY_RADIUS;
+        e += player;
+        e.y = m_cb->getHeightAt(e.x, e.z) + 10;
+        enemy = new Enemy(e);
+        m_world->addMovableEntity(enemy);
+        m_enemies.append(enemy);
+    }
 }
 
 
@@ -64,6 +96,8 @@ GameScreen::~GameScreen()
 void GameScreen::onTick(float secs)
 {
     secs = glm::min(secs, .05f);
+
+    updateEnemies(m_player->getPosition());
 
     m_world->onTick(secs);
     m_player->setCameraPos();
@@ -101,7 +135,11 @@ void GameScreen::onTick(float secs)
     glm::vec3 pos = m_player->getPosition();
     glm::vec3 vec = glm::vec3(m_safety.x - pos.x, m_safety.y - pos.y, m_safety.z - pos.z);
 
-    if (m_player->hasAlly() && glm::length2(vec) < 1.f)
+    if (m_player->hasAlly() && glm::length2(vec) < 10.f)
+        m_parentApp->popScreens(1);
+    if (m_player->getPosition().y > 150.f)
+        m_parentApp->popScreens(1);
+    if (m_player->getHealth() <= 0)
         m_parentApp->popScreens(1);
 }
 
@@ -140,18 +178,36 @@ void GameScreen::scan()
 }
 
 
-void GameScreen::placeEnemies(Point p)
+void GameScreen::updateEnemies(glm::vec3 player)
 {
+    if (m_player->getMode() > 0)
+        foreach (Enemy *e, m_enemies) {
+            e->clearLights();
+            e->addLight(player);
+        }
 
-    for (int i = 0; i < MAX_ENEMIES; i++)
+    glm::vec3 dir = m_player->getVelocity();
+    if (glm::length2(dir) > 0.00001f)
+        dir = glm::normalize(dir);
+
+    glm::vec3 epos;
+    float bounds = 4.f * ENEMY_RADIUS;
+    bounds *= bounds;
+    foreach(Enemy *e, m_enemies)
     {
-        int r = 30;
-        Point e;
-        e.x = rand() % (r * 2) - r;
-        e.z = rand() % (r * 2) - r;
-        e = p + e;
-        e.y = m_cb->getHeightAt(e.x, e.z);
-        m_world->addMovableEntity(new Enemy(glm::vec3(e.x, e.y + 10, e.z)));
+        epos = e->getPosition();
+        if (glm::distance2(epos, player) > bounds || e->isStuck())
+        {
+            epos.x = rand() % (ENEMY_RADIUS * 2) - ENEMY_RADIUS;
+            epos.z = rand() % (ENEMY_RADIUS * 2) - ENEMY_RADIUS;
+
+            epos += player;
+            if (!e->isStuck())
+                epos += dir * (3.f * ENEMY_RADIUS);
+
+            epos.y = m_cb->getHeightAt((int) glm::round(epos.x), (int) glm::round(epos.z));
+            e->setPosition(epos);
+        }
     }
 }
 
@@ -203,6 +259,19 @@ void GameScreen::onRender(Graphics *g)
     int mode = m_player->getMode();
     glm::vec3 pos = m_player->getPosition();
     glm::vec3 look = glm::vec3(m_camera->getLook());
+    glm::vec3 horizLook = look;
+    horizLook.y = 0;
+    horizLook = glm::normalize(horizLook);
+
+    cout << mode << endl;
+
+
+    if (mode > 0)
+    {
+        g->setGraphicsMode(DEFAULT);
+        m_jetPackLight->posDir = pos - horizLook * .6f;
+        g->addLight(*m_jetPackLight);
+    }
 
     g->setGraphicsMode(SPARSE);
     g->setPlayer(pos, mode);
@@ -221,9 +290,7 @@ void GameScreen::onRender(Graphics *g)
             g->setParticleForce(glm::vec3(0, -45, 0));
         }
 
-        look.y = 0;
-        look = glm::normalize(look) * .503f;
-        g->drawParticles(pos - look, fuzziness);
+        g->drawParticles(pos - horizLook * .503f, fuzziness);
     }
 
     m_world->onDraw(g);

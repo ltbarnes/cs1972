@@ -14,7 +14,7 @@ uniform mat4 model;
 
 // Light data
 const int MAX_LIGHTS = 10;
-//uniform int lightTypes[MAX_LIGHTS];         // 0 for point, 1 for directional
+uniform int lightTypes[MAX_LIGHTS];         // 0 for point, 1 for directional
 uniform vec3 lightPositions[MAX_LIGHTS];    // pos for point lights dir for direction
 uniform vec3 lightAttenuations[MAX_LIGHTS]; // Constant, linear, and quadratic term
 uniform vec3 lightColors[MAX_LIGHTS];
@@ -43,9 +43,15 @@ void main(){
     color = world_color * diffuse_color; // Add ambient component
 
     for (int i = 0; i < MAX_LIGHTS; i++) {
+        vec4 vertexToLight;
         // Point Light
-//        if (lightTypes[i] == 0)
-        vec4 vertexToLight = normalize(view * vec4(-lightPositions[i], 0));// - position_cameraSpace);
+        if (lightTypes[i] == 0)
+            vertexToLight = normalize(view * vec4(lightPositions[i], 1) - position_cameraSpace);
+        // Directional Light
+        else if (lightTypes[i] == 1)
+            vertexToLight = normalize(view * vec4(-lightPositions[i], 0));
+        else
+            continue;
 
         if (transparency < 1.0)
             color = diffuse_color;

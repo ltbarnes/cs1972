@@ -38,7 +38,8 @@ private:
     Point descend(Point p);
 
     void scan();
-    void placeEnemies(Point p);
+    void initEnemies(glm::vec3 p);
+    void updateEnemies(glm::vec3 player);
 
     void display2D(Graphics *g);
 
@@ -54,6 +55,8 @@ private:
     QList<Enemy *> m_enemies;
 
     Point m_neighbors[8];
+
+    Light *m_jetPackLight;
 };
 
 #endif // GAMESCREEN_H

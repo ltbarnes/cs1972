@@ -17,12 +17,14 @@ macx {
 INCLUDEPATH += glm engine game shaders \
                engine/common engine/ui engine/graphics \
                engine/shapes engine/world engine/voxel \
+               engine/collisions \
                # game/warmup1/gamescreens game/warmup1/world game/warmup1/entities \ # warmup
                game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ # minecraft
                res/images res/images/cubemap
 DEPENDPATH +=  glm engine game shaders \
                engine/common engine/ui engine/graphics \
                engine/shapes engine/world engine/voxel \
+               engine/collisions \
                # game/warmup1/gamescreens game/warmup1/world game/warmup1/entities \ # warmup
                game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ #minecraft
                res/images res/images/cubemap
@@ -47,22 +49,24 @@ SOURCES += \
     engine/shapes/cube.cpp \
     engine/shapes/cylinder.cpp \
     engine/shapes/sphere.cpp \
-    engine/shapes/collisioncylinder.cpp \
     engine/shapes/cone.cpp \
     engine/shapes/facecube.cpp \
+    engine/collisions/collisioncylinder.cpp \
     engine/voxel/chunk.cpp \
     engine/voxel/voxelmanager.cpp \
 ### minecraft
-    game/minecraft/gamescreens/minecraftmenu.cpp \
-    game/minecraft/gamescreens/gamescreen.cpp \
-    game/minecraft/world/minecraftworld.cpp \
-    game/minecraft/entities/player.cpp \
-    game/minecraft/world/mcchunkbuilder.cpp \
     engine/common/perlinnoise.cpp \
     engine/graphics/particleemitter.cpp \
+    engine/collisions/collisionmanager.cpp \
+    game/minecraft/gamescreens/minecraftmenu.cpp \
+    game/minecraft/gamescreens/gamescreen.cpp \
     game/minecraft/gamescreens/createscreen.cpp \
+    game/minecraft/world/minecraftworld.cpp \
+    game/minecraft/world/mcchunkbuilder.cpp \
+    game/minecraft/entities/player.cpp \
     game/minecraft/entities/ally.cpp \
-    game/minecraft/entities/enemy.cpp
+    game/minecraft/entities/enemy.cpp \
+    game/minecraft/world/mccollisionmanager.cpp
 ### warmup
 #    game/warmup/gamescreens/menuscreen.cpp \
 #    game/warmup/gamescreens/gamescreen.cpp \
@@ -91,25 +95,27 @@ HEADERS += \
     engine/shapes/cube.h \
     engine/shapes/cylinder.h \
     engine/shapes/sphere.h \
-    engine/shapes/collisionshape.h \
-    engine/shapes/collisioncylinder.h \
     engine/shapes/cone.h \
     engine/shapes/facecube.h \
+    engine/collisions/collisionshape.h \
+    engine/collisions/collisioncylinder.h \
     engine/voxel/chunk.h \
     engine/voxel/voxelmanager.h \
     engine/voxel/chunkbuilder.h \
 ### minecraft
-    game/minecraft/gamescreens/minecraftmenu.h \
-    game/minecraft/gamescreens/gamescreen.h \
-    game/minecraft/world/minecraftworld.h \
-    game/minecraft/entities/player.h \
-    game/minecraft/world/mcchunkbuilder.h \
     engine/world/manager.h \
     engine/common/perlinnoise.h \
     engine/graphics/particleemitter.h \
+    engine/collisions/collisionmanager.h \
+    game/minecraft/gamescreens/minecraftmenu.h \
+    game/minecraft/gamescreens/gamescreen.h \
     game/minecraft/gamescreens/createscreen.h \
+    game/minecraft/world/minecraftworld.h \
+    game/minecraft/world/mcchunkbuilder.h \
+    game/minecraft/entities/player.h \
     game/minecraft/entities/ally.h \
-    game/minecraft/entities/enemy.h
+    game/minecraft/entities/enemy.h \
+    game/minecraft/world/mccollisionmanager.h
 ### warmup
 #    game/warmup/gamescreens/menuscreen.h \
 #    game/warmup/gamescreens/gamescreen.h \
