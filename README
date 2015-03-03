@@ -12,6 +12,13 @@ Voxel Engine Requirements
 [ ] Automated chunk streaming 
 	### all handled in the engine/voxel/voxelmanager class.
 	[ ] Chunks within a certain distance of a selected focus point are automatically loaded into the game
+
+######## RETRY ADDITION: ################
+		If any entity can potentially pass into an unloaded chunk during collision detection that chunks is loaded on the spot before collision detection continues to ensure no entities pass through the level (engine/voxel/VoxelManager::checkCollision1D())
+
+		Blocks close to the player are loaded before surrounding blocks to prevent reduce automatic loading of blocks during collision detection (engine/voxel/VoxelManager::manage())
+
+
 	[ ] Loaded chunks outside a certain distance are unloaded from the game
 		### checkCenterPosition() within VoxelManager uses the camera eye point to accomplish loading and unloading chunks.
 

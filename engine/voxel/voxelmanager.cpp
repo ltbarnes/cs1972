@@ -194,7 +194,7 @@ void VoxelManager::manage(World *world, float onTickSecs)
     else if (b.w && !m_chunks.contains(center + Point(0, 0, -m_chunkSize.z)))
         addChunk(center + Point(0, 0, -m_chunkSize.z));
 
-    // add nearby chunks ass the player approaches the corners
+    // add nearby chunks as the player approaches the corners
     else if (b.x and b.z && !m_chunks.contains(center + Point(m_chunkSize.x, 0, m_chunkSize.z)))
         addChunk(center + Point(m_chunkSize.x, 0, m_chunkSize.z));
     else if (b.x and b.w && !m_chunks.contains(center + Point(m_chunkSize.x, 0, -m_chunkSize.z)))
@@ -381,6 +381,17 @@ void VoxelManager::checkCollision1D(Collision *col, glm::vec3 pos, glm::vec3 dim
 
                 bp = Point(roundDown(x, m_chunkSize.x), roundDown(y, m_chunkSize.y), roundDown(z, m_chunkSize.z));
                 c = m_chunks.value(bp, NULL);
+
+                // load the block if it isn't already loaded
+                if (!c)
+                {
+                    float yPos = bp.y / m_dim.y;
+                    if (yPos <= m_dim.y && yPos >= -m_dim.y)
+                    {
+                        addChunk(bp);
+                        m_chunksToAdd.removeAll(bp);
+                    }
+                }
 
                 if (c && c->getSingleBlock(x - bp.x, y - bp.y, z - bp.z))
                 {
