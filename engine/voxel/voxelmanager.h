@@ -55,6 +55,7 @@ private:
     QString m_atlasName;
 
     float m_timer;
+    bool m_loadOnTick;
 };
 
 #endif // VOXELMANAGER_H

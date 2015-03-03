@@ -34,6 +34,7 @@ VoxelManager::VoxelManager(Camera *cam, GLuint shader, Point dim, Point chunkSiz
     addBlocks(center.x, center.x, m_min.y, m_max.y, center.z, center.z);
 
     m_timer = -.1;
+    m_loadOnTick = true;
 }
 
 VoxelManager::~VoxelManager()
@@ -138,6 +139,8 @@ void VoxelManager::onDraw(Graphics *g)
 
 void VoxelManager::manage(World *world, float onTickSecs)
 {
+    m_loadOnTick = true;
+
     if (m_timer > 0)
         m_timer -= onTickSecs;
 
@@ -180,37 +183,41 @@ void VoxelManager::manage(World *world, float onTickSecs)
                 pos.z > center.z + m_chunkSize.z - border,
                 pos.z < center.z + border);
 
-    // add current chunk if it isn't loaded
-    if (!m_chunks.contains(center))
-        addChunk(center);
+    if (m_loadOnTick)
+    {
+        // add current chunk if it isn't loaded
+        if (!m_chunks.contains(center))
+            addChunk(center);
 
-    // add nearby chunks as the player approaches the edges
-    else if (b.x && !m_chunks.contains(center + Point(m_chunkSize.x, 0, 0)))
-        addChunk(center + Point(m_chunkSize.x, 0, 0));
-    else if (b.y && !m_chunks.contains(center + Point(-m_chunkSize.x, 0, 0)))
-        addChunk(center + Point(-m_chunkSize.x, 0, 0));
-    else if (b.z && !m_chunks.contains(center + Point(0, 0, m_chunkSize.z)))
-        addChunk(center + Point(0, 0, m_chunkSize.z));
-    else if (b.w && !m_chunks.contains(center + Point(0, 0, -m_chunkSize.z)))
-        addChunk(center + Point(0, 0, -m_chunkSize.z));
+        // add nearby chunks as the player approaches the edges
+        else if (b.x && !m_chunks.contains(center + Point(m_chunkSize.x, 0, 0)))
+            addChunk(center + Point(m_chunkSize.x, 0, 0));
+        else if (b.y && !m_chunks.contains(center + Point(-m_chunkSize.x, 0, 0)))
+            addChunk(center + Point(-m_chunkSize.x, 0, 0));
+        else if (b.z && !m_chunks.contains(center + Point(0, 0, m_chunkSize.z)))
+            addChunk(center + Point(0, 0, m_chunkSize.z));
+        else if (b.w && !m_chunks.contains(center + Point(0, 0, -m_chunkSize.z)))
+            addChunk(center + Point(0, 0, -m_chunkSize.z));
 
-    // add nearby chunks as the player approaches the corners
-    else if (b.x and b.z && !m_chunks.contains(center + Point(m_chunkSize.x, 0, m_chunkSize.z)))
-        addChunk(center + Point(m_chunkSize.x, 0, m_chunkSize.z));
-    else if (b.x and b.w && !m_chunks.contains(center + Point(m_chunkSize.x, 0, -m_chunkSize.z)))
-        addChunk(center + Point(m_chunkSize.x, 0, -m_chunkSize.z));
-    else if (b.y and b.z && !m_chunks.contains(center + Point(-m_chunkSize.x, 0, m_chunkSize.z)))
-        addChunk(center + Point(-m_chunkSize.x, 0, m_chunkSize.z));
-    else if (b.y and b.w && !m_chunks.contains(center + Point(-m_chunkSize.x, 0, -m_chunkSize.z)))
-        addChunk(center + Point(-m_chunkSize.x, 0, -m_chunkSize.z));
+        // add nearby chunks as the player approaches the corners
+        else if (b.x and b.z && !m_chunks.contains(center + Point(m_chunkSize.x, 0, m_chunkSize.z)))
+            addChunk(center + Point(m_chunkSize.x, 0, m_chunkSize.z));
+        else if (b.x and b.w && !m_chunks.contains(center + Point(m_chunkSize.x, 0, -m_chunkSize.z)))
+            addChunk(center + Point(m_chunkSize.x, 0, -m_chunkSize.z));
+        else if (b.y and b.z && !m_chunks.contains(center + Point(-m_chunkSize.x, 0, m_chunkSize.z)))
+            addChunk(center + Point(-m_chunkSize.x, 0, m_chunkSize.z));
+        else if (b.y and b.w && !m_chunks.contains(center + Point(-m_chunkSize.x, 0, -m_chunkSize.z)))
+            addChunk(center + Point(-m_chunkSize.x, 0, -m_chunkSize.z));
 
-    // add a chunk at the bottom if the player is approaching the next chunk
-    else if (pos.y < center.y + border * 2 && !m_chunks.contains(center + Point(0, -m_chunkSize.y, 0)))
-        addChunk(center + Point(0, -m_chunkSize.y, 0));
+        // add a chunk at the bottom if the player is approaching the next chunk
+        else if (pos.y < center.y + border * 2 && !m_chunks.contains(center + Point(0, -m_chunkSize.y, 0)))
+            addChunk(center + Point(0, -m_chunkSize.y, 0));
 
-    // add all the other chunks waiting to be loaded
-    else if (!m_chunksToAdd.isEmpty())
-        addChunk(m_chunksToAdd.takeFirst());
+        // add all the other chunks waiting to be loaded
+        else if (!m_chunksToAdd.isEmpty())
+            addChunk(m_chunksToAdd.takeFirst());
+
+    }
 
 }
 
@@ -383,14 +390,16 @@ void VoxelManager::checkCollision1D(Collision *col, glm::vec3 pos, glm::vec3 dim
                 c = m_chunks.value(bp, NULL);
 
                 // load the block if it isn't already loaded
-                if (!c)
+                if (c == NULL)
                 {
-                    float yPos = bp.y / m_dim.y;
+                    float yPos = bp.y / m_chunkSize.y;
                     if (yPos <= m_dim.y && yPos >= -m_dim.y)
                     {
                         addChunk(bp);
                         m_chunksToAdd.removeAll(bp);
                     }
+                    c = m_chunks.value(bp, NULL);
+                    m_loadOnTick = false;
                 }
 
                 if (c && c->getSingleBlock(x - bp.x, y - bp.y, z - bp.z))
