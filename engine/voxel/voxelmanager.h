@@ -31,7 +31,7 @@ public:
     int roundDown(int num, int multiple);
 
 private:
-    void checkCenterPosition();
+    Point checkCenterPosition();
     void addBlocks(int xmin, int xmax, int ymin, int ymax, int zmin, int zmax);
     void removeBlocks(int xmin, int xmax, int ymin, int ymax, int zmin, int zmax);
 

@@ -45,7 +45,7 @@ void CreateScreen::onTick(float secs)
 //    assert(0);
     secs = glm::min(secs, .03f);
 
-    float moveAmt = .3f;
+    float moveAmt = 1.3f;
     if (m_moveSlow)
         moveAmt = .1f;
     glm::vec3 dir = glm::vec3();

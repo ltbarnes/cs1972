@@ -70,8 +70,6 @@ void VoxelManager::setAtlas(QString atlasName)
 void VoxelManager::onDraw(Graphics *g)
 {
     g->setAtlas(m_atlasName);
-//    g->setTint(.15f, .065f, .065f);
-//    g->setTint(0, .5, 0);
 
     glm::mat4 frust = g->getFrustum();
 
@@ -143,7 +141,7 @@ void VoxelManager::manage(World *world, float onTickSecs)
     if (m_timer > 0)
         m_timer -= onTickSecs;
 
-    checkCenterPosition();
+    Point center = checkCenterPosition();
 
     foreach (Point p, m_chunksToRemove)
     {
@@ -173,16 +171,54 @@ void VoxelManager::manage(World *world, float onTickSecs)
         delete col;
     }
 
-    if (!m_chunksToAdd.isEmpty())
+    glm::vec3 pos = glm::vec3(m_camera->getEye());
+    int border = 5;
+
+    glm::bvec4 b = glm::bvec4(
+                pos.x > center.x + m_chunkSize.x - border,
+                pos.x < center.x + border,
+                pos.z > center.z + m_chunkSize.z - border,
+                pos.z < center.z + border);
+
+    // add current chunk if it isn't loaded
+    if (!m_chunks.contains(center))
+        addChunk(center);
+
+    // add nearby chunks as the player approaches the edges
+    else if (b.x && !m_chunks.contains(center + Point(m_chunkSize.x, 0, 0)))
+        addChunk(center + Point(m_chunkSize.x, 0, 0));
+    else if (b.y && !m_chunks.contains(center + Point(-m_chunkSize.x, 0, 0)))
+        addChunk(center + Point(-m_chunkSize.x, 0, 0));
+    else if (b.z && !m_chunks.contains(center + Point(0, 0, m_chunkSize.z)))
+        addChunk(center + Point(0, 0, m_chunkSize.z));
+    else if (b.w && !m_chunks.contains(center + Point(0, 0, -m_chunkSize.z)))
+        addChunk(center + Point(0, 0, -m_chunkSize.z));
+
+    // add nearby chunks ass the player approaches the corners
+    else if (b.x and b.z && !m_chunks.contains(center + Point(m_chunkSize.x, 0, m_chunkSize.z)))
+        addChunk(center + Point(m_chunkSize.x, 0, m_chunkSize.z));
+    else if (b.x and b.w && !m_chunks.contains(center + Point(m_chunkSize.x, 0, -m_chunkSize.z)))
+        addChunk(center + Point(m_chunkSize.x, 0, -m_chunkSize.z));
+    else if (b.y and b.z && !m_chunks.contains(center + Point(-m_chunkSize.x, 0, m_chunkSize.z)))
+        addChunk(center + Point(-m_chunkSize.x, 0, m_chunkSize.z));
+    else if (b.y and b.w && !m_chunks.contains(center + Point(-m_chunkSize.x, 0, -m_chunkSize.z)))
+        addChunk(center + Point(-m_chunkSize.x, 0, -m_chunkSize.z));
+
+    // add a chunk at the bottom if the player is approaching the next chunk
+    else if (pos.y < center.y + border * 2 && !m_chunks.contains(center + Point(0, -m_chunkSize.y, 0)))
+        addChunk(center + Point(0, -m_chunkSize.y, 0));
+
+    // add all the other chunks waiting to be loaded
+    else if (!m_chunksToAdd.isEmpty())
         addChunk(m_chunksToAdd.takeFirst());
 
 }
 
-void VoxelManager::checkCenterPosition()
+Point VoxelManager::checkCenterPosition()
 {
     glm::vec3 cent = glm::round(glm::vec3(m_camera->getEye()));
-    Point center = Point(roundDown(cent.x, m_chunkSize.x), roundDown(cent.y, m_chunkSize.y), roundDown(cent.z, m_chunkSize.z));
-    center = Point(center.x / m_chunkSize.x, center.y / m_chunkSize.y, center.z / m_chunkSize.z);
+    Point centerPoint = Point(roundDown(cent.x, m_chunkSize.x), roundDown(cent.y, m_chunkSize.y), roundDown(cent.z, m_chunkSize.z));
+    Point center = Point(centerPoint.x / m_chunkSize.x, centerPoint.y / m_chunkSize.y, centerPoint.z / m_chunkSize.z);
 
     Point diffMin = center - m_min;
     Point diffMax = m_max - center;
@@ -204,6 +240,7 @@ void VoxelManager::checkCenterPosition()
     else if (diffMax.x > m_dim.x + 1)
     { removeBlocks(m_max.x, m_max.x, m_min.y, m_max.y, m_min.z, m_max.z); m_max.x -= 1; }
 
+    return centerPoint;
 }
 
 void VoxelManager::addBlocks(int xmin, int xmax, int ymin, int ymax, int zmin, int zmax)
