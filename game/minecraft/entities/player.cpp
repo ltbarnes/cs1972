@@ -84,9 +84,9 @@ void Player::onTick(float secs)
     if (m_healthTimer >= 0.f)
         m_healthTimer -= secs;
 
-    float forceAmt = 18.f;
+    float forceAmt = 8.f;
     if (m_jetMode)
-        forceAmt += 17.f;
+        forceAmt += 7.f;
 
     glm::vec3 force = glm::vec3(0.f);
     if (m_wsad & 0b1000)
