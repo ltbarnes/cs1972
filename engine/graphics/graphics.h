@@ -16,7 +16,7 @@
 
 enum GraphicsMode
 {
-    DEFAULT, SPARSE, CUBEMAP
+    DEFAULT, SPARSE, CUBEMAP, DRAW2D
 };
 
 enum ShapeType

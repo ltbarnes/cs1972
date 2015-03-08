@@ -167,6 +167,17 @@ GLuint Graphics::setGraphicsMode(GraphicsMode gm)
         break;
     case CUBEMAP:
         break;
+    case DRAW2D:
+        m_currentShader = m_defaultShader;
+        glUseProgram(m_defaultShader);
+        glm::mat4 trans = glm::mat4();
+
+        // Set scene uniforms.
+        glUniformMatrix4fv(m_defaultLocs["projection"], 1, GL_FALSE,
+                glm::value_ptr(trans));
+        glUniformMatrix4fv(m_defaultLocs["view"], 1, GL_FALSE,
+                glm::value_ptr(trans));
+        break;
     }
     return m_currentShader;
 }

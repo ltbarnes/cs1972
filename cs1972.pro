@@ -1,6 +1,6 @@
 QT += core gui opengl
 
-TARGET = warmup
+TARGET = cs1972
 TEMPLATE = app
 
 unix:!macx {
@@ -19,15 +19,17 @@ INCLUDEPATH += glm engine game shaders \
                engine/shapes engine/world engine/voxel \
                engine/collisions \
                # game/warmup1/gamescreens game/warmup1/world game/warmup1/entities \ # warmup
-               game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ # minecraft
-               res/images res/images/cubemap
+               # game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ # minecraft
+               game/platformer/gamescreens game/platformer/world game/platformer/entities \ # platformer
+               res/images res/images/cubemap res/levels
 DEPENDPATH +=  glm engine game shaders \
                engine/common engine/ui engine/graphics \
                engine/shapes engine/world engine/voxel \
                engine/collisions \
                # game/warmup1/gamescreens game/warmup1/world game/warmup1/entities \ # warmup
-               game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ #minecraft
-               res/images res/images/cubemap
+               # game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ # minecraft
+               game/platformer/gamescreens game/platformer/world game/platformer/entities \ # platformer
+               res/images res/images/cubemap res/levels
 DEFINES += TIXML_USE_STL
 OTHER_FILES += shaders/shader.frag shaders/shader.vert
 
@@ -36,7 +38,9 @@ SOURCES += \
     engine/ui/mainwindow.cpp \
     engine/ui/view.cpp \
     engine/ui/application.cpp \
+    engine/ui/button.cpp \
     engine/common/point3d.cpp \
+    engine/common/obj.cpp \
     engine/graphics/graphics.cpp \
     engine/graphics/cubemap.cpp \
     engine/graphics/camera.cpp \
@@ -54,20 +58,23 @@ SOURCES += \
     engine/collisions/collisioncylinder.cpp \
     engine/voxel/chunk.cpp \
     engine/voxel/voxelmanager.cpp \
-### minecraft
     engine/common/perlinnoise.cpp \
     engine/graphics/particleemitter.cpp \
     engine/collisions/collisionmanager.cpp \
-    game/minecraft/gamescreens/minecraftmenu.cpp \
-    game/minecraft/gamescreens/gamescreen.cpp \
-    game/minecraft/gamescreens/createscreen.cpp \
-    game/minecraft/gamescreens/gameoverscreen.cpp \
-    game/minecraft/world/minecraftworld.cpp \
-    game/minecraft/world/mcchunkbuilder.cpp \
-    game/minecraft/entities/player.cpp \
-    game/minecraft/entities/ally.cpp \
-    game/minecraft/entities/enemy.cpp \
-    game/minecraft/world/mccollisionmanager.cpp
+### platformer
+    game/platformer/gamescreens/platformermenu.cpp \
+    game/platformer/gamescreens/gamescreen.cpp
+### minecraft
+#    game/minecraft/gamescreens/minecraftmenu.cpp \
+#    game/minecraft/gamescreens/gamescreen.cpp \
+#    game/minecraft/gamescreens/createscreen.cpp \
+#    game/minecraft/gamescreens/gameoverscreen.cpp \
+#    game/minecraft/world/minecraftworld.cpp \
+#    game/minecraft/world/mcchunkbuilder.cpp \
+#    game/minecraft/entities/player.cpp \
+#    game/minecraft/entities/ally.cpp \
+#    game/minecraft/entities/enemy.cpp \
+#    game/minecraft/world/mccollisionmanager.cpp
 ### warmup
 #    game/warmup/gamescreens/menuscreen.cpp \
 #    game/warmup/gamescreens/gamescreen.cpp \
@@ -83,7 +90,9 @@ HEADERS += \
     engine/ui/view.h \
     engine/ui/application.h \
     engine/ui/screen.h \
+    engine/ui/button.h \
     engine/common/point3d.h \
+    engine/common/obj.h \
     engine/graphics/graphics.h \
     engine/graphics/cubemap.h \
     engine/graphics/camera.h \
@@ -103,21 +112,24 @@ HEADERS += \
     engine/voxel/chunk.h \
     engine/voxel/voxelmanager.h \
     engine/voxel/chunkbuilder.h \
-### minecraft
     engine/world/manager.h \
     engine/common/perlinnoise.h \
     engine/graphics/particleemitter.h \
     engine/collisions/collisionmanager.h \
-    game/minecraft/gamescreens/minecraftmenu.h \
-    game/minecraft/gamescreens/gamescreen.h \
-    game/minecraft/gamescreens/createscreen.h \
-    game/minecraft/gamescreens/gameoverscreen.h \
-    game/minecraft/world/minecraftworld.h \
-    game/minecraft/world/mcchunkbuilder.h \
-    game/minecraft/entities/player.h \
-    game/minecraft/entities/ally.h \
-    game/minecraft/entities/enemy.h \
-    game/minecraft/world/mccollisionmanager.h
+### platformer
+    game/platformer/gamescreens/platformermenu.h \
+    game/platformer/gamescreens/gamescreen.h
+### minecraft
+#    game/minecraft/gamescreens/minecraftmenu.h \
+#    game/minecraft/gamescreens/gamescreen.h \
+#    game/minecraft/gamescreens/createscreen.h \
+#    game/minecraft/gamescreens/gameoverscreen.h \
+#    game/minecraft/world/minecraftworld.h \
+#    game/minecraft/world/mcchunkbuilder.h \
+#    game/minecraft/entities/player.h \
+#    game/minecraft/entities/ally.h \
+#    game/minecraft/entities/enemy.h \
+#    game/minecraft/world/mccollisionmanager.h
 ### warmup
 #    game/warmup/gamescreens/menuscreen.h \
 #    game/warmup/gamescreens/gamescreen.h \
