@@ -4,6 +4,8 @@
 #include "screen.h"
 #include "obj.h"
 
+class Player; // TEMP, SHOULD BE IN WORLD
+
 class GameScreen : public Screen
 {
 public:
@@ -28,6 +30,8 @@ public:
 
 private:
     OBJ *m_level;
+    Player *player;
+
 
 };
 

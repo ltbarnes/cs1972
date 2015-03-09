@@ -63,7 +63,8 @@ SOURCES += \
     engine/collisions/collisionmanager.cpp \
 ### platformer
     game/platformer/gamescreens/platformermenu.cpp \
-    game/platformer/gamescreens/gamescreen.cpp
+    game/platformer/gamescreens/gamescreen.cpp \
+    engine/world/player.cpp
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.cpp \
 #    game/minecraft/gamescreens/gamescreen.cpp \
@@ -86,6 +87,7 @@ SOURCES += \
 #    game/warmup/entities/ground.cpp
 
 HEADERS += \
+    engine/vector/vector.h \
     engine/ui/mainwindow.h \
     engine/ui/view.h \
     engine/ui/application.h \
@@ -118,7 +120,8 @@ HEADERS += \
     engine/collisions/collisionmanager.h \
 ### platformer
     game/platformer/gamescreens/platformermenu.h \
-    game/platformer/gamescreens/gamescreen.h
+    game/platformer/gamescreens/gamescreen.h \
+    engine/world/player.h
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.h \
 #    game/minecraft/gamescreens/gamescreen.h \

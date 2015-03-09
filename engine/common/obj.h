@@ -1,8 +1,9 @@
 #ifndef OBJ_H
 #define OBJ_H
 
+#include <GL/glew.h>
 #include <glm.hpp>
-#include <QVector>
+#include <QList>
 
 // A simple parser that reads and writes Wavefront .obj files
 class OBJ
@@ -26,18 +27,30 @@ public:
         Triangle(const Index &a, const Index &b, const Index &c) : a(a), b(b), c(c) {}
     };
 
-    QVector<glm::vec3> vertices;
-    QVector<glm::vec2> coords;
-    QVector<glm::vec3> normals;
-    QVector<Triangle> triangles;
+    ~OBJ();
 
-    void draw() const;
+    QList<glm::vec3> vertices;
+    QList<glm::vec2> coords;
+    QList<glm::vec3> normals;
+    QList<Triangle> triangles;
+
+    void draw(glm::mat4 trans) const;
     bool read(const QString &path);
     bool write(const QString &path) const;
+    void createVBO(GLuint shader);
 
 private:
     Index getIndex(const QString &str) const;
-    void drawIndex(const Index &index) const;
+    void fillVertex(int *i, GLfloat *data, Index index);
+
+    GLuint m_shader;
+    GLuint m_vaoID;
+    GLuint m_vboID;
+    int m_numVerts;
+
+
+    bool inBounds(const Index &index) const;
+
 };
 
 #endif // OBJ_H

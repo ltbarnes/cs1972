@@ -2,25 +2,40 @@
 #include <qgl.h>
 #include <QFile>
 #include <QTextStream>
+#include <QStringList>
+
+#define GLM_FORCE_RADIANS
+#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 using namespace std;
 
-void OBJ::draw() const
+OBJ::~OBJ()
 {
-    glBegin(GL_TRIANGLES);
-    foreach (const Triangle &tri, triangles) {
-        drawIndex(tri.a);
-        drawIndex(tri.b);
-        drawIndex(tri.c);
-    }
-    glEnd();
+    if (m_vaoID)
+        glDeleteVertexArrays(1, &m_vaoID);
+    if (m_vboID)
+        glDeleteBuffers(1, &m_vboID);
+}
+
+void OBJ::draw(glm::mat4 trans) const
+{
+    glBindVertexArray(m_vaoID);
+    glUniformMatrix4fv(glGetUniformLocation(m_shader, "model"), 1, GL_FALSE, glm::value_ptr(trans));
+    glDrawArrays(GL_TRIANGLES, 0, m_numVerts);
+    glBindVertexArray(0);
+
+//    glBegin(GL_TRIANGLES);
+//    foreach (const Triangle &tri, triangles) {
+//        drawIndex(tri.a);
+//        drawIndex(tri.b);
+//        drawIndex(tri.c);
+//    }
+//    glEnd();
 }
 
 bool OBJ::read(const QString &path)
 {
-    cout << path.toStdString() << endl;
-
     // Open the file
     QFile file(path);
     if (!file.open(QFile::ReadOnly | QFile::Text)) return false;
@@ -52,11 +67,102 @@ bool OBJ::read(const QString &path)
         }
     } while (!line.isNull());
 
-    assert(vertices.size() == coords.size());
-    assert(coords.size() == normals.size());
-
     return true;
 }
+
+void OBJ::createVBO(GLuint shader)
+{
+    // delete old array and buffer
+    if (m_vaoID)
+        glDeleteVertexArrays(1, &m_vaoID);
+    if (m_vboID)
+        glDeleteBuffers(1, &m_vboID);
+
+    // build new data array
+    m_numVerts = triangles.size() * 3;
+    int size = m_numVerts * 8;
+    GLfloat vertexData[size];
+
+    int index = 0;
+    foreach (Triangle t, triangles)
+    {
+        if (inBounds(t.a) && inBounds(t.b) && inBounds(t.c))
+        {
+            fillVertex(&index, vertexData, t.a);
+            fillVertex(&index, vertexData, t.b);
+            fillVertex(&index, vertexData, t.c);
+        }
+        else
+            m_numVerts -= 3;
+    }
+
+    cout << index << ", " << (m_numVerts * 8) << endl;
+
+    // Initialize the vertex array object.
+    glGenVertexArrays(1, &m_vaoID);
+    glBindVertexArray(m_vaoID);
+
+    // Initialize the vertex buffer object.
+    glGenBuffers(1, &m_vboID);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
+
+    glBufferData(GL_ARRAY_BUFFER, 8 * m_numVerts * sizeof(GLfloat), vertexData, GL_STATIC_DRAW);
+
+    GLuint position = glGetAttribLocation(shader, "position");
+    GLuint normal = glGetAttribLocation(shader, "normal");
+    GLuint texCoord = glGetAttribLocation(shader, "texCoord");
+
+    glEnableVertexAttribArray(position);
+    glVertexAttribPointer(
+        position,
+        3,                   // Num coordinates per position
+        GL_FLOAT,            // Type
+        GL_FALSE,            // Normalized
+        sizeof(GLfloat) * 8, // Stride
+        (void*) 0            // Array buffer offset
+    );
+    glEnableVertexAttribArray(normal);
+    glVertexAttribPointer(
+        normal,
+        3,                              // Num coordinates per normal
+        GL_FLOAT,                       // Type
+        GL_TRUE,                        // Normalized
+        sizeof(GLfloat) * 8,            // Stride
+        (void*) (sizeof(GLfloat) * 3)   // Array buffer offset
+    );
+    glEnableVertexAttribArray(texCoord);
+    glVertexAttribPointer(
+        texCoord,
+        2,                              // Num coordinates per position
+        GL_FLOAT,                       // Type
+        GL_TRUE,                        // Normalized
+        sizeof(GLfloat) * 8,            // Stride
+        (void*) (sizeof(GLfloat) * 6)   // Array buffer offset
+    );
+
+    // Unbind buffers.
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    m_shader = shader;
+}
+
+void OBJ::fillVertex(int *i, GLfloat *data, Index index)
+{
+    glm::vec3 v = vertices.value(index.vertex);
+    glm::vec3 n = normals.value(index.normal);
+    glm::vec2 c = coords.value(index.coord);
+
+    data[(*i)++] = v.x;
+    data[(*i)++] = v.y;
+    data[(*i)++] = v.z;
+    data[(*i)++] = n.x;
+    data[(*i)++] = n.y;
+    data[(*i)++] = n.z;
+    data[(*i)++] = c.x;
+    data[(*i)++] = c.y;
+}
+
 
 static QString str(const glm::vec2 &v) { return QString("%1 %2").arg(v.x).arg(v.y); }
 static QString str(const glm::vec3 &v) { return QString("%1 %2 %3").arg(v.x).arg(v.y).arg(v.z); }
@@ -96,12 +202,19 @@ inline int relativeIndex(int index, int count)
 OBJ::Index OBJ::getIndex(const QString &str) const
 {
     QStringList parts = str.split('/');
-    int vertex = parts.count() > 0 ? relativeIndex(parts[0].toInt(), vertices.count()) : -1;
-    int coord = parts.count() > 1 ? relativeIndex(parts[1].toInt(), coords.count()) : -1;
-    int normal = parts.count() > 2 ? relativeIndex(parts[2].toInt(), normals.count()) : -1;
+    int vertex = parts.count() > 0 ? relativeIndex(parts[0].toInt(), vertices.size()) : -1;
+    int coord = parts.count() > 1 ? relativeIndex(parts[1].toInt(), coords.size()) : -1;
+    int normal = parts.count() > 2 ? relativeIndex(parts[2].toInt(), normals.size()) : -1;
     return Index(vertex, coord, normal);
 }
 
-void OBJ::drawIndex(const Index &) const
+bool OBJ::inBounds(const Index &index) const
 {
+    if (index.coord < 0 || index.coord >= coords.count())
+        return false;
+    if (index.normal < 0 || index.normal >= normals.count())
+        return false;
+    if (index.vertex < 0 || index.vertex >= vertices.count())
+        return false;
+    return true;
 }

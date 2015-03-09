@@ -19,7 +19,7 @@ public:
     virtual bool animate();
 
     void render();
-    virtual void transformAndRender(GLuint shader, glm::mat4 trans, GLenum mode/*int faces = 0*/);
+    virtual void transformAndRender(GLuint shader, glm::mat4 trans, GLenum mode);
 
     float map(const float val, const float oldMin, const float oldMax, const float newMin, const float newMax);
     glm::vec2 mapPoints(const glm::vec2 val, const glm::vec2 oldMin, const glm::vec2 oldMax,

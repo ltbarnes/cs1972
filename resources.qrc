@@ -22,11 +22,12 @@
     	<file alias="posz.jpg">res/cubemap/posz.jpg</file>
     	<file alias="negz.jpg">res/cubemap/negz.jpg</file>
     </qresource>
-    <qresource prefix="/level">
+    <qresource prefix="/levels">
         <file alias="level_easy.obj">res/levels/level_easy.obj</file>
         <file alias="level_hard.obj">res/levels/level_hard.obj</file>
         <file alias="level_island.obj">res/levels/level_island.obj</file>
         <file alias="level_easy_navmesh.obj">res/levels/level_easy_navmesh.obj</file>
         <file alias="level_island_navmesh.obj">res/levels/level_island_navmesh.obj</file>
+        <file alias="level_island_navmesh_eroded.obj">res/levels/level_island_navmesh_eroded.obj</file>
     </qresource>
 </RCC>

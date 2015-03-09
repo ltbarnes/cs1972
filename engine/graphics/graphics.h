@@ -24,6 +24,11 @@ enum ShapeType
     QUAD, CUBE, CYLINDER, SPHERE, CONE
 };
 
+enum LightType
+{
+    POINT, DIRECTIONAL
+};
+
 struct RenderShape
 {
     ShapeType type;
@@ -39,7 +44,7 @@ struct RenderShape
 struct Light
 {
     int id;
-    int type;
+    LightType type;
     glm::vec3 color;
     glm::vec3 posDir;   // position for point, direction for directional
     glm::vec3 function; // Attenuation function
