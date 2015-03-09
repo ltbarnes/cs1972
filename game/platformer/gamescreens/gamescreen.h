@@ -31,7 +31,7 @@ public:
 private:
     OBJ *m_level;
     Player *player;
-
+    QString m_levelTexture;
 
 };
 

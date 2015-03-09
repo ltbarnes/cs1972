@@ -34,6 +34,11 @@ void OBJ::draw(glm::mat4 trans) const
 //    glEnd();
 }
 
+static bool inBounds(int i, int size)
+{
+    return (i >= 0 && i < size);
+}
+
 bool OBJ::read(const QString &path)
 {
     // Open the file
@@ -86,14 +91,14 @@ void OBJ::createVBO(GLuint shader)
     int index = 0;
     foreach (Triangle t, triangles)
     {
-        if (inBounds(t.a) && inBounds(t.b) && inBounds(t.c))
-        {
+//        if (inBounds(t.a) && inBounds(t.b) && inBounds(t.c))
+//        {
             fillVertex(&index, vertexData, t.a);
             fillVertex(&index, vertexData, t.b);
             fillVertex(&index, vertexData, t.c);
-        }
-        else
-            m_numVerts -= 3;
+//        }
+//        else
+//            m_numVerts -= 3;
     }
 
     cout << index << ", " << (m_numVerts * 8) << endl;
@@ -150,7 +155,7 @@ void OBJ::createVBO(GLuint shader)
 void OBJ::fillVertex(int *i, GLfloat *data, Index index)
 {
     glm::vec3 v = vertices.value(index.vertex);
-    glm::vec3 n = normals.value(index.normal);
+    glm::vec3 n = (inBounds(index.normal, normals.size()) ? normals.value(index.normal) : glm::vec3());
     glm::vec2 c = coords.value(index.coord);
 
     data[(*i)++] = v.x;
@@ -206,15 +211,4 @@ OBJ::Index OBJ::getIndex(const QString &str) const
     int coord = parts.count() > 1 ? relativeIndex(parts[1].toInt(), coords.size()) : -1;
     int normal = parts.count() > 2 ? relativeIndex(parts[2].toInt(), normals.size()) : -1;
     return Index(vertex, coord, normal);
-}
-
-bool OBJ::inBounds(const Index &index) const
-{
-    if (index.coord < 0 || index.coord >= coords.count())
-        return false;
-    if (index.normal < 0 || index.normal >= normals.count())
-        return false;
-    if (index.vertex < 0 || index.vertex >= vertices.count())
-        return false;
-    return true;
 }

@@ -76,6 +76,9 @@ void Graphics::init()
     m_defaultLocs["subPos"] = glGetUniformLocation(m_defaultShader, "subPos");
     m_defaultLocs["repeatUV"] = glGetUniformLocation(m_defaultShader, "repeatUV");
 
+    m_defaultLocs["allBlack"] = glGetUniformLocation(m_defaultShader, "allBlack");
+    m_defaultLocs["allWhite"] = glGetUniformLocation(m_defaultShader, "allWhite");
+
 
     m_sparseShader = Graphics::loadShaders(
                 ":/shaders/sparse.vert",
@@ -329,6 +332,15 @@ void Graphics::resetParticles()
 void Graphics::setParticleForce(glm::vec3 force)
 {
     m_pe->setForce(force);
+}
+
+
+void Graphics::setAllWhite(bool allWhite)
+{
+    if (allWhite)
+        glUniform3f(glGetUniformLocation(m_currentShader, "allWhite"), 1, 1, 1);
+    else
+        glUniform3f(glGetUniformLocation(m_currentShader, "allWhite"), 0, 0, 0);
 }
 
 

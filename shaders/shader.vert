@@ -30,6 +30,7 @@ uniform vec2 subPos = vec2(0.);
 uniform vec2 repeatUV = vec2(1.0);
 
 uniform vec3 allBlack = vec3(1.0);
+uniform vec3 allWhite = vec3(0.0);
 
 void main(){
 
@@ -71,5 +72,5 @@ void main(){
             }
         }
     }
-    color = clamp(color, 0.0, 1.0) * allBlack;
+    color = clamp(color + allWhite, 0.0, 1.0) * allBlack;
 }

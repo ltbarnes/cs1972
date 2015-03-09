@@ -15,7 +15,7 @@ Player::~Player()
 }
 
 
-void Player::onTick(float secs)
+void Player::onTick(float)
 {
     glm::vec3 force = glm::vec3();
     if (m_wsad & 0b1000)

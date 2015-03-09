@@ -11,14 +11,17 @@ PlatformerMenu::PlatformerMenu(Application *parent)
     m_buttonEasy = new Button();
     m_buttonEasy->setCenter(0.f, 0.f);
     m_buttonEasy->setSize(.4, .5);
+    m_buttonEasy->setImage("imageEasy.png");
 
     m_buttonHard = new Button();
     m_buttonHard->setCenter(-.6f, 0.f);
     m_buttonHard->setSize(.4, .5);
+    m_buttonHard->setImage("imageHard.png");
 
     m_buttonIsland = new Button();
     m_buttonIsland->setCenter(.6f, 0.f);
     m_buttonIsland->setSize(.4, .5);
+    m_buttonIsland->setImage("imageIsland.png");
 
     m_cursor = glm::scale(glm::mat4(), glm::vec3(.05, .05, .05));
     m_cursor[3][2] = -.999f;
@@ -39,12 +42,15 @@ void PlatformerMenu::onTick(float) {}
 void PlatformerMenu::onRender(Graphics *g)
 {
     m_parentApp->setUseCubeMap(false);
+    g->setWorldColor(1, 1, 1);
+    g->setColor(1, 1, 1, 1, 0);
 
     g->setGraphicsMode(DRAW2D);
     m_buttonEasy->onDraw(g);
     m_buttonHard->onDraw(g);
     m_buttonIsland->onDraw(g);
 
+    g->setTexture("");
     g->setColor(1, 0, 0, 1, 0);
     g->drawSphere(m_cursor);
 
@@ -66,12 +72,25 @@ void PlatformerMenu::onMouseMoved(QMouseEvent *, float deltaX, float deltaY)
         newY = 1.f;
     m_cursor[3][1] = newY;
 
+    float c = .5f;
+    m_buttonEasy->setColor(c, c, c);
+    m_buttonHard->setColor(c, c, c);
+    m_buttonIsland->setColor(c, c, c);
     if (m_buttonEasy->contains(newX, newY))
+    {
         m_level = 1;
+        m_buttonEasy->setColor(1, 1, 1);
+    }
     else if (m_buttonHard->contains(newX, newY))
+    {
         m_level = 2;
+        m_buttonHard->setColor(1, 1, 1);
+    }
     else if (m_buttonIsland->contains(newX, newY))
+    {
         m_level = 3;
+        m_buttonIsland->setColor(1, 1, 1);
+    }
     else
         m_level = 0;
 }

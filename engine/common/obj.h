@@ -49,7 +49,7 @@ private:
     int m_numVerts;
 
 
-    bool inBounds(const Index &index) const;
+//    bool inBounds(const Index &index) const;
 
 };
 

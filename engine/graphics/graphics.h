@@ -70,6 +70,7 @@ public:
     void setAtlasPosition(float x, float y);
     void setTransparentMode(bool on);
     void setPlayer(glm::vec3 player, int mode);
+    void setAllWhite(bool allWhite);
 
     glm::mat4 getFrustum();
 

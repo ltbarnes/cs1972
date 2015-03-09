@@ -50,11 +50,10 @@ void Button::setImage(QString image)
 void Button::onDraw(Graphics *g)
 {
     g->setWorldColor(1, 1, 1);
+    g->setColor(m_color.r, m_color.g, m_color.b, m_color.a, 0);
 
     if (m_image.size() > 0)
         g->setTexture(m_image);
-    else
-        g->setColor(m_color.r, m_color.g, m_color.b, m_color.a, 0);
 
     g->drawQuad(m_trans);
 }
@@ -65,12 +64,6 @@ bool Button::contains(float x, float y)
     glm::vec2 ul = center - m_size * .5f; // upper left
     glm::vec2 br = center + m_size * .5f; // bottom right
 
-    if (x < ul.x || y < ul.y || x > br.x || y > br.y)
-    {
-        m_color.g = .5f;
-        return false;
-    }
-    m_color.g = 1.f;
-    return true;
+    return !(x < ul.x || y < ul.y || x > br.x || y > br.y);
 }
 
