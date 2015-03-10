@@ -3,8 +3,11 @@
 
 #include "entity.h"
 #include <QString>
+#include <QList>
 
 class CollisionCylinder;
+class Triangle;
+struct TriCollision;
 
 class CollisionShape
 {
@@ -31,12 +34,14 @@ public:
 
     virtual Collision *collides(CollisionShape *shape) = 0;
     virtual Collision *collidesCylinder(CollisionCylinder *cc) = 0;
+    virtual void collidesTriangle(Triangle tri, glm::vec3 d, TriCollision *col) = 0;
 
 protected:
     glm::vec3 m_posRel, m_pos, m_dim;
     QString m_id;
     float m_mass;
     bool m_reactable;
+    Entity *e;
 
 };
 

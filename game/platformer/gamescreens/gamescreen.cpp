@@ -4,6 +4,8 @@
 #include "player.h"
 #include "staticentity.h"
 #include "platformerplayer.h"
+#include "geometriccollisionmanager.h"
+#include "ellipsoid.h"
 
 GameScreen::GameScreen(Application *parent, int level)
     : Screen(parent)
@@ -34,7 +36,26 @@ GameScreen::GameScreen(Application *parent, int level)
     ActionCamera *cam = new ActionCamera();
     cam->setCenter(glm::vec3(0, 2, 0));
 
-    player = new PlatformerPlayer(cam, glm::vec3());
+    PlatformerPlayer *player = new PlatformerPlayer(cam, glm::vec3());
+
+    GeometricCollisionManager *gcm = new GeometricCollisionManager();
+    m_world->addManager(gcm);
+
+    player->addCollisionShape(new Ellipsoid(glm::vec3(0, 1, 0), glm::vec3(.99f, 1.98f, .99f), "player"));
+    player->setPosition(glm::vec3(0, 2, 0));
+
+    RenderShape *rs = new RenderShape();
+    rs->type = SPHERE;
+    rs->color = glm::vec3(0, 1.f, 0);
+    rs->shininess = 32.f;
+    rs->transparency = 1.f;
+    rs->trans = glm::scale(glm::mat4(), glm::vec3(.99f, 1.98f, .99f));
+    rs->texture = "";
+    rs->repeatU = 1.f;
+    rs->repeatV = 1.f;
+    player->addRenderShape(rs);
+
+    m_world->setPlayer(player);
 
     setCamera(cam);
 }
@@ -42,17 +63,14 @@ GameScreen::GameScreen(Application *parent, int level)
 GameScreen::~GameScreen()
 {
     delete m_oh;
-    delete player;
+//    delete player;
     delete m_world;
 }
 
 // update and render
 void GameScreen::onTick(float secs  )
 {
-    // should be world->onTick(secs)
-    player->onTick(secs);
-
-    player->setCameraPos();
+    m_world->onTick(secs);
 }
 
 void GameScreen::onRender(Graphics *g)
@@ -73,12 +91,12 @@ void GameScreen::onRender(Graphics *g)
     m_level->draw(glm::mat4());
     g->setAllWhite(false);
 
-    // world.onDraw(g);
+     m_world->onDraw(g);
 }
 
 void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
 {
-    player->onMouseMoved(e, deltaX, deltaY);
+    m_world->onMouseMoved(e, deltaX, deltaY);
 }
 
 void GameScreen::onMousePressed(QMouseEvent *)
@@ -96,14 +114,14 @@ void GameScreen::onKeyPressed(QKeyEvent *e)
         break;
     default:
         // should be world->onKP(e);
-        player->onKeyPressed(e);
+        m_world->onKeyPressed(e);
         break;
     }
 }
 
 void GameScreen::onKeyReleased(QKeyEvent *e )
 {
-    player->onKeyReleased(e);
+    m_world->onKeyReleased(e);
 }
 
 // unused in game

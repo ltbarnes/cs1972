@@ -23,9 +23,12 @@ public:
     void applyImpulse(glm::vec3 impulse);
     void applyForce(glm::vec3 force);
 
+    glm::vec3 getDestination();
+
 protected:
     float m_mass;
     glm::vec3 m_vel, m_force, m_impulse;
+    glm::vec3 m_destination;
 };
 
 #endif // MOVABLEENTITY_H

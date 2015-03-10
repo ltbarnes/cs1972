@@ -4,9 +4,13 @@ Player::Player(ActionCamera *cam, glm::vec3 pos)
     : MovableEntity(pos)
 {
     m_camera = cam;
+    m_camera->setOffset(15.f);
     m_wsad = 0;
     m_up = false;
     m_down = false;
+
+
+    setMass(1.f);
 }
 
 

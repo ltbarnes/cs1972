@@ -7,9 +7,6 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
 
-#include <iostream>
-using namespace std;
-
 OBJ::OBJ(GLuint shader)
 {
     m_shader = shader;
@@ -100,17 +97,10 @@ void OBJ::createVBO(QList<Triangle *>)
     int index = 0;
     foreach (Tri t, triangles)
     {
-//        if (inBounds(t.a) && inBounds(t.b) && inBounds(t.c))
-//        {
-            fillVertex(&index, vertexData, t.a);
-            fillVertex(&index, vertexData, t.b);
-            fillVertex(&index, vertexData, t.c);
-//        }
-//        else
-//            m_numVerts -= 3;
+        fillVertex(&index, vertexData, t.a);
+        fillVertex(&index, vertexData, t.b);
+        fillVertex(&index, vertexData, t.c);
     }
-
-    cout << index << ", " << (m_numVerts * 8) << endl;
 
     // Initialize the vertex array object.
     glGenVertexArrays(1, &m_vaoID);

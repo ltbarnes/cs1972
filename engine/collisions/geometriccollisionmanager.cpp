@@ -1,6 +1,8 @@
 #include "geometriccollisionmanager.h"
 #include "ellipsoid.h"
 #include "triangle.h"
+#include "movableentity.h"
+#include "world.h"
 
 GeometricCollisionManager::GeometricCollisionManager()
 {
@@ -12,20 +14,20 @@ GeometricCollisionManager::~GeometricCollisionManager()
 }
 
 
-void GeometricCollisionManager::manage(World *world, float onTickSecs)
+void GeometricCollisionManager::manage(World *world, float)
 {
     int iterations = 4;
 
-    QList<Ellipsoid*> ellis;
+    QList<MovableEntity*> ellis;
     QList<Triangle*> triangles;
-    // ideally: ellis = world.getMovableEntities()
-    // ellis.append(world->getPlayer().getCollisionShapes().
+//    ellis = world.getMovableEntities()
+    ellis.append(world->getPlayer());
 
     // triangles = world->getTriangles();
 
     for (int i = 0; i < iterations; i++)
     {
-        QList<TriCollision *> cols = detectEllipsoidTriangleCollisions(ellis, triangles);
+        QList<TriCollision *> cols = detectTriangleCollisions(ellis, triangles);
 
         handleCollisions(cols);
 
@@ -36,51 +38,50 @@ void GeometricCollisionManager::manage(World *world, float onTickSecs)
 }
 
 
-QList<TriCollision* > GeometricCollisionManager::detectEllipsoidTriangleCollisions(
-        QList<Ellipsoid *> ellis, QList<Triangle *> tris)
+QList<TriCollision* > GeometricCollisionManager::detectTriangleCollisions(
+        QList<MovableEntity *> mes, QList<Triangle *> tris)
 {
     float origT;
     QList<TriCollision *> cols;
     TriCollision col, best;
 
-    foreach (Ellipsoid *elli, ellis)
+    foreach (MovableEntity *me, mes)
     {
-        best.e = elli;
+        best.me = me;
+        QList<CollisionShape*> shapes = me->getCollisionShapes();
 
-        glm::vec3 d = (elli->getDestination() - elli->getCenter());
-        origT = d.length();
-        if (origT < 0.00001f)
-            continue; // Ellipsoid hasn't moved
-
-        best.t = origT;
-        d = glm::normalize(d);
-        best.dir = d;
-
-        // put Ellipsoid and ray into sphere space
-        glm::vec3 r = elli->getRadius();
-        Ellipsoid e = Ellipsoid(elli->getCenter() / r, elli->getRadius() / r);
-        glm::vec3 p = e.getCenter();
-        d = d / r;
-
-        glm::vec3 basis;
-        // check for collisions with each triangle in the scene
-        foreach (Triangle *orig, tris)
+        foreach (CollisionShape *cs, shapes)
         {
-            basis = glm::vec3(1 / r.x, 1 / r.y, 1 / r.z);
-            e.intersectTriangle(orig->scale(basis), p, d, &col);
-            if (col.t < best.t)
+            glm::vec3 d = (me->getDestination() - cs->getPos());
+            origT = d.length();
+            if (origT < 0.00001f)
+                continue; // Ellipsoid hasn't moved
+
+            best.t = origT;
+            best.dir = glm::normalize(d);
+
+            // put Ellipsoid and ray into sphere space
+            glm::vec3 r = cs->getDim();
+
+            glm::vec3 basis = glm::vec3(1 / r.x, 1 / r.y, 1 / r.z);
+            // check for collisions with each triangle in the scene
+            foreach (Triangle *tri, tris)
             {
-                best.t = col.t;
-                best.tMinus = origT - col.t;
-                best.type = col.type;
-                best.colPoint = col.colPoint * r;   // back to world space
-                best.colNorm = col.colNorm * basis;     // back to world space
-                best.colNorm = glm::normalize(best.colNorm);
+                cs->collidesTriangle(tri->scale(basis), d, &col);
+                if (col.t < best.t)
+                {
+                    best.t = col.t;
+                    best.tMinus = origT - col.t;
+                    best.type = col.type;
+                    best.colPoint = col.colPoint * r;   // back to world space
+                    best.colNorm = col.colNorm * basis;     // back to world space
+                    best.colNorm = glm::normalize(best.colNorm);
+                }
             }
-        }
-        // collision occured
-        if (best.e != NULL)
-            cols.append(new TriCollision(best));
+            // collision occured
+            if (best.me != NULL)
+                cols.append(new TriCollision(best));
+            }
     }
 
     return cols;
@@ -94,9 +95,9 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
     // handle collisions
     foreach (TriCollision *col, cols)
     {
-        Ellipsoid *e = col->e;
+        MovableEntity *me = col->me;
         glm::vec3 &n = col->colNorm;
-        glm::vec3 hit = e->getCenter() + col->dir * col->t + n * eps;
+        glm::vec3 hit = me->getPosition() + col->dir * col->t + n * eps;
 
         glm::vec3 rem = col->dir * col->tMinus;
 
@@ -109,7 +110,7 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
         glm::vec3 perp = n * (glm::dot(n, rem) / glm::dot(n, n));
         glm::vec3 para = rem - perp;
 
-        e->setCenter(hit + para);
+        me->setPosition(hit + para);
     }
 }
 

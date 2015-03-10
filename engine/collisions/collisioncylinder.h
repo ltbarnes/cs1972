@@ -12,6 +12,7 @@ public:
 
     virtual Collision *collides(CollisionShape *cs);
     virtual Collision *collidesCylinder(CollisionCylinder *cc);
+    virtual void collidesTriangle(Triangle tri, glm::vec3 dest, TriCollision *col);
 };
 
 #endif // COLLISIONCYLINDER_H

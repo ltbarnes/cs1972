@@ -1,25 +1,15 @@
 #include "ellipsoid.h"
 #include "triangle.h"
 
-Ellipsoid::Ellipsoid(glm::vec3 center, glm::vec3 radius)
+Ellipsoid::Ellipsoid(glm::vec3 center, glm::vec3 radius, QString id)
+    : CollisionShape(center, radius, id)
 {
-    m_center = center;
-    m_radius = radius;
 }
 
 
 Ellipsoid::~Ellipsoid()
 {
 }
-
-// getters
-glm::vec3 Ellipsoid::getCenter() { return m_center; }
-glm::vec3 Ellipsoid::getRadius() { return m_radius; }
-glm::vec3 Ellipsoid::getDestination() { return m_dest; }
-
-// setters
-void Ellipsoid::setCenter(glm::vec3 center) { m_center = center; }
-void Ellipsoid::setDestination(glm::vec3 dest) { m_dest = dest; }
 
 
 float Ellipsoid::intersectRay(glm::vec3 p, glm::vec3 d)
@@ -87,8 +77,9 @@ int Ellipsoid::findT(glm::vec3 p, glm::vec3 d, float *t1, float *t2)
  * @param d
  * @return
  */
-void Ellipsoid::intersectTriangle(Triangle tri, glm::vec3 p, glm::vec3 d, TriCollision *col)
+void Ellipsoid::collidesTriangle(Triangle tri, glm::vec3 d, TriCollision *col)
 {
+    glm::vec3 p = getPos() * glm::vec3(1 / m_dim.x, 1 / m_dim.y, 1 / m_dim.z);
     glm::vec3 point, norm;
 
     // plane test
@@ -131,7 +122,6 @@ void Ellipsoid::intersectTriangle(Triangle tri, glm::vec3 p, glm::vec3 d, TriCol
 }
 
 
-void Ellipsoid::handleCollision(TriCollision)
-{
-
-}
+void Ellipsoid::handleCollision(TriCollision) {}
+Collision *Ellipsoid::collides(CollisionShape *) { return NULL; }
+Collision *Ellipsoid::collidesCylinder(CollisionCylinder *) { return NULL; }

@@ -2,9 +2,8 @@
 #define GEOMETRICCOLLISIONMANAGER_H
 
 #include "manager.h"
-
-class Ellipsoid;
-class Triangle;
+#include "collisionshape.h"
+#include "movableentity.h"
 
 enum CollisionType
 {
@@ -19,7 +18,7 @@ struct TriCollision
     glm::vec3 dir;
     glm::vec3 colPoint;
     glm::vec3 colNorm;
-    Ellipsoid *e;
+    MovableEntity *me;
 
     TriCollision() : t(INFINITY) {}
 };
@@ -30,10 +29,10 @@ public:
     GeometricCollisionManager();
     virtual ~GeometricCollisionManager();
 
-    virtual void manage(World *world, float onTickSecs);
+    virtual void manage(World *world, float secs);
 
-    QList<TriCollision *> detectEllipsoidTriangleCollisions(
-            QList<Ellipsoid *> ellis, QList<Triangle *> tris);
+    QList<TriCollision *> detectTriangleCollisions(
+            QList<MovableEntity *> mes, QList<Triangle *> tris);
 
     void handleCollisions(QList<TriCollision *> cols);
 };

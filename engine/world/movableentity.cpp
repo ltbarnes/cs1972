@@ -42,7 +42,8 @@ void MovableEntity::setVelocity(glm::vec3 vel)
 void MovableEntity::onTick(float secs)
 {
     m_vel += (m_force * secs / m_mass) + m_impulse * 1.f / m_mass;
-    setPosition(getPosition() + m_vel * secs);
+//    setPosition(getPosition() + m_vel * secs);
+    m_destination = getPosition() + m_vel * secs;
 
     m_force = glm::vec3(0.f);
     m_impulse = glm::vec3(0.f);
@@ -64,5 +65,11 @@ void MovableEntity::applyImpulse(glm::vec3 impulse)
 void MovableEntity::applyForce(glm::vec3 force)
 {
     m_force += force;
+}
+
+
+glm::vec3 MovableEntity::getDestination()
+{
+    return m_destination;
 }
 

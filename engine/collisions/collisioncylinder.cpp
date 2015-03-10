@@ -1,4 +1,6 @@
 #include "collisioncylinder.h"
+#include "geometriccollisionmanager.h"
+#include "triangle.h"
 #include <glm/common.hpp>
 
 CollisionCylinder::CollisionCylinder(glm::vec3 pos, glm::vec3 dim, QString id)
@@ -71,4 +73,7 @@ Collision *CollisionCylinder::collidesCylinder(CollisionCylinder *cc)
 
     return col;
 }
+
+
+void CollisionCylinder::collidesTriangle(Triangle, glm::vec3, TriCollision *) {}
 

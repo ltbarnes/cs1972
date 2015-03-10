@@ -35,7 +35,7 @@ private:
     QString m_levelTexture;
 
     PlatformerWorld *m_world;
-    PlatformerPlayer *player;
+//    PlatformerPlayer *player;
 
 };
 

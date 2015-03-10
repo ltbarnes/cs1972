@@ -28,6 +28,15 @@ public:
     virtual void onDraw(Graphics *g);
 
     void addManager(Manager *m);
+    void setPlayer(Player *player);
+    Player *getPlayer();
+
+    // mouse events
+    virtual void onMouseMoved(QMouseEvent *e, float deltaX, float deltaY);
+
+    // key events
+    virtual void onKeyPressed(QKeyEvent *e);
+    virtual void onKeyReleased(QKeyEvent *e);
 
 protected:
     Player *m_player;
