@@ -10,6 +10,11 @@
 #include <iostream>
 using namespace std;
 
+OBJ::OBJ(GLuint shader)
+{
+    m_shader = shader;
+}
+
 OBJ::~OBJ()
 {
     if (m_vaoID)
@@ -39,13 +44,15 @@ static bool inBounds(int i, int size)
     return (i >= 0 && i < size);
 }
 
-bool OBJ::read(const QString &path)
+bool OBJ::read(const QString &path, QList<Triangle *> tris)
 {
     // Open the file
     QFile file(path);
     if (!file.open(QFile::ReadOnly | QFile::Text)) return false;
     QTextStream f(&file);
     QString line;
+
+    tris.clear();
 
     // Read the file
     QRegExp spaces("\\s+");
@@ -66,16 +73,18 @@ bool OBJ::read(const QString &path)
             Index b = getIndex(parts[2]);
             for (int i = 3; i < parts.count(); i++) {
                 Index c = getIndex(parts[i]);
-                triangles += Triangle(a, b, c);
+                triangles += Tri(a, b, c);
                 b = c;
             }
         }
     } while (!line.isNull());
 
+    createVBO(tris);
+
     return true;
 }
 
-void OBJ::createVBO(GLuint shader)
+void OBJ::createVBO(QList<Triangle *>)
 {
     // delete old array and buffer
     if (m_vaoID)
@@ -89,7 +98,7 @@ void OBJ::createVBO(GLuint shader)
     GLfloat vertexData[size];
 
     int index = 0;
-    foreach (Triangle t, triangles)
+    foreach (Tri t, triangles)
     {
 //        if (inBounds(t.a) && inBounds(t.b) && inBounds(t.c))
 //        {
@@ -113,9 +122,9 @@ void OBJ::createVBO(GLuint shader)
 
     glBufferData(GL_ARRAY_BUFFER, 8 * m_numVerts * sizeof(GLfloat), vertexData, GL_STATIC_DRAW);
 
-    GLuint position = glGetAttribLocation(shader, "position");
-    GLuint normal = glGetAttribLocation(shader, "normal");
-    GLuint texCoord = glGetAttribLocation(shader, "texCoord");
+    GLuint position = glGetAttribLocation(m_shader, "position");
+    GLuint normal = glGetAttribLocation(m_shader, "normal");
+    GLuint texCoord = glGetAttribLocation(m_shader, "texCoord");
 
     glEnableVertexAttribArray(position);
     glVertexAttribPointer(
@@ -148,8 +157,6 @@ void OBJ::createVBO(GLuint shader)
     // Unbind buffers.
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-    m_shader = shader;
 }
 
 void OBJ::fillVertex(int *i, GLfloat *data, Index index)
@@ -194,7 +201,7 @@ bool OBJ::write(const QString &path) const
     foreach (const glm::vec3 &vertex, vertices) f << "v " << str(vertex) << '\n';
     foreach (const glm::vec2 &coord, coords) f << "vt " << str(coord) << '\n';
     foreach (const glm::vec3 &normal, normals) f << "vn " << str(normal) << '\n';
-    foreach (const Triangle &tri, triangles) f << "f " << str(tri.a) << ' ' << str(tri.b) << ' ' << str(tri.c) << '\n';
+    foreach (const Tri &tri, triangles) f << "f " << str(tri.a) << ' ' << str(tri.b) << ' ' << str(tri.c) << '\n';
 
     return true;
 }

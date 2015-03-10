@@ -64,7 +64,10 @@ SOURCES += \
 ### platformer
     game/platformer/gamescreens/platformermenu.cpp \
     game/platformer/gamescreens/gamescreen.cpp \
-    engine/world/player.cpp
+    engine/world/player.cpp \
+    engine/collisions/triangle.cpp \
+    engine/collisions/geometriccollisionmanager.cpp \
+    engine/collisions/ellipsoid.cpp
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.cpp \
 #    game/minecraft/gamescreens/gamescreen.cpp \
@@ -121,7 +124,10 @@ HEADERS += \
 ### platformer
     game/platformer/gamescreens/platformermenu.h \
     game/platformer/gamescreens/gamescreen.h \
-    engine/world/player.h
+    engine/world/player.h \
+    engine/collisions/triangle.h \
+    engine/collisions/geometriccollisionmanager.h \
+    engine/collisions/ellipsoid.h
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.h \
 #    game/minecraft/gamescreens/gamescreen.h \

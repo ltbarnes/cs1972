@@ -7,24 +7,25 @@ GameScreen::GameScreen(Application *parent, int level)
     : Screen(parent)
 {
     m_parentApp->setUseCubeMap(false);
-    m_level = new OBJ();
+    m_level = new OBJ(m_parentApp->getShader(DEFAULT));
+
+    QList<Triangle *> tris;
 
     switch (level)
     {
     case 2:
         m_levelTexture = "level_hard.png";
-        m_level->read(":/objects/level_hard.obj");
+        m_level->read(":/objects/level_hard.obj", tris);
         break;
     case 3:
         m_levelTexture = "level_island.png";
-        m_level->read(":/objects/level_island.obj");
+        m_level->read(":/objects/level_island.obj", tris);
         break;
     default: // 1
         m_levelTexture = "level_easy.png";
-        m_level->read(":/objects/level_easy.obj");
+        m_level->read(":/objects/level_easy.obj", tris);
         break;
     }
-    m_level->createVBO(m_parentApp->getShader(DEFAULT));
 
 
     ActionCamera *cam = new ActionCamera();

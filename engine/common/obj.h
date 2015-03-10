@@ -5,6 +5,7 @@
 #include <glm.hpp>
 #include <QList>
 
+class Triangle;
 // A simple parser that reads and writes Wavefront .obj files
 class OBJ
 {
@@ -19,27 +20,28 @@ public:
         Index(int vertex, int coord, int normal) : vertex(vertex), coord(coord), normal(normal) {}
     };
 
-    struct Triangle
+    struct Tri
     {
         Index a, b, c;
 
-        Triangle() {}
-        Triangle(const Index &a, const Index &b, const Index &c) : a(a), b(b), c(c) {}
+        Tri() {}
+        Tri(const Index &a, const Index &b, const Index &c) : a(a), b(b), c(c) {}
     };
 
+    OBJ(GLuint shader);
     ~OBJ();
 
     QList<glm::vec3> vertices;
     QList<glm::vec2> coords;
     QList<glm::vec3> normals;
-    QList<Triangle> triangles;
+    QList<Tri> triangles;
 
     void draw(glm::mat4 trans) const;
-    bool read(const QString &path);
+    bool read(const QString &path, QList<Triangle *> tris);
     bool write(const QString &path) const;
-    void createVBO(GLuint shader);
 
 private:
+    void createVBO(QList<Triangle *> triangles);
     Index getIndex(const QString &str) const;
     void fillVertex(int *i, GLfloat *data, Index index);
 
