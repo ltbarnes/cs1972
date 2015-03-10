@@ -2,12 +2,14 @@
 #include "application.h"
 #include "actioncamera.h"
 #include "player.h"
+#include "staticentity.h"
+#include "platformerplayer.h"
 
 GameScreen::GameScreen(Application *parent, int level)
     : Screen(parent)
 {
-    m_parentApp->setUseCubeMap(false);
-    m_level = new OBJ(m_parentApp->getShader(DEFAULT));
+    m_oh = new ObjectHandler();
+    GLuint shader = m_parentApp->getShader(DEFAULT);
 
     QList<Triangle *> tris;
 
@@ -15,31 +17,33 @@ GameScreen::GameScreen(Application *parent, int level)
     {
     case 2:
         m_levelTexture = "level_hard.png";
-        m_level->read(":/objects/level_hard.obj", tris);
+        m_level = m_oh->getObject(":/objects/level_hard.obj", shader, tris);
         break;
     case 3:
         m_levelTexture = "level_island.png";
-        m_level->read(":/objects/level_island.obj", tris);
+        m_level = m_oh->getObject(":/objects/level_island.obj", shader, tris);
         break;
     default: // 1
         m_levelTexture = "level_easy.png";
-        m_level->read(":/objects/level_easy.obj", tris);
+        m_level = m_oh->getObject(":/objects/level_easy.obj", shader, tris);
         break;
     }
 
+    m_world = new PlatformerWorld();
 
     ActionCamera *cam = new ActionCamera();
     cam->setCenter(glm::vec3(0, 2, 0));
 
-    player = new Player(cam, glm::vec3());
+    player = new PlatformerPlayer(cam, glm::vec3());
 
     setCamera(cam);
 }
 
 GameScreen::~GameScreen()
 {
-    delete m_level;
+    delete m_oh;
     delete player;
+    delete m_world;
 }
 
 // update and render

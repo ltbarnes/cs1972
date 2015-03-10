@@ -2,9 +2,10 @@
 #define GAMESCREEN_H
 
 #include "screen.h"
-#include "obj.h"
+#include "objecthandler.h"
+#include "platformerworld.h"
 
-class Player; // TEMP, SHOULD BE IN WORLD
+class PlatformerPlayer; // TEMP, SHOULD BE IN WORLD
 
 class GameScreen : public Screen
 {
@@ -29,9 +30,12 @@ public:
     virtual void onKeyReleased(QKeyEvent *e);
 
 private:
+    ObjectHandler *m_oh;
     OBJ *m_level;
-    Player *player;
     QString m_levelTexture;
+
+    PlatformerWorld *m_world;
+    PlatformerPlayer *player;
 
 };
 

@@ -3,6 +3,7 @@
 
 #include "movableentity.h"
 #include "staticentity.h"
+#include "player.h"
 #include <QList>
 
 class Manager;
@@ -29,9 +30,7 @@ public:
     void addManager(Manager *m);
 
 protected:
-    // TODO: Move to a CollisionManager
-//    virtual void detectCollisions(float secs);
-//    virtual void handleCollisions();
+    Player *m_player;
 
     QList<StaticEntity *> m_staticEntities;
     QList<MovableEntity *> m_movableEntities;
@@ -40,8 +39,6 @@ protected:
     QList<MovableEntity *> m_me2Delete;
 
     QList<Manager *> m_managers;
-//    VoxelManager *m_vm;
-
 };
 
 #endif // WORLD_H

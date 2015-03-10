@@ -67,7 +67,11 @@ SOURCES += \
     engine/world/player.cpp \
     engine/collisions/triangle.cpp \
     engine/collisions/geometriccollisionmanager.cpp \
-    engine/collisions/ellipsoid.cpp
+    engine/collisions/ellipsoid.cpp \
+    engine/world/staticobject.cpp \
+    engine/common/objecthandler.cpp \
+    game/platformer/world/platformerworld.cpp \
+    game/platformer/entities/platformerplayer.cpp
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.cpp \
 #    game/minecraft/gamescreens/gamescreen.cpp \
@@ -127,7 +131,11 @@ HEADERS += \
     engine/world/player.h \
     engine/collisions/triangle.h \
     engine/collisions/geometriccollisionmanager.h \
-    engine/collisions/ellipsoid.h
+    engine/collisions/ellipsoid.h \
+    engine/world/staticobject.h \
+    engine/common/objecthandler.h \
+    game/platformer/world/platformerworld.h \
+    game/platformer/entities/platformerplayer.h
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.h \
 #    game/minecraft/gamescreens/gamescreen.h \
