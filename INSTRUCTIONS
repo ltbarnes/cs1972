@@ -1,58 +1,14 @@
-Project: Minecraft 3
+Project: Platformer 2
 Student: Logan Barnes (ltbarnes)
 
-
-Operation Conic Capture:
-
-	You are being tasked with a relic acquisition mission on a lone dark asteroid. The ghosts inhabiting the surface come and go as they please and are known to cause damage to your cylinder race. When using items that create light (like say maybe a jetpack) the ghosts may investigate the area where the light last came from. Find high ground to increase your chances of survival.
-
-	You have a scanner bot to help you locate the lost relic. Press 'E' to deploy the bot and follow it to high ground. When the bot reaches some highground it will begin to scan for the missing relic. When the relic is located, acquire it and return to the hill where your bot is waiting.
-
-	Important Notes:
-		If the bot is scanning for a while it is possible our reconnaissance was not successful and you were deployed farther from the relic than anticipated. Fly around the world and redeploy the bot until the relic is located.
-
-		The relic is heavy so when you try flying with it you may be a little sluggish. You've been warned.
-
-		If you fly too high you risk getting hit by asteroid debris and dying.
-
-
-	Good luck.
-
-
-	TL;DR
-		Start the game, press 'E', follow the arrows, avoid the cubes. You have a jetpack.
+Run around.
 
 
 Controls:
 
-	General:
-
-	   E 			- 		Action (deploy bot / pickup relic)
-
-
-	Ground:
-
 	 WASD 			- 		horizontal movement
 	 space			-		jump
 
-
-	Air:
-
-	 shift 			- 		enable jetpack
-	 WASD 			- 		horizontal forces
-	 space 			- 		vertical boost
-
-		Enabling jetback mode won't lift you off the ground but it will slow your descent.
-		To gain altitude use the boost (but be careful not to jet too high).
-
-
-
-	Create Mode:
-
-	 WASD 			- 		horizontal movement
-	  E 			- 				up
-	  Q 			- 			   down
-	 Shift(hold) 	- 	   slow down all movement
-	 Left Click 	- 			 add block
-	 Right Click 	- 		   remove block
+	 +/- 			-  		change camera zoom
+  Backspace 		- 		back to menu
 

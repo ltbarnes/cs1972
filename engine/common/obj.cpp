@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QStringList>
+#include "triangle.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
@@ -41,7 +42,7 @@ static bool inBounds(int i, int size)
     return (i >= 0 && i < size);
 }
 
-bool OBJ::read(const QString &path, QList<Triangle *> tris)
+bool OBJ::read(const QString &path, QList<Triangle *> *tris)
 {
     // Open the file
     QFile file(path);
@@ -49,7 +50,7 @@ bool OBJ::read(const QString &path, QList<Triangle *> tris)
     QTextStream f(&file);
     QString line;
 
-    tris.clear();
+    tris->clear();
 
     // Read the file
     QRegExp spaces("\\s+");
@@ -71,17 +72,18 @@ bool OBJ::read(const QString &path, QList<Triangle *> tris)
             for (int i = 3; i < parts.count(); i++) {
                 Index c = getIndex(parts[i]);
                 triangles += Tri(a, b, c);
+                tris->append(new Triangle(vertices[a.vertex], vertices[b.vertex], vertices[c.vertex]));
                 b = c;
             }
         }
     } while (!line.isNull());
 
-    createVBO(tris);
+    createVBO();
 
     return true;
 }
 
-void OBJ::createVBO(QList<Triangle *>)
+void OBJ::createVBO()
 {
     // delete old array and buffer
     if (m_vaoID)

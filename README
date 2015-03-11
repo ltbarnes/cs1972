@@ -1,67 +1,51 @@
-Project: Minecraft 3
+Project: Platformer 2
 Student: Logan Barnes (ltbarnes)
 
 
 COMPILED USING QT 5.2.0!!!
 
 
-Voxel Engine Requirements
+Common Engine Requirements
 ========================================
-[ ] Analytic voxel-based raycasting
-	### engine/voxel/voxelmanager had a castray method used in the game/world/minecraftworld class.
-[ ] Automated chunk streaming 
-	### all handled in the engine/voxel/voxelmanager class.
-	[ ] Chunks within a certain distance of a selected focus point are automatically loaded into the game
+[ ] Able to load OBJ models using the support code
+	### engine/common/OBJ
+[ ] Able to render OBJ models using the support code
+	### had to to a little adjusting for the new API
+[ ] Stores only one copy of any single model (never load the same model twice)
+	### engine/common/ObjectHander keeps track of loaded objects
 
-######## RETRY ADDITION: ################
-		If any entity can potentially pass into an unloaded chunk during collision detection that chunks is loaded on the spot before collision detection continues to ensure no entities pass through the level (engine/voxel/VoxelManager::checkCollision1D())
-
-		Blocks close to the player are loaded before surrounding blocks to prevent reduce automatic loading of blocks during collision detection (engine/voxel/VoxelManager::manage())
-
-
-	[ ] Loaded chunks outside a certain distance are unloaded from the game
-		### checkCenterPosition() within VoxelManager uses the camera eye point to accomplish loading and unloading chunks.
-
+Geometric Engine Requirements
+========================================
+[ ] Analytic collision response
+	[ ] Collision response slides for at least N iterations of the sweep test in the plane horizontal to collision (N = 4 is a good value)
+		### engine/collisions/GeometricCollisionManager sets the iteration count in the manage() function.
+	[ ] Collision response implement with the straight sliding hack for ramps
+		### in engine/collisions/GeometricCollisionManager handleCollisions() method
 
 Game Requirements
 ========================================
-[ ] Addition and removal of blocks
-	### This functionality didn't seem to fit in the game so there is a separate create mode showing this capability
-	[ ] Ray shot from the camera eye extending along the look vector
-		### handled in game/world/minecraftworld onTick() method.
-	[ ] Visual highlighting of the nearest intersected face
-		### selectedFace stored in game/world/minecraftworld. Easily seen in create mode.
-	[ ] Targeted block can be removed
-	[ ] Block can be added to the empty block adjacent to the targeted face
-	[ ] Addition or removal of blocks updates the appropriate VBO's
-		### addition and removal are passed from the minecraftworld to the VoxelManager to the game/world/mcchunkbuilder where the vbo is recreated and passed to the respective chunk.
-[ ] Continuous chunk streaming
-	[ ] Chunks within 2 chunks of the player must be in memory
-		### uses a radius of 6 passed to the engine/voxel/voxelmanager constructor.
-	[ ] Chunks further than this distance must be unloaded from memory (you do not need to save changes to unloaded chunks)
-		### handled in the checkCenterPosition() method of VoxelManager.
-	[ ] Initialization of newly visible chunks must be spread across multiple frames or performed in a separate thread
-		### the VoxelManager loads a single chunk at the end of its manage() method which is called once per tick.
-[ ] Simplistic enemies
-	[ ] Spawn either at the beginning of the game or at intervals during play
-		### game/entities/enemy are ghosts that spawn and disappear around the player
-	[ ] Collide and interact with both the world and the player
-		### collisions are detected and handled in the game/world/mccollisionmanager
-	[ ] No complex AI required, but cannot remain stationary or jump in place
-		### ghosts move toward the last location where light was seen and damage the player if contact is made.
-[ ] It must be possible to restart the game without quitting the program
+[ ] Collision debugger support code is not present
+	### couldn't really use it with the new API anyway
+[ ] Movement and view controls must be the same as warmup and minecraft (including gravity and jumping)
+	### yup. engine/world/Player is a generic class to handle this since it's a requirement for every game.
+	### game/platformer/entities/PlatformerPlayer implements the Player class for platformer.
+[ ] The camera must be able to use a 3rd-person view
+	### press + or - to zoom
+[ ] The player must be drawn as an ellipsoid
+	### added in the game/platformer/gamescreens/GameScreen adds this in the constructor.
+[ ] The game must have a menu screen that allows the player to choose between different levels (different OBJ models)
+	### game/platformer/gamescreens/PlatformerMenu
+[ ] The player must be able to return to the menu screen without restarting the program
 	### press backspace
-[ ] The game must have at least two screens
-	### has a menu, create, game, and gameover screen all located in game/gamescreens
 
 
 Issues:
-	
-	-Raycasting doesn't work when the camera is outside the chunks. Not a problem for games when the player is constrained to the world but becomes an issue when using a free cam for creation and such.
+
+	I'm sure there are plenty of bugs but I haven't noticed any yet in my very limited testing.
 	-FPS prints to the console.
 	-Compiled with Qt5.2.0
 
 
 ~Hours:
-  48
+  20
 

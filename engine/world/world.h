@@ -4,6 +4,7 @@
 #include "movableentity.h"
 #include "staticentity.h"
 #include "player.h"
+#include "triangle.h"
 #include <QList>
 
 class Manager;
@@ -14,6 +15,7 @@ public:
     World();
     virtual ~World();
 
+    void addToMesh(QList<Triangle *> tris);
     void addMovableEntity(MovableEntity *me);
     void addStaticEntity(StaticEntity *se);
     bool removeMovableEntity(MovableEntity *me, bool clearMem);
@@ -21,6 +23,7 @@ public:
 
     QList<MovableEntity *> getMovableEntities();
     QList<StaticEntity *> getStaticEntities();
+    QList<Triangle *> getMesh();
 
     void setToDeleteMovable(MovableEntity *me);
 
@@ -28,6 +31,7 @@ public:
     virtual void onDraw(Graphics *g);
 
     void addManager(Manager *m);
+    void setGravity(glm::vec3 gravity);
     void setPlayer(Player *player);
     Player *getPlayer();
 
@@ -43,11 +47,13 @@ protected:
 
     QList<StaticEntity *> m_staticEntities;
     QList<MovableEntity *> m_movableEntities;
+    QList<Triangle *> m_mesh;
 
     QList<Collision *> m_collisions;
     QList<MovableEntity *> m_me2Delete;
 
     QList<Manager *> m_managers;
+    glm::vec3 m_gravity;
 };
 
 #endif // WORLD_H

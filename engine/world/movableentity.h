@@ -24,6 +24,7 @@ public:
     void applyForce(glm::vec3 force);
 
     glm::vec3 getDestination();
+    void setDestination(glm::vec3 destination);
 
 protected:
     float m_mass;

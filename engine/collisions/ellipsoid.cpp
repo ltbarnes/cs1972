@@ -98,6 +98,7 @@ void Ellipsoid::collidesTriangle(Triangle tri, glm::vec3 d, TriCollision *col)
             col->colPoint = point;
             col->colNorm = norm;
             col->type = EDGE;
+//            assert(glm::length(norm) > 0.00001f);
         }
 
         // vertices
@@ -108,8 +109,9 @@ void Ellipsoid::collidesTriangle(Triangle tri, glm::vec3 d, TriCollision *col)
             {
                 col->t = t;
                 col->colPoint = tri.vertices[i];
-                col->colNorm = (p + d * col->t) - col->colPoint;
+                col->colNorm = norm;
                 col->type = VERTEX;
+//                assert(glm::length(norm) > 0.00001f);
             }
         }
     }
@@ -118,6 +120,7 @@ void Ellipsoid::collidesTriangle(Triangle tri, glm::vec3 d, TriCollision *col)
         col->colPoint = point;
         col->colNorm = norm;
         col->type = PLANE;
+//        assert(glm::length(norm) > 0.00001f);
     }
 }
 

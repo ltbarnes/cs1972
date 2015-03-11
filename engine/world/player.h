@@ -31,14 +31,14 @@ public:
     virtual void onKeyPressed(QKeyEvent *e);
     virtual void onKeyReleased(QKeyEvent *e);
 
-//    virtual void handleCollision(Collision *col);
+    virtual void handleCollision(Collision *col);
 
 private:
     ActionCamera *m_camera;
+    float m_offset;
 
     int m_wsad;
-    bool m_up, m_down;
-//    bool m_canJump, m_jump;
+    bool m_canJump, m_jump;
 };
 
 #endif // PLAYER_H
