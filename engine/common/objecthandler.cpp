@@ -13,7 +13,7 @@ ObjectHandler::~ObjectHandler()
 }
 
 
-OBJ *ObjectHandler::getObject(const QString &path, GLuint shader, QList<Triangle *> tris)
+OBJ *ObjectHandler::getObject(const QString &path, GLuint shader, QList<Triangle *> *tris)
 {
     OBJ* obj;
     obj = m_objects.value(path, NULL);

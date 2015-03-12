@@ -1,6 +1,10 @@
 #include "movableentity.h"
 #include "collisionshape.h"
 
+#include <iostream>
+using namespace std;
+#include <glm/ext.hpp>
+
 MovableEntity::MovableEntity(glm::vec3 pos)
     : Entity(pos)
 {
@@ -9,6 +13,8 @@ MovableEntity::MovableEntity(glm::vec3 pos)
 
     m_force = glm::vec3();
     m_impulse = glm::vec3();
+
+    m_destination = pos;
 }
 
 MovableEntity::~MovableEntity() {}
@@ -71,5 +77,10 @@ void MovableEntity::applyForce(glm::vec3 force)
 glm::vec3 MovableEntity::getDestination()
 {
     return m_destination;
+}
+
+void MovableEntity::setDestination(glm::vec3 destination)
+{
+    m_destination = destination;
 }
 

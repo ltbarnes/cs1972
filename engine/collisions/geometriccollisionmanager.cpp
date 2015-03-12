@@ -4,6 +4,9 @@
 #include "movableentity.h"
 #include "world.h"
 
+#define GLM_FORCE_RADIANS
+#include <glm/gtx/norm.hpp>
+
 GeometricCollisionManager::GeometricCollisionManager()
 {
 }
@@ -20,10 +23,9 @@ void GeometricCollisionManager::manage(World *world, float)
 
     QList<MovableEntity*> ellis;
     QList<Triangle*> triangles;
-//    ellis = world.getMovableEntities()
-    ellis.append(world->getPlayer());
 
-    // triangles = world->getTriangles();
+    ellis.append(world->getPlayer());
+    triangles = world->getMesh();
 
     for (int i = 0; i < iterations; i++)
     {
@@ -53,21 +55,24 @@ QList<TriCollision* > GeometricCollisionManager::detectTriangleCollisions(
         foreach (CollisionShape *cs, shapes)
         {
             glm::vec3 d = (me->getDestination() - cs->getPos());
-            origT = d.length();
+            origT = glm::length(d);
             if (origT < 0.00001f)
                 continue; // Ellipsoid hasn't moved
 
             best.t = origT;
-            best.dir = glm::normalize(d);
+            d = glm::normalize(d);
+            best.dir = d;
 
             // put Ellipsoid and ray into sphere space
             glm::vec3 r = cs->getDim();
+            d = d / r;
 
             glm::vec3 basis = glm::vec3(1 / r.x, 1 / r.y, 1 / r.z);
             // check for collisions with each triangle in the scene
             foreach (Triangle *tri, tris)
             {
                 cs->collidesTriangle(tri->scale(basis), d, &col);
+
                 if (col.t < best.t)
                 {
                     best.t = col.t;
@@ -79,9 +84,8 @@ QList<TriCollision* > GeometricCollisionManager::detectTriangleCollisions(
                 }
             }
             // collision occured
-            if (best.me != NULL)
-                cols.append(new TriCollision(best));
-            }
+            cols.append(new TriCollision(best));
+        }
     }
 
     return cols;
@@ -91,6 +95,7 @@ QList<TriCollision* > GeometricCollisionManager::detectTriangleCollisions(
 void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
 {
     float eps = 0.00001f;
+    glm::vec3 up = glm::vec3(0, 1, 0);
 
     // handle collisions
     foreach (TriCollision *col, cols)
@@ -100,17 +105,36 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
         glm::vec3 hit = me->getPosition() + col->dir * col->t + n * eps;
 
         glm::vec3 rem = col->dir * col->tMinus;
+        glm::vec3 para;
 
-        if (col->type == PLANE)
+        if (glm::length2(col->colNorm) > eps)
         {
-            rem = rem - (glm::dot(n, rem) / glm::dot(n, glm::vec3(0, 1, 0)) * glm::vec3(0, 1, 0));
-            float tMinus = glm::length(rem - glm::dot(n, rem) * n);
-            rem = glm::normalize(rem) * tMinus;
-        }
-        glm::vec3 perp = n * (glm::dot(n, rem) / glm::dot(n, n));
-        glm::vec3 para = rem - perp;
 
-        me->setPosition(hit + para);
+            if (col->type == PLANE && glm::dot(n, up) > 0.0001f) // do ramp hack
+            {
+                rem = rem - (glm::dot(n, rem) / glm::dot(n, up) * up);
+                float tMinus = glm::length(rem - glm::dot(n, rem) * n);
+                if (tMinus > 0.000001f)
+                    rem = glm::normalize(rem) * tMinus;
+                else
+                    rem = glm::vec3();
+            }
+            glm::vec3 perp = n * (glm::dot(n, rem));
+            para = rem - perp;
+
+            glm::vec3 vel = me->getVelocity();
+            vel -= n * glm::dot(n, vel);
+            me->setVelocity(vel);
+        }
+        else
+            para = glm::vec3();
+
+        me->setDestination(hit + para);
+        me->setPosition(hit);
+
+        Collision c;
+        c.impulse = n;
+        me->handleCollision(&c);
     }
 }
 

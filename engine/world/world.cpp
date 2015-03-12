@@ -10,6 +10,7 @@ World::World()
     m_managers.clear();
 
     m_player = NULL;
+    m_gravity = glm::vec3();
 }
 
 World::~World()
@@ -22,6 +23,13 @@ World::~World()
         delete c;
     foreach(Manager *m, m_managers)
         delete m;
+    foreach(Triangle * t, m_mesh)
+        delete t;
+}
+
+void World::addToMesh(QList<Triangle *> tris)
+{
+    m_mesh.append(tris);
 }
 
 void World::addMovableEntity(MovableEntity *me)
@@ -65,6 +73,11 @@ QList<StaticEntity *> World::getStaticEntities()
     return m_staticEntities;
 }
 
+QList<Triangle *> World::getMesh()
+{
+    return m_mesh;
+}
+
 void World::onTick(float secs)
 {
     foreach(MovableEntity *me, m_me2Delete)
@@ -72,6 +85,11 @@ void World::onTick(float secs)
         removeMovableEntity(me, true);
     }
     m_me2Delete.clear();
+
+    foreach(MovableEntity *me, m_movableEntities)
+    {
+        me->applyForce(m_gravity * me->getMass());
+    }
 
     // update (tick) movableEntities
     foreach(Entity *e, m_movableEntities)
@@ -126,6 +144,11 @@ void World::setPlayer(Player *player)
         delete m_player;
     m_player = player;
     addMovableEntity(m_player);
+}
+
+void World::setGravity(glm::vec3 gravity)
+{
+    m_gravity = gravity;
 }
 
 // mouse events

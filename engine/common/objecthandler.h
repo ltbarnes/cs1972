@@ -11,7 +11,7 @@ public:
     ObjectHandler();
     virtual ~ObjectHandler();
 
-    OBJ *getObject(const QString &path, GLuint shader, QList<Triangle *> tris);
+    OBJ *getObject(const QString &path, GLuint shader, QList<Triangle *> *tris);
 
 private:
     QHash<QString, OBJ *> m_objects;

@@ -19,30 +19,33 @@ GameScreen::GameScreen(Application *parent, int level)
     {
     case 2:
         m_levelTexture = "level_hard.png";
-        m_level = m_oh->getObject(":/objects/level_hard.obj", shader, tris);
+        m_level = m_oh->getObject(":/objects/level_hard.obj", shader, &tris);
         break;
     case 3:
         m_levelTexture = "level_island.png";
-        m_level = m_oh->getObject(":/objects/level_island.obj", shader, tris);
+        m_level = m_oh->getObject(":/objects/level_island.obj", shader, &tris);
         break;
     default: // 1
         m_levelTexture = "level_easy.png";
-        m_level = m_oh->getObject(":/objects/level_easy.obj", shader, tris);
+        m_level = m_oh->getObject(":/objects/level_easy.obj", shader, &tris);
         break;
     }
 
     m_world = new PlatformerWorld();
+    m_world->addToMesh(tris);
 
     ActionCamera *cam = new ActionCamera();
     cam->setCenter(glm::vec3(0, 2, 0));
 
-    PlatformerPlayer *player = new PlatformerPlayer(cam, glm::vec3());
+    glm::vec3 playerPos = glm::vec3(0, 2, 0);
+    PlatformerPlayer *player = new PlatformerPlayer(cam, playerPos);
 
     GeometricCollisionManager *gcm = new GeometricCollisionManager();
     m_world->addManager(gcm);
 
-    player->addCollisionShape(new Ellipsoid(glm::vec3(0, 1, 0), glm::vec3(.99f, 1.98f, .99f), "player"));
-    player->setPosition(glm::vec3(0, 2, 0));
+    Ellipsoid *e = new Ellipsoid(glm::vec3(0, 0, 0), glm::vec3(.49f, .98f, .49f), "player");
+    e->updatePos(playerPos);
+    player->addCollisionShape(e);
 
     RenderShape *rs = new RenderShape();
     rs->type = SPHERE;
@@ -56,6 +59,7 @@ GameScreen::GameScreen(Application *parent, int level)
     player->addRenderShape(rs);
 
     m_world->setPlayer(player);
+    m_world->setGravity(glm::vec3(0, -10, 0));
 
     setCamera(cam);
 }
@@ -63,7 +67,6 @@ GameScreen::GameScreen(Application *parent, int level)
 GameScreen::~GameScreen()
 {
     delete m_oh;
-//    delete player;
     delete m_world;
 }
 
@@ -113,7 +116,6 @@ void GameScreen::onKeyPressed(QKeyEvent *e)
         m_parentApp->popScreens(1);
         break;
     default:
-        // should be world->onKP(e);
         m_world->onKeyPressed(e);
         break;
     }

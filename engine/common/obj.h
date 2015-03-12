@@ -37,11 +37,11 @@ public:
     QList<Tri> triangles;
 
     void draw(glm::mat4 trans) const;
-    bool read(const QString &path, QList<Triangle *> tris);
+    bool read(const QString &path, QList<Triangle *> *tris);
     bool write(const QString &path) const;
 
 private:
-    void createVBO(QList<Triangle *> triangles);
+    void createVBO();
     Index getIndex(const QString &str) const;
     void fillVertex(int *i, GLfloat *data, Index index);
 
