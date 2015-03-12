@@ -21,7 +21,8 @@ INCLUDEPATH += glm engine game shaders \
                # game/warmup1/gamescreens game/warmup1/world game/warmup1/entities \ # warmup
                # game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ # minecraft
                game/platformer/gamescreens game/platformer/world game/platformer/entities \ # platformer
-               res/images res/images/cubemap res/levels
+               res/images res/images/cubemap res/levels \
+               LeapSDK/include
 DEPENDPATH +=  glm engine game shaders \
                engine/common engine/ui engine/graphics \
                engine/shapes engine/world engine/voxel \
@@ -30,6 +31,7 @@ DEPENDPATH +=  glm engine game shaders \
                # game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ # minecraft
                game/platformer/gamescreens game/platformer/world game/platformer/entities \ # platformer
                res/images res/images/cubemap res/levels
+               LeapSDK/include
 DEFINES += TIXML_USE_STL
 OTHER_FILES += shaders/shader.frag shaders/shader.vert
 
@@ -71,7 +73,8 @@ SOURCES += \
     engine/world/staticobject.cpp \
     engine/common/objecthandler.cpp \
     game/platformer/world/platformerworld.cpp \
-    game/platformer/entities/platformerplayer.cpp
+    game/platformer/entities/platformerplayer.cpp \
+    engine/leaphandler.cpp
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.cpp \
 #    game/minecraft/gamescreens/gamescreen.cpp \
@@ -135,7 +138,8 @@ HEADERS += \
     engine/world/staticobject.h \
     engine/common/objecthandler.h \
     game/platformer/world/platformerworld.h \
-    game/platformer/entities/platformerplayer.h
+    game/platformer/entities/platformerplayer.h \
+    engine/leaphandler.h
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.h \
 #    game/minecraft/gamescreens/gamescreen.h \
