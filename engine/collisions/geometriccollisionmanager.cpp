@@ -80,7 +80,8 @@ QList<TriCollision* > GeometricCollisionManager::detectTriangleCollisions(
                     best.type = col.type;
                     best.colPoint = col.colPoint * r;   // back to world space
                     best.colNorm = col.colNorm * basis;     // back to world space
-                    best.colNorm = glm::normalize(best.colNorm);
+                    if (glm::length2(best.colNorm) > 0.00001f)
+                        best.colNorm = glm::normalize(best.colNorm);
                 }
             }
             // collision occured

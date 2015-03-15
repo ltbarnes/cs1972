@@ -1,10 +1,6 @@
 #include "movableentity.h"
 #include "collisionshape.h"
 
-#include <iostream>
-using namespace std;
-#include <glm/ext.hpp>
-
 MovableEntity::MovableEntity(glm::vec3 pos)
     : Entity(pos)
 {

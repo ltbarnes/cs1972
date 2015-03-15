@@ -98,7 +98,7 @@ void Ellipsoid::collidesTriangle(Triangle tri, glm::vec3 d, TriCollision *col)
             col->colPoint = point;
             col->colNorm = norm;
             col->type = EDGE;
-//            assert(glm::length(norm) > 0.00001f);
+            assert(glm::length(norm) > 0.00001f);
         }
 
         // vertices

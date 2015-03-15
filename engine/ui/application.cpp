@@ -6,6 +6,7 @@ Application::Application()
 
     // create graphics object
     m_g = new Graphics();
+    m_leapController = NULL;
 }
 
 Application::~Application()
@@ -17,6 +18,9 @@ Application::~Application()
         delete s;
 
     delete m_g;
+
+    if (m_leapController)
+        delete m_leapController;
 }
 
 void Application::init(Screen *initScreen)
@@ -49,6 +53,38 @@ void Application::popScreens(int num)
             break;
         }
     }
+}
+
+bool Application::isUsingLeapMotion()
+{
+    return (m_leapController != NULL);
+}
+
+void Application::useLeapMotion(bool useLeap)
+{
+    if (useLeap)
+    {
+        // already using leap
+        if (m_leapController)
+            return;
+
+        // not using leap. Create a controller
+        m_leapController = new Leap::Controller();
+    }
+    else // not using leap
+    {
+        // delete controller to stop the data flow
+        if (m_leapController)
+        {
+            delete m_leapController;
+            m_leapController = NULL;
+        }
+    }
+}
+
+Leap::Frame Application::getLeapFrame()
+{
+    return m_leapController->frame();
 }
 
 void Application::onTick(float secs)
