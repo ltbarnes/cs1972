@@ -42,6 +42,7 @@ private:
     bool m_drawEllipsoid;
     bool m_drawPoint;
     bool m_mouseDown;
+    bool m_drawNavMesh;
 
     Ellipsoid* m_ellipsoid;
     glm::vec3 m_point;

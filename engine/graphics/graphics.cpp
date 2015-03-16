@@ -10,6 +10,7 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 //#include "printing.h"
 #include <iostream>
@@ -19,6 +20,7 @@ using namespace std;
 
 Graphics::Graphics()
 {
+    m_line = new Line(1);
     m_quad = new Shape(10);
     m_cone = new Cone(50);
     m_cube = new Cube(10);
@@ -41,6 +43,7 @@ Graphics::Graphics()
 Graphics::~Graphics()
 {
     // shapes
+    delete m_line;
     delete m_quad;
     delete m_cone;
     delete m_cube;
@@ -111,6 +114,7 @@ void Graphics::init()
 
     m_cubeMap->init();
 
+    m_line->init(m_defaultShader);
     m_quad->init(m_defaultShader);
     m_cone->init(m_defaultShader);
     m_cube->init(m_defaultShader);
@@ -364,6 +368,34 @@ void Graphics::addLight(const Light &light)
                 glm::value_ptr(light.color));
     glUniform3fv(glGetUniformLocation(m_defaultShader, ("lightAttenuations" + indexString).c_str()), 1,
             glm::value_ptr(light.function));
+}
+
+
+void Graphics::drawLineSeg(glm::vec3 p1, glm::vec3 p2, float width, GLenum mode)
+{
+    glm::vec3 d = p2 - p1;
+
+    if (glm::dot(d, d) < 0.00001f)
+    {
+        m_line->transformAndRender(m_currentShader,
+                                   glm::scale(glm::mat4(), glm::vec3(0.00001f)), mode);
+        return;
+    }
+
+    float dmag = glm::length(d);
+    glm::vec3 dn = glm::normalize(d);
+    glm::vec3 v = glm::vec3(0, 1, 0);
+
+    glm::mat4 trans = glm::translate(glm::mat4(), p1 + d * .5f);
+    trans *= glm::rotate(glm::mat4(), glm::angle(dn, v), glm::cross(v, dn));
+    trans *= glm::scale(glm::mat4(), glm::vec3(width, dmag, width));
+    m_cyl->transformAndRender(m_currentShader, trans, mode);
+}
+
+
+void Graphics::drawLine(glm::mat4 trans, GLenum mode)
+{
+    m_line->transformAndRender(m_defaultShader, trans, mode);
 }
 
 

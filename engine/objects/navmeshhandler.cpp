@@ -25,7 +25,10 @@ void NavMeshHandler::setObject(OBJ *obj)
         delete m_obj;
     m_obj = obj;
     if (m_obj)
+    {
         m_shader = obj->getShader();
+        buildGraph();
+    }
 }
 
 bool NavMeshHandler::hasObject()
@@ -107,6 +110,12 @@ void NavMeshHandler::fillVertex(int *index, GLfloat *data, glm::vec3 v)
     data[(*index)++] = v.x;
     data[(*index)++] = v.y;
     data[(*index)++] = v.z;
+}
+
+
+void NavMeshHandler::buildGraph()
+{
+
 }
 
 

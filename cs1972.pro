@@ -60,10 +60,10 @@ SOURCES += \
     engine/shapes/cone.cpp \
     engine/shapes/facecube.cpp \
     engine/collisions/collisioncylinder.cpp \
-    engine/collisions/triangle.cpp \
     engine/collisions/geometriccollisionmanager.cpp \
     engine/collisions/ellipsoid.cpp \
     engine/collisions/collisionmanager.cpp \
+    engine/collisions/triangle.cpp \
     engine/voxel/chunk.cpp \
     engine/voxel/voxelmanager.cpp \
 ### platformer
@@ -71,7 +71,8 @@ SOURCES += \
     game/platformer/gamescreens/gamescreen.cpp \
     game/platformer/world/platformerworld.cpp \
     game/platformer/entities/platformerplayer.cpp \
-    engine/objects/navmeshhandler.cpp
+    engine/objects/navmeshhandler.cpp \
+    engine/shapes/line.cpp
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.cpp \
 #    game/minecraft/gamescreens/gamescreen.cpp \
@@ -135,7 +136,8 @@ HEADERS += \
     game/platformer/gamescreens/gamescreen.h \
     game/platformer/world/platformerworld.h \
     game/platformer/entities/platformerplayer.h \
-    engine/objects/navmeshhandler.h
+    engine/objects/navmeshhandler.h \
+    engine/shapes/line.h
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.h \
 #    game/minecraft/gamescreens/gamescreen.h \

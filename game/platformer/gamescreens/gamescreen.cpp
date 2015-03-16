@@ -7,11 +7,19 @@
 #include "geometriccollisionmanager.h"
 #include "triangle.h"
 
-//#include <glm/ext.hpp>
+#include <glm/ext.hpp>
 
 GameScreen::GameScreen(Application *parent, int level)
     : Screen(parent)
 {
+//    glm::vec4 p1 = glm::vec4(0, 0, 0, 1);
+//    glm::vec4 p2 = glm::vec4(1, 0, 0, 1);
+//    glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(0, 0, -1));
+//    glm::mat4 s = glm::scale(glm::mat4(), glm::vec3(500.f));
+//    glm::mat4 r = glm::rotate(glm::mat4(), glm::radians(450.f), glm::vec3(0, 0, 1));
+//    cout << glm::to_string(t*s*r*p1) << endl;
+//    cout << glm::to_string(t*s*r*p2) << endl;
+
     m_oh = new ObjectHandler();
     m_nmh = new NavMeshHandler();
     GLuint shader = m_parentApp->getShader(DEFAULT);
@@ -51,21 +59,6 @@ GameScreen::GameScreen(Application *parent, int level)
     GeometricCollisionManager *gcm = new GeometricCollisionManager();
     m_world->addManager(gcm);
 
-    Ellipsoid *e = new Ellipsoid(glm::vec3(0, 0, 0), glm::vec3(.49f, .98f, .49f), "player");
-    e->updatePos(playerPos);
-    player->addCollisionShape(e);
-
-    RenderShape *rs = new RenderShape();
-    rs->type = SPHERE;
-    rs->color = glm::vec3(0, 1.f, 0);
-    rs->shininess = 32.f;
-    rs->transparency = 1.f;
-    rs->trans = glm::scale(glm::mat4(), glm::vec3(.99f, 1.98f, .99f));
-    rs->texture = "";
-    rs->repeatU = 1.f;
-    rs->repeatV = 1.f;
-    player->addRenderShape(rs);
-
     m_world->setPlayer(player);
     m_world->setGravity(glm::vec3(0, -10, 0));
 
@@ -74,6 +67,7 @@ GameScreen::GameScreen(Application *parent, int level)
     m_drawEllipsoid = false;
     m_drawPoint = false;
     m_mouseDown = false;
+    m_drawNavMesh = false;
 
     m_ellipsoid = new Ellipsoid(glm::vec3(), glm::vec3(.25f, .5, .25f), "rayshape");
 }
@@ -105,7 +99,7 @@ void GameScreen::onTick(float secs  )
         {
             m_drawEllipsoid = true;
             glm::vec3 pos = p + d * t;
-            pos += tri->normal * m_ellipsoid->getDim();
+//            pos += tri->normal * m_ellipsoid->getDim();
             m_ellipsoid->setPosition(pos);
         }
     }
@@ -128,6 +122,7 @@ void GameScreen::onRender(Graphics *g)
 {
     g->setWorldColor(.1, .1, .1);
     g->setColor(1, 1, 1, 1, 0);
+
 
     Light light1;
     light1.type = POINT;
@@ -161,7 +156,7 @@ void GameScreen::onRender(Graphics *g)
         g->drawSphere(trans);
     }
 
-    if (m_nmh->hasObject())
+    if (m_drawNavMesh && m_nmh->hasObject())
     {
         g->setColor(0, 1, 1, .3f, 0);
         trans = glm::translate(glm::mat4(), glm::vec3(0, .3f, 0));
@@ -172,6 +167,8 @@ void GameScreen::onRender(Graphics *g)
         g->setTransparentMode(false);
         m_nmh->drawLines(trans);
     }
+    g->setColor(0, 0, 0, 1, 0);
+    g->drawLineSeg(glm::vec3(5, 6, 2), glm::vec3(-5, 6, -2), .1f);
 }
 
 void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
@@ -184,6 +181,8 @@ void GameScreen::onMousePressed(QMouseEvent *)
 }
 void GameScreen::onKeyReleased(QKeyEvent *e )
 {
+    if (e->key() == Qt::Key_N)
+        m_drawNavMesh = !m_drawNavMesh;
     m_world->onKeyReleased(e);
 }
 void GameScreen::onMouseDragged(QMouseEvent *e, float deltaX, float deltaY)

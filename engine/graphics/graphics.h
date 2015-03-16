@@ -7,6 +7,7 @@
 #include "camera.h"
 #include "cubemap.h"
 #include "shape.h"
+#include "line.h"
 #include "cone.h"
 #include "cube.h"
 #include "cylinder.h"
@@ -21,7 +22,7 @@ enum GraphicsMode
 
 enum ShapeType
 {
-    QUAD, CUBE, CYLINDER, SPHERE, CONE
+    LINE, QUAD, CUBE, CYLINDER, SPHERE, CONE
 };
 
 enum LightType
@@ -80,6 +81,8 @@ public:
 
     void addLight(const Light &light);
 
+    void drawLineSeg(glm::vec3 p1, glm::vec3 p2, float width, GLenum mode = GL_TRIANGLE_STRIP);
+    void drawLine(glm::mat4 trans, GLenum mode = GL_TRIANGLE_STRIP);
     void drawQuad(glm::mat4 trans, GLenum mode = GL_TRIANGLE_STRIP);
     void drawCone(glm::mat4 trans, GLenum mode = GL_TRIANGLE_STRIP);
     void drawCube(glm::mat4 trans, GLenum mode = GL_TRIANGLE_STRIP);
@@ -117,6 +120,7 @@ private:
     glm::mat4 m_currProj;
     glm::mat4 m_currView;
 
+    Shape *m_line;
     Shape *m_quad;
     Shape *m_cone;
     Shape *m_cube;
