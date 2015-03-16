@@ -29,7 +29,7 @@ public:
     };
 
     OBJ(GLuint shader);
-    ~OBJ();
+    virtual ~OBJ();
 
     QList<glm::vec3> vertices;
     QList<glm::vec2> coords;
@@ -40,18 +40,19 @@ public:
     bool read(const QString &path, QList<Triangle *> *tris);
     bool write(const QString &path) const;
 
+    GLuint getShader();
+
+protected:
+    virtual void createVBO();
+    GLuint m_shader;
+
 private:
-    void createVBO();
     Index getIndex(const QString &str) const;
     void fillVertex(int *i, GLfloat *data, Index index);
 
-    GLuint m_shader;
     GLuint m_vaoID;
     GLuint m_vboID;
     int m_numVerts;
-
-
-//    bool inBounds(const Index &index) const;
 
 };
 

@@ -7,32 +7,35 @@
 #include "geometriccollisionmanager.h"
 #include "triangle.h"
 
-#include <glm/ext.hpp>
+//#include <glm/ext.hpp>
 
 GameScreen::GameScreen(Application *parent, int level)
     : Screen(parent)
 {
     m_oh = new ObjectHandler();
+    m_nmh = new NavMeshHandler();
     GLuint shader = m_parentApp->getShader(DEFAULT);
 
     QList<Triangle *> tris;
+    QList<Triangle *> *navTris = m_nmh->getTriangleList();
 
     switch (level)
     {
     case 2:
         m_levelTexture = "level_hard.png";
         m_level = m_oh->getObject(":/objects/level_hard.obj", shader, &tris);
-        m_navMesh = NULL;
         break;
     case 3:
         m_levelTexture = "level_island.png";
         m_level = m_oh->getObject(":/objects/level_island.obj", shader, &tris);
-        m_navMesh = m_oh->getObject(":/objects/level_island_navmesh.obj", shader, &m_navTris);
+        m_nmh->setObject(m_oh->getObject(":/objects/level_island_navmesh.obj", shader, navTris));
+        m_nmh->createVBO();
         break;
     default: // 1
         m_levelTexture = "level_easy.png";
         m_level = m_oh->getObject(":/objects/level_easy.obj", shader, &tris);
-        m_navMesh = m_oh->getObject(":/objects/level_easy_navmesh.obj", shader, &m_navTris);
+        m_nmh->setObject(m_oh->getObject(":/objects/level_easy_navmesh.obj", shader, navTris));
+        m_nmh->createVBO();
         break;
     }
 
@@ -78,6 +81,7 @@ GameScreen::GameScreen(Application *parent, int level)
 GameScreen::~GameScreen()
 {
     delete m_oh;
+    delete m_nmh;
     delete m_world;
     delete m_ellipsoid;
 }
@@ -157,12 +161,16 @@ void GameScreen::onRender(Graphics *g)
         g->drawSphere(trans);
     }
 
-    if (m_navMesh)
+    if (m_nmh->hasObject())
     {
-        g->setTransparentMode(true);
         g->setColor(0, 1, 1, .3f, 0);
-        m_navMesh->draw(glm::translate(glm::mat4(), glm::vec3(0, .001f, 0)));
+        trans = glm::translate(glm::mat4(), glm::vec3(0, .3f, 0));
+
+        g->setTransparentMode(true);
+        m_nmh->draw(trans);
+
         g->setTransparentMode(false);
+        m_nmh->drawLines(trans);
     }
 }
 

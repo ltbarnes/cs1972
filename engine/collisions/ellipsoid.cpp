@@ -1,9 +1,9 @@
 #include "ellipsoid.h"
 #include "triangle.h"
 
-#include <iostream>
-using namespace std;
-#include <glm/ext.hpp>
+//#include <iostream>
+//using namespace std;
+//#include <glm/ext.hpp>
 
 Ellipsoid::Ellipsoid(glm::vec3 center, glm::vec3 radius, QString id)
     : CollisionShape(center, radius, id)
@@ -20,8 +20,8 @@ float Ellipsoid::intersectRayWorldSpace(glm::vec3 p, glm::vec3 d)
 {
     p = (p - getPos()) * glm::vec3(1 / m_dim.x, 1 / m_dim.y, 1 / m_dim.z);
     d = glm::vec3(d.x / m_dim.x, d.y / m_dim.y, d.z / m_dim.z);
-    cout << "P: " << glm::to_string(p) << endl;
-    cout << "D: " << glm::to_string(d) << endl;
+//    cout << "P: " << glm::to_string(p) << endl;
+//    cout << "D: " << glm::to_string(d) << endl;
     return intersectRay(p, d);
 }
 

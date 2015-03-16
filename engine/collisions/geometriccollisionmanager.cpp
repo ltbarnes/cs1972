@@ -7,9 +7,9 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/norm.hpp>
 
-#include <iostream>
-using namespace std;
-#include <glm/ext.hpp>
+//#include <iostream>
+//using namespace std;
+//#include <glm/ext.hpp>
 
 GeometricCollisionManager::GeometricCollisionManager()
 {
@@ -35,8 +35,8 @@ void GeometricCollisionManager::manage(World *world, float)
     {
         QList<TriCollision *> cols = detectTriangleCollisions(ellis, triangles);
 
-        if (!cols.isEmpty())
-            cout << i << ": " << glm::to_string(cols.first()->colNorm) << endl;
+//        if (!cols.isEmpty())
+//            cout << i << ": " << glm::to_string(cols.first()->colNorm) << endl;
         handleCollisions(cols);
 
         // delete collisions
@@ -114,8 +114,6 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
         glm::vec3 rem = col->dir * col->tMinus;
         glm::vec3 para;
 
-        glm::vec3 vel = me->getVelocity();
-        cout << "vel: " << glm::to_string(vel) << endl;
         if (glm::length2(col->colNorm) > eps)
         {
             if (col->type == PLANE && glm::dot(n, up) > 0.0001f) // do ramp hack
@@ -126,22 +124,18 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
                     rem = glm::normalize(rem) * tMinus;
                 else
                     rem = glm::vec3();
-
-                if (glm::length2(vel) > 0.000001f)
-                    vel -= vel * glm::abs(n);
-                else
-                    vel = glm::vec3();
             }
-            else
-                if (glm::length2(vel) > 0.000001f)
-                    vel -= vel * glm::abs(n);
-                else
-                    vel = glm::vec3();
 
             glm::vec3 perp = n * (glm::dot(n, rem));
             para = rem - perp;
 
-            cout << "vel2: " << glm::to_string(vel) << endl;
+            glm::vec3 vel = me->getVelocity();
+//            cout << "vel: " << glm::to_string(vel) << endl;
+            if (glm::length2(vel) > 0.000001f)
+                vel -= vel * glm::abs(n);
+            else
+                vel = glm::vec3();
+//            cout << "vel2: " << glm::to_string(vel) << endl;
             me->setVelocity(vel);
         }
         else

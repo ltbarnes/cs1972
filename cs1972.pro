@@ -17,7 +17,7 @@ macx {
 INCLUDEPATH += glm engine game shaders \
                engine/common engine/ui engine/graphics \
                engine/shapes engine/world engine/voxel \
-               engine/collisions engine/leap \
+               engine/collisions engine/objects engine/leap \
                # game/warmup1/gamescreens game/warmup1/world game/warmup1/entities \ # warmup
                # game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ # minecraft
                game/platformer/gamescreens game/platformer/world game/platformer/entities \ # platformer
@@ -25,7 +25,7 @@ INCLUDEPATH += glm engine game shaders \
 DEPENDPATH +=  glm engine game shaders \
                engine/common engine/ui engine/graphics \
                engine/shapes engine/world engine/voxel \
-               engine/collisions engine/leap \
+               engine/collisions engine/objects engine/leap \
                # game/warmup1/gamescreens game/warmup1/world game/warmup1/entities \ # warmup
                # game/minecraft/gamescreens game/minecraft/world game/minecraft/entities \ # minecraft
                game/platformer/gamescreens game/platformer/world game/platformer/entities \ # platformer
@@ -40,15 +40,19 @@ SOURCES += \
     engine/ui/application.cpp \
     engine/ui/button.cpp \
     engine/common/point3d.cpp \
-    engine/common/obj.cpp \
+    engine/common/perlinnoise.cpp \
+    engine/objects/obj.cpp \
+    engine/objects/objecthandler.cpp \
     engine/graphics/graphics.cpp \
     engine/graphics/cubemap.cpp \
     engine/graphics/camera.cpp \
     engine/graphics/actioncamera.cpp \
+    engine/graphics/particleemitter.cpp \
     engine/world/world.cpp \
     engine/world/entity.cpp \
     engine/world/movableentity.cpp \
     engine/world/staticentity.cpp \
+    engine/world/player.cpp \
     engine/shapes/shape.cpp \
     engine/shapes/cube.cpp \
     engine/shapes/cylinder.cpp \
@@ -56,22 +60,18 @@ SOURCES += \
     engine/shapes/cone.cpp \
     engine/shapes/facecube.cpp \
     engine/collisions/collisioncylinder.cpp \
-    engine/voxel/chunk.cpp \
-    engine/voxel/voxelmanager.cpp \
-    engine/common/perlinnoise.cpp \
-    engine/graphics/particleemitter.cpp \
-    engine/collisions/collisionmanager.cpp \
-### platformer
-    game/platformer/gamescreens/platformermenu.cpp \
-    game/platformer/gamescreens/gamescreen.cpp \
-    engine/world/player.cpp \
     engine/collisions/triangle.cpp \
     engine/collisions/geometriccollisionmanager.cpp \
     engine/collisions/ellipsoid.cpp \
-    engine/world/staticobject.cpp \
-    engine/common/objecthandler.cpp \
+    engine/collisions/collisionmanager.cpp \
+    engine/voxel/chunk.cpp \
+    engine/voxel/voxelmanager.cpp \
+### platformer
+    game/platformer/gamescreens/platformermenu.cpp \
+    game/platformer/gamescreens/gamescreen.cpp \
     game/platformer/world/platformerworld.cpp \
-    game/platformer/entities/platformerplayer.cpp
+    game/platformer/entities/platformerplayer.cpp \
+    engine/objects/navmeshhandler.cpp
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.cpp \
 #    game/minecraft/gamescreens/gamescreen.cpp \
@@ -101,15 +101,20 @@ HEADERS += \
     engine/ui/screen.h \
     engine/ui/button.h \
     engine/common/point3d.h \
-    engine/common/obj.h \
+    engine/common/perlinnoise.h \
+    engine/objects/obj.h \
+    engine/objects/objecthandler.h \
     engine/graphics/graphics.h \
     engine/graphics/cubemap.h \
     engine/graphics/camera.h \
     engine/graphics/actioncamera.h \
+    engine/graphics/particleemitter.h \
     engine/world/world.h \
     engine/world/entity.h \
     engine/world/movableentity.h \
     engine/world/staticentity.h \
+    engine/world/manager.h \
+    engine/world/player.h \
     engine/shapes/shape.h \
     engine/shapes/cube.h \
     engine/shapes/cylinder.h \
@@ -118,24 +123,19 @@ HEADERS += \
     engine/shapes/facecube.h \
     engine/collisions/collisionshape.h \
     engine/collisions/collisioncylinder.h \
-    engine/voxel/chunk.h \
-    engine/voxel/voxelmanager.h \
-    engine/voxel/chunkbuilder.h \
-    engine/world/manager.h \
-    engine/common/perlinnoise.h \
-    engine/graphics/particleemitter.h \
-    engine/collisions/collisionmanager.h \
-### platformer
-    game/platformer/gamescreens/platformermenu.h \
-    game/platformer/gamescreens/gamescreen.h \
-    engine/world/player.h \
     engine/collisions/triangle.h \
     engine/collisions/geometriccollisionmanager.h \
     engine/collisions/ellipsoid.h \
-    engine/world/staticobject.h \
-    engine/common/objecthandler.h \
+    engine/collisions/collisionmanager.h \
+    engine/voxel/chunk.h \
+    engine/voxel/voxelmanager.h \
+    engine/voxel/chunkbuilder.h \
+### platformer
+    game/platformer/gamescreens/platformermenu.h \
+    game/platformer/gamescreens/gamescreen.h \
     game/platformer/world/platformerworld.h \
-    game/platformer/entities/platformerplayer.h
+    game/platformer/entities/platformerplayer.h \
+    engine/objects/navmeshhandler.h
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.h \
 #    game/minecraft/gamescreens/gamescreen.h \

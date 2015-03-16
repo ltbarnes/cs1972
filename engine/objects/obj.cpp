@@ -11,6 +11,8 @@
 OBJ::OBJ(GLuint shader)
 {
     m_shader = shader;
+    m_vaoID = 0;
+    m_vboID = 0;
 }
 
 OBJ::~OBJ()
@@ -21,20 +23,17 @@ OBJ::~OBJ()
         glDeleteBuffers(1, &m_vboID);
 }
 
+GLuint OBJ::getShader()
+{
+    return m_shader;
+}
+
 void OBJ::draw(glm::mat4 trans) const
 {
     glBindVertexArray(m_vaoID);
     glUniformMatrix4fv(glGetUniformLocation(m_shader, "model"), 1, GL_FALSE, glm::value_ptr(trans));
     glDrawArrays(GL_TRIANGLES, 0, m_numVerts);
     glBindVertexArray(0);
-
-//    glBegin(GL_TRIANGLES);
-//    foreach (const Triangle &tri, triangles) {
-//        drawIndex(tri.a);
-//        drawIndex(tri.b);
-//        drawIndex(tri.c);
-//    }
-//    glEnd();
 }
 
 static bool inBounds(int i, int size)
