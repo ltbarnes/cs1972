@@ -29,6 +29,7 @@ public:
 
     virtual void onTick(float secs);
     virtual void onDraw(Graphics *g);
+//    void setCameraPos();
 
     void addManager(Manager *m);
     void setGravity(glm::vec3 gravity);

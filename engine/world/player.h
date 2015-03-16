@@ -5,6 +5,8 @@
 #include "actioncamera.h"
 #include <QMouseEvent>
 
+#define EYE_HEIGHT .75f
+
 class Player : public MovableEntity
 {
 public:
@@ -16,13 +18,10 @@ public:
 //    virtual void onDrawTransparent(Graphics *g);
 
     void setCameraPos();
+    glm::vec3 getEyePos();
 
-//    void grabAlly();
-//    bool hasAlly();
 //    void decreaseHealth(int amount);
 //    int getHealth();
-
-//    int getMode();
 
     // mouse events
     virtual void onMouseMoved(QMouseEvent *e, float deltaX, float deltaY);
@@ -33,7 +32,7 @@ public:
 
     virtual void handleCollision(Collision *col);
 
-private:
+protected:
     ActionCamera *m_camera;
     float m_offset;
 

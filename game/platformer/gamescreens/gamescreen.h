@@ -4,6 +4,7 @@
 #include "screen.h"
 #include "objecthandler.h"
 #include "platformerworld.h"
+#include "ellipsoid.h"
 
 class PlatformerPlayer; // TEMP, SHOULD BE IN WORLD
 
@@ -31,11 +32,19 @@ public:
 
 private:
     ObjectHandler *m_oh;
-    OBJ *m_level;
     QString m_levelTexture;
+    OBJ *m_level;
+    OBJ *m_navMesh;
 
     PlatformerWorld *m_world;
-//    PlatformerPlayer *player;
+    QList<Triangle*> m_navTris;
+
+    bool m_drawEllipsoid;
+    bool m_drawPoint;
+    bool m_mouseDown;
+
+    Ellipsoid* m_ellipsoid;
+    glm::vec3 m_point;
 
 };
 

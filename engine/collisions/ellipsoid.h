@@ -15,6 +15,9 @@ public:
     virtual Collision *collidesCylinder(CollisionCylinder *cc);
     virtual void collidesTriangle(Triangle tri, glm::vec3 d, TriCollision *col);
 
+    void setPosition(glm::vec3 pos);
+
+    float intersectRayWorldSpace(glm::vec3 p, glm::vec3 d);
     float intersectRay(glm::vec3 p, glm::vec3 d);
 
     void handleCollision(TriCollision col);

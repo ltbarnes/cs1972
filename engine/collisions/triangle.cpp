@@ -31,8 +31,10 @@ float Triangle::intersectPlane(glm::vec3 p, glm::vec3 d, glm::vec3 *colPoint, gl
         t = INFINITY;
     else
     {
-        *colPoint = point;
-        *colNorm = normal;
+        if (colPoint)
+            *colPoint = point;
+        if (colNorm)
+            *colNorm = normal;
     }
 
     return t;
@@ -48,24 +50,30 @@ float Triangle::intersectEdges(glm::vec3 p, glm::vec3 d, glm::vec3 *colPoint, gl
     if (t > 0.f && t < bestT)
     {
         bestT = t;
-        *colPoint = point;
-        *colNorm = norm;
+        if (colPoint)
+            *colPoint = point;
+        if (colNorm)
+            *colNorm = norm;
     }
 
     t = intersectEdge(p, d, 1, 2, &point, &norm);
     if (t > 0.f && t < bestT)
     {
         bestT = t;
-        *colPoint = point;
-        *colNorm = norm;
+        if (colPoint)
+            *colPoint = point;
+        if (colNorm)
+            *colNorm = norm;
     }
 
     t = intersectEdge(p, d, 2, 0, &point, &norm);
     if (t > 0.f && t < bestT)
     {
         bestT = t;
-        *colPoint = point;
-        *colNorm = norm;
+        if (colPoint)
+            *colPoint = point;
+        if (colNorm)
+            *colNorm = norm;
     }
 
     return bestT;

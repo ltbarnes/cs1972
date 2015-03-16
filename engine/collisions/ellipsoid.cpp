@@ -1,6 +1,10 @@
 #include "ellipsoid.h"
 #include "triangle.h"
 
+#include <iostream>
+using namespace std;
+#include <glm/ext.hpp>
+
 Ellipsoid::Ellipsoid(glm::vec3 center, glm::vec3 radius, QString id)
     : CollisionShape(center, radius, id)
 {
@@ -9,6 +13,16 @@ Ellipsoid::Ellipsoid(glm::vec3 center, glm::vec3 radius, QString id)
 
 Ellipsoid::~Ellipsoid()
 {
+}
+
+
+float Ellipsoid::intersectRayWorldSpace(glm::vec3 p, glm::vec3 d)
+{
+    p = (p - getPos()) * glm::vec3(1 / m_dim.x, 1 / m_dim.y, 1 / m_dim.z);
+    d = glm::vec3(d.x / m_dim.x, d.y / m_dim.y, d.z / m_dim.z);
+    cout << "P: " << glm::to_string(p) << endl;
+    cout << "D: " << glm::to_string(d) << endl;
+    return intersectRay(p, d);
 }
 
 
@@ -109,9 +123,9 @@ void Ellipsoid::collidesTriangle(Triangle tri, glm::vec3 d, TriCollision *col)
             {
                 col->t = t;
                 col->colPoint = tri.vertices[i];
-                col->colNorm = norm;
+                col->colNorm = (p + d * col->t) - col->colPoint;
                 col->type = VERTEX;
-//                assert(glm::length(norm) > 0.00001f);
+                assert(glm::length(col->colNorm) > 0.00001f);
             }
         }
     }
@@ -120,8 +134,13 @@ void Ellipsoid::collidesTriangle(Triangle tri, glm::vec3 d, TriCollision *col)
         col->colPoint = point;
         col->colNorm = norm;
         col->type = PLANE;
-//        assert(glm::length(norm) > 0.00001f);
+        assert(glm::length(norm) > 0.00001f);
     }
+}
+
+void Ellipsoid::setPosition(glm::vec3 pos)
+{
+    m_pos = pos;
 }
 
 

@@ -104,6 +104,11 @@ void World::onTick(float secs)
     m_player->setCameraPos();
 }
 
+//void World::setCameraPos()
+//{
+//    m_player->setCameraPos();
+//}
+
 void World::onDraw(Graphics *g)
 {
     foreach(Manager *m, m_managers)

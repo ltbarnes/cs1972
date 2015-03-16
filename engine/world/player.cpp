@@ -38,7 +38,7 @@ void Player::onTick(float secs)
     if (m_wsad & 0b0001)
         force.x += 1;
     if (m_jump && m_canJump)
-        force.y += 10.f;
+        force.y += 15.f;
 
     glm::vec4 look = m_camera->getLook();
 
@@ -59,7 +59,13 @@ void Player::onTick(float secs)
 
 void Player::setCameraPos()
 {
-    m_camera->setCenter(getPosition() + glm::vec3(0, 2, 0));
+    m_camera->setCenter(getPosition() + glm::vec3(0, EYE_HEIGHT, 0));
+}
+
+
+glm::vec3 Player::getEyePos()
+{
+    return (getPosition() + glm::vec3(0, EYE_HEIGHT, 0));
 }
 
 
