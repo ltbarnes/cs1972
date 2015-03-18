@@ -1,7 +1,7 @@
-Project: Platformer 2
+Project: Platformer 2.4
 Student: Logan Barnes (ltbarnes)
 
-Run around.
+Platformer 2.4.1u7 
 
 
 Controls:
@@ -11,4 +11,7 @@ Controls:
 
 	 +/- 			-  		change camera zoom
   Backspace 		- 		back to menu
+
+  	  N 			- 		toggles navigation mesh
+  click/drag        - 		place arbitrary ellipse
 

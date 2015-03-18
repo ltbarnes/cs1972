@@ -17,6 +17,12 @@ Common Engine Requirements
 Geometric Engine Requirements
 ========================================
 [ ] Analytic collision response
+	
+	#################### RETRY ######################
+	### I believe I located the zero vector that was being normalized and haven't had any random black screens in a while.
+	### Fixed some other issues with camera positions and such too.
+	#################################################
+
 	[ ] Collision response slides for at least N iterations of the sweep test in the plane horizontal to collision (N = 4 is a good value)
 		### engine/collisions/GeometricCollisionManager sets the iteration count in the manage() function.
 	[ ] Collision response implement with the straight sliding hack for ramps

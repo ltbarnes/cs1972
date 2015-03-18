@@ -7,18 +7,11 @@
 #include "geometriccollisionmanager.h"
 #include "triangle.h"
 
-#include <glm/ext.hpp>
+//#include <glm/ext.hpp>
 
 GameScreen::GameScreen(Application *parent, int level)
     : Screen(parent)
 {
-//    glm::vec4 p1 = glm::vec4(0, 0, 0, 1);
-//    glm::vec4 p2 = glm::vec4(1, 0, 0, 1);
-//    glm::mat4 t = glm::translate(glm::mat4(), glm::vec3(0, 0, -1));
-//    glm::mat4 s = glm::scale(glm::mat4(), glm::vec3(500.f));
-//    glm::mat4 r = glm::rotate(glm::mat4(), glm::radians(450.f), glm::vec3(0, 0, 1));
-//    cout << glm::to_string(t*s*r*p1) << endl;
-//    cout << glm::to_string(t*s*r*p2) << endl;
 
     m_oh = new ObjectHandler();
     m_nmh = new NavMeshHandler();
@@ -107,7 +100,6 @@ void GameScreen::onTick(float secs  )
     else if (m_drawEllipsoid)
     {
         float t2 = m_ellipsoid->intersectRayWorldSpace(p, d);
-        cout << "T2: " << t2 << endl;
         if (t2 < t)
             t = t2;
     }

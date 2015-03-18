@@ -2,7 +2,7 @@
 #define APPLICATION_H
 
 #include "screen.h"
-#include "Leap.h"
+//#include "Leap.h"
 
 class Application
 {
@@ -16,9 +16,10 @@ public:
     void addScreen(Screen *s);
     void popScreens(int num);
 
-    void useLeapMotion(bool useLeap);
-    bool isUsingLeapMotion();
-    Leap::Frame getLeapFrame();
+    // leap motion stuff for personal mac
+//    void useLeapMotion(bool useLeap);
+//    bool isUsingLeapMotion();
+//    Leap::Frame getLeapFrame();
 
     // update and render
     void onTick(float secs);
@@ -49,7 +50,7 @@ private:
     Graphics *m_g;
 
     int m_width, m_height;
-    Leap::Controller *m_leapController;
+//    Leap::Controller *m_leapController;
 
 };
 

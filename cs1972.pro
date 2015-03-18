@@ -173,7 +173,7 @@ DEPENDPATH+=/usr/local/Cellar/glew/1.11.0/include
 RESOURCES += \
     resources.qrc
 
-macx: LIBS += -L$$PWD/leap/ -lLeap
+#macx: LIBS += -L$$PWD/leap/ -lLeap
 
-INCLUDEPATH += $$PWD/leap/include
-DEPENDPATH += $$PWD/leap/include
+#INCLUDEPATH += $$PWD/leap/include
+#DEPENDPATH += $$PWD/leap/include

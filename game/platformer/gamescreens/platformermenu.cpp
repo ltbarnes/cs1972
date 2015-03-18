@@ -41,53 +41,53 @@ PlatformerMenu::~PlatformerMenu()
 // update and render
 void PlatformerMenu::onTick(float)
 {
-    if (!m_parentApp->isUsingLeapMotion())
-        return;
+//    if (!m_parentApp->isUsingLeapMotion())
+//        return;
 
-    Leap::Frame frame = m_parentApp->getLeapFrame();
-    Leap::Vector pos = frame.hands().rightmost().palmPosition();
+//    Leap::Frame frame = m_parentApp->getLeapFrame();
+//    Leap::Vector pos = frame.hands().rightmost().palmPosition();
 
-    float newX = pos.x / 200.f;
-    if (newX < -1.f)
-        newX = -1.f;
-    else if (newX > 1.f)
-        newX = 1.f;
-    m_cursor[3][0] = newX;
+//    float newX = pos.x / 200.f;
+//    if (newX < -1.f)
+//        newX = -1.f;
+//    else if (newX > 1.f)
+//        newX = 1.f;
+//    m_cursor[3][0] = newX;
 
-    float newY = pos.y / 200.f - 1.f;
-    if (newY < -1.f)
-        newY = -1.f;
-    else if (newY > 1.f)
-        newY = 1.f;
-    m_cursor[3][1] = newY;
+//    float newY = pos.y / 200.f - 1.f;
+//    if (newY < -1.f)
+//        newY = -1.f;
+//    else if (newY > 1.f)
+//        newY = 1.f;
+//    m_cursor[3][1] = newY;
 
-    float c = .5f;
-    m_buttonEasy->setColor(c, c, c);
-    m_buttonHard->setColor(c, c, c);
-    m_buttonIsland->setColor(c, c, c);
-    if (m_buttonEasy->contains(newX, newY))
-    {
-        m_level = 1;
-        m_buttonEasy->setColor(1, 1, 1);
-    }
-    else if (m_buttonHard->contains(newX, newY))
-    {
-        m_level = 2;
-        m_buttonHard->setColor(1, 1, 1);
-    }
-    else if (m_buttonIsland->contains(newX, newY))
-    {
-        m_level = 3;
-        m_buttonIsland->setColor(1, 1, 1);
-    }
-    else
-        m_level = 0;
+//    float c = .5f;
+//    m_buttonEasy->setColor(c, c, c);
+//    m_buttonHard->setColor(c, c, c);
+//    m_buttonIsland->setColor(c, c, c);
+//    if (m_buttonEasy->contains(newX, newY))
+//    {
+//        m_level = 1;
+//        m_buttonEasy->setColor(1, 1, 1);
+//    }
+//    else if (m_buttonHard->contains(newX, newY))
+//    {
+//        m_level = 2;
+//        m_buttonHard->setColor(1, 1, 1);
+//    }
+//    else if (m_buttonIsland->contains(newX, newY))
+//    {
+//        m_level = 3;
+//        m_buttonIsland->setColor(1, 1, 1);
+//    }
+//    else
+//        m_level = 0;
 
-    if (frame.hands().count() > 0 && frame.fingers().count() == 0)
-        cout << "CLIIIIIIIIIIIIIIIIIIIIIICKEEEEEEEEEEEEEEEED" << endl;
+//    if (frame.hands().count() > 0 && frame.fingers().count() == 0)
+//        cout << "CLIIIIIIIIIIIIIIIIIIIIIICKEEEEEEEEEEEEEEEED" << endl;
 
-    if (frame.hands().count() > 0)
-        cout << frame.fingers().extended().count() << endl;
+//    if (frame.hands().count() > 0)
+//        cout << frame.fingers().extended().count() << endl;
 }
 
 void PlatformerMenu::onRender(Graphics *g)
