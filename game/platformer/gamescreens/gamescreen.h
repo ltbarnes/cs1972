@@ -6,6 +6,7 @@
 #include "platformerworld.h"
 #include "ellipsoid.h"
 #include "navmeshhandler.h"
+#include "meshbuffer.h"
 
 class PlatformerPlayer; // TEMP, SHOULD BE IN WORLD
 
@@ -46,6 +47,9 @@ private:
 
     Ellipsoid* m_ellipsoid;
     glm::vec3 m_point;
+
+    MeshBuffer *m_mb;
+    Triangle *m_test;
 
 };
 

@@ -73,7 +73,8 @@ SOURCES += \
     game/platformer/entities/platformerplayer.cpp \
     engine/objects/navmeshhandler.cpp \
     engine/shapes/line.cpp \
-    engine/graphics/raygraphics.cpp
+    engine/graphics/raygraphics.cpp \
+    engine/graphics/meshbuffer.cpp
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.cpp \
 #    game/minecraft/gamescreens/gamescreen.cpp \
@@ -139,7 +140,8 @@ HEADERS += \
     game/platformer/entities/platformerplayer.h \
     engine/objects/navmeshhandler.h \
     engine/shapes/line.h \
-    engine/graphics/raygraphics.h
+    engine/graphics/raygraphics.h \
+    engine/graphics/meshbuffer.h
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.h \
 #    game/minecraft/gamescreens/gamescreen.h \

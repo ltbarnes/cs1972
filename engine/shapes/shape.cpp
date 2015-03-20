@@ -17,6 +17,14 @@ Shape::Shape(int complexity)
     m_vboID = 0;
 
     m_halfWidth = 0.5f;
+
+    // hack for raytracing
+    if (complexity == -1)
+    {
+        m_p1 = 1;
+        m_p2 = 1;
+        m_halfWidth = 1.f;
+    }
 }
 
 Shape::~Shape()

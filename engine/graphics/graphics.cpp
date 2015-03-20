@@ -27,6 +27,7 @@ Graphics::Graphics()
     m_cyl = new Cylinder(50);
     m_sphere = new Sphere(50);
     m_faceCube = new FaceCube();
+    m_rayQuad = new Shape(-1);
 
     m_cubeMap = new CubeMap();
     m_useCubeMap = false;
@@ -37,7 +38,15 @@ Graphics::Graphics()
     m_sparseLocs.clear();
     m_cubeLocs.clear();
 
+    m_currProj = glm::mat4();
+    m_currView = glm::mat4();
+    m_currScale = glm::mat4();
+    m_frustum = glm::mat4();
+
     m_pe = new ParticleEmitter();
+
+    m_w = 1;
+    m_h = 1;
 }
 
 Graphics::~Graphics()
@@ -50,6 +59,7 @@ Graphics::~Graphics()
     delete m_cyl;
     delete m_sphere;
     delete m_faceCube;
+    delete m_rayQuad;
 
     // skybox
     delete m_cubeMap;
@@ -108,9 +118,18 @@ void Graphics::init()
                 ":/shaders/cubemap.vert",
                 ":/shaders/cubemap.frag");
 
+
     m_cubeLocs["projection"] = glGetUniformLocation(m_cubeShader, "projection");
     m_cubeLocs["view"] = glGetUniformLocation(m_cubeShader, "view");
     m_cubeLocs["envMap"] = glGetUniformLocation(m_cubeShader, "envMap");
+
+    m_rayShader = Graphics::loadShaders(
+                ":/shaders/ray.vert",
+                ":/shaders/ray.frag");
+
+    m_rayLocs["viewport"] = glGetUniformLocation(m_rayShader, "viewport");
+    m_rayLocs["scale"] = glGetUniformLocation(m_rayShader, "scale");
+    m_rayLocs["view"] = glGetUniformLocation(m_rayShader, "view");
 
     m_cubeMap->init();
 
@@ -121,6 +140,7 @@ void Graphics::init()
     m_cyl->init(m_defaultShader);
     m_sphere->init(m_defaultShader);
     m_faceCube->init(m_sparseShader);
+    m_rayQuad->init(m_rayShader);
 
     loadTexturesFromDirectory();
 
@@ -135,13 +155,16 @@ void Graphics::update()
 }
 
 
-void Graphics::setCamera(Camera *camera)
+void Graphics::setCamera(Camera *camera, int w, int h)
 {
     assert(camera);
 
     m_currProj = camera->getProjectionMatrix();
     m_currView = camera->getViewMatrix();
+    m_currScale = camera->getScaleMatrix();
     m_frustum = camera->getFrustumMatrix();
+
+    m_w = w; m_h = h;
 
     if (m_currentShader == m_defaultShader)
         clearLights();
@@ -171,6 +194,17 @@ GLuint Graphics::setGraphicsMode(GraphicsMode gm)
                 glm::value_ptr(m_currProj));
         glUniformMatrix4fv(m_sparseLocs["view"], 1, GL_FALSE,
                 glm::value_ptr(m_currView));
+        break;
+    case RAY:
+        m_currentShader = m_rayShader;
+        glUseProgram(m_rayShader);
+
+        // Set scene uniforms.
+        glUniformMatrix4fv(m_rayLocs["scale"], 1, GL_FALSE,
+                glm::value_ptr(m_currScale));
+        glUniformMatrix4fv(m_rayLocs["view"], 1, GL_FALSE,
+                glm::value_ptr(m_currView));
+        glUniform2f(m_rayLocs["viewport"], m_w, m_h);
         break;
     case CUBEMAP:
         break;
@@ -441,6 +475,20 @@ void Graphics::drawParticles(glm::vec3 source, float fuzziness)
     m_pe->drawParticlesVAO(m_currentShader, source);
 }
 
+
+
+
+
+
+
+
+
+
+
+void Graphics::rayDrawQuad()
+{
+    m_rayQuad->render();
+}
 
 
 

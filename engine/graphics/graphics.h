@@ -17,7 +17,7 @@
 
 enum GraphicsMode
 {
-    DEFAULT, SPARSE, CUBEMAP, DRAW2D
+    DEFAULT, SPARSE, CUBEMAP, DRAW2D, RAY
 };
 
 enum ShapeType
@@ -60,7 +60,7 @@ public:
     void update();
 
     void init();
-    void setCamera(Camera *camera);
+    void setCamera(Camera *camera, int w, int h);
     GLuint setGraphicsMode(GraphicsMode gm);
 
     void setWorldColor(float r, float g, float b);
@@ -94,6 +94,9 @@ public:
     void resetParticles();
     void setParticleForce(glm::vec3 force);
 
+    // ray stuff
+    void rayDrawQuad();
+
     static GLuint loadShaders(const char *vertex_file_path, const char *fragment_file_path);
 
 private:
@@ -107,6 +110,7 @@ private:
     QHash<QString, GLint> m_defaultLocs;
     QHash<QString, GLint> m_sparseLocs;
     QHash<QString, GLint> m_cubeLocs;
+    QHash<QString, GLint> m_rayLocs;
 
     QHash<QString, GLint> m_textures;
 
@@ -114,11 +118,13 @@ private:
     GLuint m_defaultShader;
     GLuint m_sparseShader;
     GLuint m_cubeShader;
+    GLuint m_rayShader;
 
     CubeMap *m_cubeMap;
 
     glm::mat4 m_currProj;
     glm::mat4 m_currView;
+    glm::mat4 m_currScale;
 
     Shape *m_line;
     Shape *m_quad;
@@ -127,9 +133,12 @@ private:
     Shape *m_cyl;
     Shape *m_sphere;
     Shape *m_faceCube;
+    Shape *m_rayQuad;
 
     bool m_useCubeMap;
     bool m_usingAtlas;
+
+    int m_w, m_h;
 
     glm::vec2 m_subImages;
 

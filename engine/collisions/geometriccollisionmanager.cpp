@@ -7,9 +7,9 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/norm.hpp>
 
-#include <iostream>
-using namespace std;
-#include <glm/ext.hpp>
+//#include <iostream>
+//using namespace std;
+//#include <glm/ext.hpp>
 
 GeometricCollisionManager::GeometricCollisionManager()
 {
@@ -130,12 +130,12 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
             para = rem - perp;
 
             glm::vec3 vel = me->getVelocity();
-            cout << "vel: " << glm::to_string(vel) << endl;
+//            cout << "vel: " << glm::to_string(vel) << endl;
             if (glm::length2(vel) > 0.000001f)
                 vel -= vel * glm::abs(n);
             else
                 vel = glm::vec3();
-            cout << "vel2: " << glm::to_string(vel) << endl;
+//            cout << "vel2: " << glm::to_string(vel) << endl;
             me->setVelocity(vel);
         }
         else

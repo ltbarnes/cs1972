@@ -35,6 +35,11 @@ glm::mat4 Camera::getViewMatrix()
     return m_view;
 }
 
+glm::mat4 Camera::getScaleMatrix()
+{
+    return m_scale;
+}
+
 glm::mat4 Camera::getFrustumMatrix()
 {
     return m_frustum;
@@ -179,11 +184,11 @@ void Camera::setProjectionMatrix()
     float h = 2.0 * m_far * glm::tan(glm::radians(m_heightDegrees / 2.0));
     float w = m_aspectRatio * h;
 
-    glm::mat4 scale = glm::mat4(1.0 / (w / 2.0),       0.0,          0.0,     0.0,
+    m_scale = glm::mat4(1.0 / (w / 2.0),       0.0,          0.0,     0.0,
                                      0.0,        1.0 / (h / 2.0),    0.0,     0.0,
                                      0.0,              0.0,       1.0 / m_far,  0.0,
                                      0.0,              0.0,          0.0,     1.0);
-    scale = glm::transpose(scale);
+    m_scale = glm::transpose(m_scale);
 
     float c = -m_near / m_far;
     glm::mat4 perspective = glm::mat4(1.0,   0.0,      0.0,         0.0,
@@ -191,7 +196,7 @@ void Camera::setProjectionMatrix()
                                       0.0,   0.0, -1.0/(1.0+c),  c/(1.0+c),
                                       0.0,   0.0,     -1.0,         0.0);
     perspective = glm::transpose(perspective);
-    m_proj = perspective * scale;
+    m_proj = perspective * m_scale;
 }
 
 void Camera::setFrustumMatrix()

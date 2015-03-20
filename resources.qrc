@@ -6,6 +6,8 @@
         <file alias="cubemap.frag">shaders/cubemap.frag</file>
         <file alias="sparse.vert">shaders/sparse.vert</file>
         <file alias="sparse.frag">shaders/sparse.frag</file>
+        <file alias="ray.vert">shaders/ray.vert</file>
+        <file alias="ray.frag">shaders/ray.frag</file>
     </qresource>
     <qresource prefix="/images">
     	<file alias="debris.png">res/images/debris.png</file>

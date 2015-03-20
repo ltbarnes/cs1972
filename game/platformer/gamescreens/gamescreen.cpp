@@ -40,6 +40,8 @@ GameScreen::GameScreen(Application *parent, int level)
         break;
     }
 
+    cout << tris.size() << endl;
+
     m_world = new PlatformerWorld();
     m_world->addToMesh(tris);
 
@@ -63,6 +65,15 @@ GameScreen::GameScreen(Application *parent, int level)
     m_drawNavMesh = false;
 
     m_ellipsoid = new Ellipsoid(glm::vec3(), glm::vec3(.25f, .5, .25f), "rayshape");
+
+
+    m_test = new Triangle(glm::vec3(0,2,-5),glm::vec3(-1,1,-5),glm::vec3(1,1,-5));
+    QList<Triangle*> triTest;
+    triTest.append(m_test);
+
+    shader = m_parentApp->getShader(RAY);
+    m_mb = new MeshBuffer();
+    m_mb->setBuffer(shader, tris);
 }
 
 GameScreen::~GameScreen()
@@ -71,6 +82,8 @@ GameScreen::~GameScreen()
     delete m_nmh;
     delete m_world;
     delete m_ellipsoid;
+    delete m_mb;
+    delete m_test;
 }
 
 // update and render
@@ -112,55 +125,61 @@ void GameScreen::onTick(float secs  )
 
 void GameScreen::onRender(Graphics *g)
 {
-    g->setWorldColor(.1, .1, .1);
-    g->setColor(1, 1, 1, 1, 0);
+//    g->setWorldColor(.1, .1, .1);
+//    g->setColor(1, 1, 1, 1, 0);
 
 
-    Light light1;
-    light1.type = POINT;
-    light1.color = glm::vec3(.5f, 1, .5f);
-    light1.posDir = glm::vec3(0, 30, 0);
-    light1.id = 1;
+//    Light light1;
+//    light1.type = POINT;
+//    light1.color = glm::vec3(.5f, 1, .5f);
+//    light1.posDir = glm::vec3(0, 30, 0);
+//    light1.id = 1;
 
-    g->addLight(light1);
+//    g->addLight(light1);
 
-    m_world->onDraw(g);
+//    m_world->onDraw(g);
 
-    g->setAllWhite(true);
-    g->setTexture(m_levelTexture);
-    m_level->draw(glm::mat4());
-    g->setAllWhite(false);
+//    g->setAllWhite(true);
+//    g->setTexture(m_levelTexture);
+//    m_level->draw(glm::mat4());
+//    g->setAllWhite(false);
 
-    g->setTexture("");
-    g->setColor(.25f, .75f, 1, 1, 0);
-    glm::mat4 trans;
-    if (m_drawEllipsoid)
-    {
-        trans = glm::translate(glm::mat4(), m_ellipsoid->getPos()) *
-                glm::scale(glm::mat4(), m_ellipsoid->getDim() * 2.f);
-        g->drawSphere(trans);
-    }
-    if (m_drawPoint)
-    {
-        trans = glm::translate(glm::mat4(), m_point) *
-                glm::scale(glm::mat4(), glm::vec3(0.1f));
-        g->setColor(1, 0, 0, 1, 0);
-        g->drawSphere(trans);
-    }
+//    g->setTexture("");
+//    g->setColor(.25f, .75f, 1, 1, 0);
+//    glm::mat4 trans;
+//    if (m_drawEllipsoid)
+//    {
+//        trans = glm::translate(glm::mat4(), m_ellipsoid->getPos()) *
+//                glm::scale(glm::mat4(), m_ellipsoid->getDim() * 2.f);
+//        g->drawSphere(trans);
+//    }
+//    if (m_drawPoint)
+//    {
+//        trans = glm::translate(glm::mat4(), m_point) *
+//                glm::scale(glm::mat4(), glm::vec3(0.1f));
+//        g->setColor(1, 0, 0, 1, 0);
+//        g->drawSphere(trans);
+//    }
 
-    if (m_drawNavMesh && m_nmh->hasObject())
-    {
-        g->setColor(0, 1, 1, .3f, 0);
-        trans = glm::translate(glm::mat4(), glm::vec3(0, .3f, 0));
+//    if (m_drawNavMesh && m_nmh->hasObject())
+//    {
+//        g->setColor(0, 1, 1, .3f, 0);
+//        trans = glm::translate(glm::mat4(), glm::vec3(0, .3f, 0));
 
-        g->setTransparentMode(true);
-        m_nmh->draw(trans);
+//        g->setTransparentMode(true);
+//        m_nmh->draw(trans);
 
-        g->setTransparentMode(false);
-        m_nmh->drawLines(trans);
-    }
-    g->setColor(0, 0, 0, 1, 0);
-    g->drawLineSeg(glm::vec3(5, 6, 2), glm::vec3(-5, 6, -2), .1f);
+//        g->setTransparentMode(false);
+//        m_nmh->drawLines(trans);
+//    }
+//    g->setColor(0, 0, 0, 1, 0);
+//    g->drawLineSeg(glm::vec3(5, 6, 2), glm::vec3(-5, 6, -2), .1f);
+
+    g->setGraphicsMode(RAY);
+//    g->rayAddTriangles(m_world->getMesh());
+    glBindBuffer(GL_UNIFORM_BUFFER, m_mb->getUBO());
+    g->rayDrawQuad();
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)

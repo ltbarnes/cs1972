@@ -11,6 +11,7 @@ public:
 
     glm::mat4 getProjectionMatrix();
     glm::mat4 getViewMatrix();
+    glm::mat4 getScaleMatrix();
     glm::mat4 getFrustumMatrix();
     glm::vec4 getLook();
     glm::vec4 getEye();
@@ -39,6 +40,7 @@ protected:
     glm::vec4 m_eye, m_look, m_up;
 
     glm::mat4 m_view, m_proj, m_frustum;
+    glm::mat4 m_scale;
 
     // View variables
     float m_near, m_far, m_heightDegrees, m_aspectRatio;

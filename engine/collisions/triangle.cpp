@@ -22,7 +22,7 @@ float Triangle::intersectPlane(glm::vec3 p, glm::vec3 d, glm::vec3 *colPoint, gl
     float t = glm::dot(-normal, p - vertices[0]) / glm::dot(normal, d);
     glm::vec3 point = p + d * t;
 
-    // check if collision point in within triangle
+    // check if collision point is within triangle
     glm::vec3 pab = glm::cross(vertices[0] - point, vertices[1] - point);
     glm::vec3 pbc = glm::cross(vertices[1] - point, vertices[2] - point);
     glm::vec3 pca = glm::cross(vertices[2] - point, vertices[0] - point);
