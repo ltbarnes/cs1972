@@ -37,6 +37,7 @@ public:
     QList<Tri> triangles;
 
     void draw(glm::mat4 trans) const;
+    void drawTriangle(int start, glm::mat4 trans) const;
     bool read(const QString &path, QList<Triangle *> *tris);
     bool write(const QString &path) const;
 

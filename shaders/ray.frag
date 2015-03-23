@@ -9,7 +9,7 @@ uniform vec2 viewport;
 uniform mat4 scale;
 uniform mat4 view;
 
-uniform int NUM_TRIS = 1;
+uniform int NUM_TRIS = 240;
 uniform int NUM_OBJECTS = 1;
 uniform int NUM_LIGHTS = 1;
 
@@ -25,7 +25,7 @@ const int TRI_SIZE = 4096;
 
 //vec3 tris[10];
 layout (std140) uniform triBlock {
-    vec3 tris[TRI_SIZE];
+    vec4 tris[TRI_SIZE];
 //    vec3 trisz[TRI_SIZE];
 };
 
@@ -110,14 +110,15 @@ vec4 intersectSphere(in vec4 p, in vec4 d)
 
 vec4 intersectTriangle(in vec4 p, in vec4 d, in int index)
 {
-    vec3 v1 = tris[index];
-    vec3 v2 = tris[index+1];
-    vec3 v3 = tris[index+2];
-    vec4 n = vec4(cross(v2 - v1, v3 - v1), INF);
+    vec3 v1 = tris[index].xyz;
+    vec3 v2 = tris[index+1].xyz;
+    vec3 v3 = tris[index+2].xyz;
+//    vec4 n = vec4(cross(v2 - v1, v3 - v1), INF);
+    vec4 n = vec4(tris[index+3].xyz, INF);
     if (dot(d, n) > 0.0)
         return n;
 
-    // intersect infinit plane
+    // intersect infinite plane
     n.w = dot(-n.xyz, p.xyz - v1) / dot(n.xyz, d.xyz);
     if (n.w < 0.0)
         return vec4(n.xyz, INF);
@@ -149,10 +150,46 @@ vec3 raytrace(in vec4 p, in vec4 d, in int depth)
     float bestT = INF;
 
     vec4 n;
-
+    int index;
+    vec3 v1, v2, v3;
+    vec4 v14, v24, v34;
+    vec3 point, pab, pbc, pca;
     for (int i = 0; i < NUM_TRIS; ++i)
     {
-        n = intersectTriangle(p, d, i * 3);
+        index = i * 3;
+//        n = intersectTriangle(p, d, i * 4);
+        ////////////////////////
+        v14 = tris[index];
+        v24 = tris[index+1];
+        v34 = tris[index+2];
+        n = vec4(v14.w, v24.w, v34.w, INF);
+
+
+        if (dot(d, n) < 0.0)
+        {
+            v1 = v14.xyz;
+            v2 = v24.xyz;
+            v3 = v34.xyz;
+            // intersect infinite plane
+            n.w = dot(-n.xyz, p.xyz - v1) / dot(n.xyz, d.xyz);
+            if (n.w < 0.0)
+                n = vec4(n.xyz, INF);
+            else
+            {
+                point = p.xyz + d.xyz * n.w;
+
+                // check if collision point is within triangle
+                pab = cross(v1 - point, v2 - point);
+                pbc = cross(v2 - point, v3 - point);
+                pca = cross(v3 - point, v1 - point);
+
+                if (dot(pab, pbc) < EPS || dot(pbc, pca) < EPS)
+                    n.w = INF;
+            }
+        }
+
+
+        /////////////////////
         if (n.w < bestT)
         {
             bestT = n.w;
@@ -176,8 +213,8 @@ vec3 raytrace(in vec4 p, in vec4 d, in int depth)
 
     if (bestT < INF)
     {
-        vec4 point = p + d * n.w;
-        return calcColor(colorIndex, point.xyz, n.xyz, p.xyz);
+        point = p.xyz + d.xyz * n.w;
+        return calcColor(colorIndex, point, n.xyz, p.xyz);
     }
 
     return vec3(0);

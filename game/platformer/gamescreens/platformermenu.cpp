@@ -1,6 +1,6 @@
 #include "platformermenu.h"
 #include "application.h"
-#include "gamescreen.h"
+#include "gamescreentest.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
@@ -149,7 +149,7 @@ void PlatformerMenu::onMouseMoved(QMouseEvent *, float deltaX, float deltaY)
 void PlatformerMenu::onMousePressed(QMouseEvent *e)
 {
     if (e->button() == Qt::LeftButton && m_level > 0)
-        m_parentApp->addScreen(new GameScreen(m_parentApp, m_level));
+        m_parentApp->addScreen(new GameScreenTest(m_parentApp, m_level));
 }
 
 void PlatformerMenu::onResize(int w, int h)

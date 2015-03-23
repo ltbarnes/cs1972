@@ -1,5 +1,5 @@
-#ifndef GAMESCREEN_H
-#define GAMESCREEN_H
+#ifndef GAMESCREENTEST_H
+#define GAMESCREENTEST_H
 
 #include "screen.h"
 #include "objecthandler.h"
@@ -8,13 +8,13 @@
 #include "navmeshhandler.h"
 #include "meshbuffer.h"
 
-class PlatformerPlayer; // TEMP, SHOULD BE IN WORLD
+class PlatformerPlayer;
 
-class GameScreen : public Screen
+class GameScreenTest : public Screen
 {
 public:
-    GameScreen(Application *parent, int level);
-    virtual ~GameScreen();
+    GameScreenTest(Application *parent, int level);
+    virtual ~GameScreenTest();
 
     // update and render
     virtual void onTick(float secs);
@@ -53,4 +53,4 @@ private:
 
 };
 
-#endif // GAMESCREEN_H
+#endif // GAMESCREENTEST_H

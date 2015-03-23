@@ -1,5 +1,6 @@
 #include "triangle.h"
-#include "stdio.h"
+#include <stdio.h>
+#include <algorithm>
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/norm.hpp>
@@ -166,4 +167,26 @@ int Triangle::findTCylinder(glm::vec3 p, glm::vec3 d, glm::vec3 v1, glm::vec3 v2
     *t1 = (-b + sqrt(disc)) / (2.f * a);
     *t2 = (-b - sqrt(disc)) / (2.f * a);
     return 2;
+}
+
+
+inline float signXZ(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
+{
+    return ((p1.x - p3.x) * (p2.z - p3.z) - (p2.x - p3.x) * (p1.z - p3.z));
+}
+
+bool Triangle::containsXZ(glm::vec3 point)
+{
+        bool b1, b2, b3;
+
+        b1 = signXZ(point, vertices[0], vertices[1]) < 0.0f;
+        b2 = signXZ(point, vertices[1], vertices[2]) < 0.0f;
+        b3 = signXZ(point, vertices[2], vertices[0]) < 0.0f;
+
+        return ((b1 == b2) && (b2 == b3));
+}
+
+float Triangle::getHeight(glm::vec3)
+{
+    return glm::min(vertices[0].y, glm::min(vertices[1].y, vertices[2].y));
 }

@@ -1,4 +1,4 @@
-#include "gamescreen.h"
+#include "gamescreentest.h"
 #include "application.h"
 #include "actioncamera.h"
 #include "player.h"
@@ -9,7 +9,7 @@
 
 //#include <glm/ext.hpp>
 
-GameScreen::GameScreen(Application *parent, int level)
+GameScreenTest::GameScreenTest(Application *parent, int level)
     : Screen(parent)
 {
 
@@ -77,7 +77,7 @@ GameScreen::GameScreen(Application *parent, int level)
 //    m_mb->setBuffer(shader, tris);
 }
 
-GameScreen::~GameScreen()
+GameScreenTest::~GameScreenTest()
 {
     delete m_oh;
     delete m_nmh;
@@ -88,7 +88,7 @@ GameScreen::~GameScreen()
 }
 
 // update and render
-void GameScreen::onTick(float secs  )
+void GameScreenTest::onTick(float secs  )
 {
     m_world->onTick(secs);
 
@@ -130,7 +130,7 @@ void GameScreen::onTick(float secs  )
     m_nmh->findPath();
 }
 
-void GameScreen::onRender(Graphics *g)
+void GameScreenTest::onRender(Graphics *g)
 {
     g->setWorldColor(.1, .1, .1);
     g->setColor(1, 1, 1, 1, 0);
@@ -203,30 +203,30 @@ void GameScreen::onRender(Graphics *g)
 ////    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
+void GameScreenTest::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
 {
     m_world->onMouseMoved(e, deltaX, deltaY);
 }
-void GameScreen::onMousePressed(QMouseEvent *)
+void GameScreenTest::onMousePressed(QMouseEvent *)
 {
     m_mouseDown = true;
 }
-void GameScreen::onKeyReleased(QKeyEvent *e )
+void GameScreenTest::onKeyReleased(QKeyEvent *e )
 {
     if (e->key() == Qt::Key_N)
         m_drawNavMesh = !m_drawNavMesh;
     m_world->onKeyReleased(e);
 }
-void GameScreen::onMouseDragged(QMouseEvent *e, float deltaX, float deltaY)
+void GameScreenTest::onMouseDragged(QMouseEvent *e, float deltaX, float deltaY)
 {
     m_world->onMouseMoved(e, deltaX, deltaY);
 }
-void GameScreen::onMouseReleased(QMouseEvent *)
+void GameScreenTest::onMouseReleased(QMouseEvent *)
 {
     m_mouseDown = false;
 }
 
-void GameScreen::onKeyPressed(QKeyEvent *e)
+void GameScreenTest::onKeyPressed(QKeyEvent *e)
 {
     switch (e->key())
     {
@@ -243,4 +243,4 @@ void GameScreen::onKeyPressed(QKeyEvent *e)
 
 
 // unused in game
-void GameScreen::onMouseWheel(QWheelEvent *) {}
+void GameScreenTest::onMouseWheel(QWheelEvent *) {}

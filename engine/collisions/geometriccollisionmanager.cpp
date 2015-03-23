@@ -132,7 +132,12 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
             glm::vec3 vel = me->getVelocity();
 //            cout << "vel: " << glm::to_string(vel) << endl;
             if (glm::length2(vel) > 0.000001f)
-                vel -= vel * glm::abs(n);
+            {
+                glm::vec3 newVel = vel - vel * glm::abs(n);
+                vel.x = (n.x*vel.x > 0.0 ? vel.x: newVel.x);
+                vel.y = (n.y*vel.y > 0.0 ? vel.y: newVel.y);
+                vel.z = (n.z*vel.z > 0.0 ? vel.z: newVel.z);
+            }
             else
                 vel = glm::vec3();
 //            cout << "vel2: " << glm::to_string(vel) << endl;

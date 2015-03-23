@@ -36,6 +36,14 @@ void OBJ::draw(glm::mat4 trans) const
     glBindVertexArray(0);
 }
 
+void OBJ::drawTriangle(int start, glm::mat4 trans) const
+{
+    glBindVertexArray(m_vaoID);
+    glUniformMatrix4fv(glGetUniformLocation(m_shader, "model"), 1, GL_FALSE, glm::value_ptr(trans));
+    glDrawArrays(GL_TRIANGLES, start*3, 3);
+    glBindVertexArray(0);
+}
+
 static bool inBounds(int i, int size)
 {
     return (i >= 0 && i < size);

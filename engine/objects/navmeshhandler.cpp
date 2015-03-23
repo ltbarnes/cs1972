@@ -1,7 +1,15 @@
 #include "navmeshhandler.h"
+#include "graphics.h"
+#include "obj.h"
+#include <QSet>
+
+//#include <iostream>
+//using namespace std;
+//#include <glm/ext.hpp>
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 NavMeshHandler::NavMeshHandler()
 {
@@ -11,11 +19,19 @@ NavMeshHandler::NavMeshHandler()
     m_shader = 0;
     m_vaoID = 0;
     m_vboID = 0;
+
+    m_start = -1;
+    m_end = -1;
+
+    m_graph.clear();
 }
 
 
 NavMeshHandler::~NavMeshHandler()
 {
+    foreach (int *edges, m_graph) {
+        delete[] edges;
+    }
 }
 
 
@@ -52,6 +68,39 @@ void NavMeshHandler::drawLines(glm::mat4 trans)
     glUniformMatrix4fv(glGetUniformLocation(m_shader, "model"), 1, GL_FALSE, glm::value_ptr(trans));
     glDrawArrays(GL_LINES, 0, m_numVerts);
     glBindVertexArray(0);
+}
+
+void NavMeshHandler::drawPath(glm::mat4 trans, Graphics *g, glm::vec4 color)
+{
+    // lines
+    int size = m_pathActual.size();
+    glm::vec3 prev = m_pathActual.value(0) + glm::vec3(0, 1, 0);
+    glm::vec3 curr;
+    g->setAllWhite(true);
+    for (int i = 1; i < size; i++)
+    {
+        curr = m_pathActual.value(i) + glm::vec3(0, 1, 0);
+        g->drawLineSeg(prev, curr, .1f);
+        prev = curr;
+    }
+    g->setAllWhite(false);
+
+    // triangles
+    g->setColor(color.r, color.g, color.b, color.a, 0);
+    foreach (PathNode n, m_pathNodes)
+        m_obj->drawTriangle(n.id, trans);
+}
+
+void NavMeshHandler::drawStart(glm::mat4 trans)
+{
+    if (m_start > -1)
+        m_obj->drawTriangle(m_start, trans);
+}
+
+void NavMeshHandler::drawEnd(glm::mat4 trans)
+{
+    if (m_end > -1)
+        m_obj->drawTriangle(m_end, trans);
 }
 
 void NavMeshHandler::createVBO()
@@ -113,9 +162,417 @@ void NavMeshHandler::fillVertex(int *index, GLfloat *data, glm::vec3 v)
 }
 
 
+void NavMeshHandler::setStart(glm::vec3 pos)
+{
+    m_start = findTriangle(pos);
+    if (m_start <= -1)
+    {
+        m_pathNodes.clear();
+        m_pathActual.clear();
+    }
+    else
+        m_startPos = pos;
+}
+
+
+void NavMeshHandler::setEnd(glm::vec3 pos)
+{
+    m_end = findTriangle(pos);
+    if (m_end <= -1)
+    {
+        m_pathNodes.clear();
+        m_pathActual.clear();
+    }
+    else
+        m_endPos = pos;
+}
+
+int NavMeshHandler::findTriangle(glm::vec3 pos)
+{
+    int index = -1;
+    int size = m_mesh.size();
+    Triangle *t;
+    float bestDist = INFINITY;
+    float dist;
+    for (int i = 0; i < size; i++)
+    {
+        t = m_mesh.value(i);
+        if (t->containsXZ(pos))
+        {
+            dist = pos.y - t->getHeight(pos);
+            if (dist > 0 && dist < bestDist)
+            {
+                bestDist = dist;
+                index = i;
+            }
+        }
+    }
+    return index;
+}
+
+
+void NavMeshHandler::findPath()
+{
+    if (m_start <= -1 || m_end <= -1)
+        return;
+
+    m_pathNodes.clear();
+    m_pathActual.clear();
+
+    if (m_start == m_end)
+    {
+        m_pathActual.append(m_startPos + glm::vec3(0, -1, 0));
+        m_pathActual.append(m_endPos + glm::vec3(0, -1, 0));
+        return;
+    }
+
+    const QList<OBJ::Tri> &tris = m_obj->triangles;
+
+    QList<int> queue;
+    QSet<int> visited;
+    QHash<int,PathNode> prev;
+
+    queue.append(m_start);
+    visited.insert(m_start);
+    prev[m_start] = PathNode();
+
+    int curr, neighbor;
+    while (!queue.isEmpty())
+    {
+        curr = queue.takeFirst();
+        if (curr == m_end)
+            break;
+
+        const OBJ::Tri &tri = tris.value(curr);
+        neighbor = m_g.value(QPair<int,int>(tri.b.vertex, tri.a.vertex), -1);
+        if (!visited.contains(neighbor))
+        {
+            queue.append(neighbor);
+            visited.insert(neighbor);
+            prev[neighbor] = PathNode(curr, neighbor, tri.a.vertex, tri.b.vertex);
+        }
+        neighbor = m_g.value(QPair<int,int>(tri.c.vertex, tri.b.vertex), -1);
+        if (!visited.contains(neighbor))
+        {
+            queue.append(neighbor);
+            visited.insert(neighbor);
+            prev[neighbor] = PathNode(curr, neighbor, tri.b.vertex, tri.c.vertex);
+        }
+        neighbor = m_g.value(QPair<int,int>(tri.a.vertex, tri.c.vertex), -1);
+        if (!visited.contains(neighbor))
+        {
+            queue.append(neighbor);
+            visited.insert(neighbor);
+            prev[neighbor] = PathNode(curr, neighbor, tri.c.vertex, tri.a.vertex);
+        }
+    }
+
+    if (curr != m_end)
+        return;
+
+    PathNode node = PathNode(curr);
+    do
+    {
+        m_pathNodes.prepend(node);
+        node = prev[node.id];
+    }
+    while (node.id != -1);
+
+    // simple stupid funnel
+    simpleStupidFunnel();
+}
+
+
 void NavMeshHandler::buildGraph()
 {
+    const QList<OBJ::Tri> &tris = m_obj->triangles;
 
+    int size = m_mesh.size();
+    for (int i = 0; i < size; i++)
+    {
+        const OBJ::Tri &tri = tris.value(i);
+        m_g[QPair<int,int>(tri.a.vertex, tri.b.vertex)] = i;
+        m_g[QPair<int,int>(tri.b.vertex, tri.c.vertex)] = i;
+        m_g[QPair<int,int>(tri.c.vertex, tri.a.vertex)] = i;
+    }
+}
+
+static void setVars(glm::vec3 *apex, int i, PathNode *gate, int *leftI, int *rightI, glm::vec3 *left,
+                    glm::vec3 *right,  glm::vec3 *vecL, glm::vec3 *vecR, const QList<glm::vec3> *verts)
+{
+    *leftI = i;
+    *rightI = i;
+    *left = (*verts)[(*gate).left];
+    *right = (*verts)[(*gate).right];
+
+    glm::vec3 temp = (*left)*.99f + (*right)*.001f;
+    *right = (*right)*.99f + (*left)*.001f;
+    *left = temp;
+
+    *vecL = glm::normalize((*left) - (*apex));
+    *vecR = glm::normalize((*right) - (*apex));
+
+
+//    cout << "i: " << i << endl;
+//    cout << "apex: " << glm::to_string(*apex) << endl;
+//    cout << "leftI: " << *leftI << endl;
+//    cout << "rightI: " << *rightI << endl;
+//    cout << "left: " << glm::to_string(*left) << endl;
+//    cout << "right: " << glm::to_string(*right) << endl;
+//    cout << "vecL: " << glm::to_string(*vecL) << endl;
+//    cout << "vecR: " << glm::to_string(*vecR) << endl;
+}
+
+
+void NavMeshHandler::simpleStupidFunnel()
+{
+//    const QList<OBJ::Tri> &tris = m_obj->triangles;
+    const QList<glm::vec3> &verts = m_obj->vertices;
+
+//    cout << "\n\nSTART: " << endl;
+
+    m_pathActual.append(m_startPos + glm::vec3(0, -1, 0));
+    glm::vec3 apex = m_startPos + glm::vec3(0, -1, 0);
+    PathNode gate = m_pathNodes[0];
+
+    int leftI, rightI, nextI;
+    glm::vec3 left, right, next;
+    glm::vec3 vecL, vecR, nextVec;
+
+    setVars(&apex, 0, &gate, &leftI, &rightI, &left, &right, &vecL, &vecR, &verts);
+
+    glm::vec3 nextCross;
+    float nextAngle;
+    glm::vec3 cross = glm::cross(vecR, vecL);
+    float angle = glm::orientedAngle(vecR, vecL, glm::normalize(cross));
+
+//    cout << "\tAngle: " << angle << endl;
+
+    PathNode prevGate = gate;
+
+    int size = m_pathNodes.size();
+    for (int i = 1; i < size; i++)
+    {
+        gate = m_pathNodes[i];
+//        cout << "\t\t\t\tI: " << i << endl;
+//        cout << "prev: " << prevGate.left << ", " << prevGate.right << endl;
+//        cout << "gate: " << gate.left << ", " << gate.right << endl;
+        if (prevGate.left == gate.left)
+        {
+            // try to move right
+            nextI = i;
+            next = verts[gate.right];
+            nextVec = glm::normalize(next - apex);
+            nextCross = glm::cross(nextVec, vecL);
+            nextAngle = glm::orientedAngle(nextVec, vecL, glm::normalize(nextCross));
+//            cout << "\tnextAngle: " << nextAngle << endl;
+//            cout << "\tcross: " << (nextCross.y < 0) << endl;
+            if (nextI == leftI) // edge length 0
+            {
+//                m_pathActual.append(left);
+//                return;
+            }
+            else if (nextCross.y < 0)
+            {
+                m_pathActual.append(left);
+                apex = left;
+                i = leftI;
+
+                // find next gate that doesn't include apex
+//                cout << "leftI: " << (leftI) << endl;
+                int currLeft = m_pathNodes.value(i, PathNode()).left;
+                gate = m_pathNodes.value(++i, PathNode());
+                while (gate.id != -1 && gate.left == currLeft)
+                {
+//                    cout << "currLeft: " << currLeft << endl;
+//                    cout << "gate.left: " << gate.left << endl;
+                    gate = m_pathNodes.value(++i, PathNode());
+                }
+
+                // on last triangle
+                if (gate.left == -1)
+                {
+//                    cout << "end" << endl;
+                    m_pathActual.append(m_endPos + glm::vec3(0, -1, 0));
+                    return;
+                }
+                setVars(&apex, i, &gate, &leftI, &rightI, &left, &right, &vecL, &vecR, &verts);
+                cross = glm::cross(vecR, vecL);
+                angle = glm::orientedAngle(vecR, vecL, glm::normalize(cross));
+            }
+            else if (nextAngle < angle)
+            {
+                rightI = nextI;
+                right = next*.99f + left*.01f;
+                vecR = nextVec;
+                cross = nextCross;
+                angle = nextAngle;
+
+//                cout << "i: " << i << endl;
+//                cout << "apex: " << glm::to_string(apex) << endl;
+//                cout << "leftI: " << leftI << endl;
+//                cout << "rightI: " << rightI << endl;
+//                cout << "left: " << glm::to_string(left) << endl;
+//                cout << "right: " << glm::to_string(right) << endl;
+//                cout << "vecL: " << glm::to_string(vecL) << endl;
+//                cout << "vecR: " << glm::to_string(vecR) << endl;
+            }
+        }
+        else if (prevGate.right == gate.right)
+        {
+            // try to move left
+            nextI = i;
+            next = verts[gate.left];
+            nextVec = glm::normalize(next - apex);
+            nextCross = glm::cross(vecR, nextVec);
+            nextAngle = glm::orientedAngle(vecR, nextVec, glm::normalize(nextCross));
+
+//            cout << "\tnextAngle: " << nextAngle << endl;
+//            cout << "\tcross: " << (nextCross.y < 0) << endl;
+            if (nextI == rightI) // edge length 0
+            {
+//                m_pathActual.append(right);
+//                return;
+            }
+            else if (nextCross.y < 0)
+            {
+                m_pathActual.append(right);
+                apex = right;
+                i = rightI;
+
+                // find next gate that doesn't include apex
+//                cout << "rightI: " << (rightI+1) << endl;
+                int currRight = m_pathNodes.value(i, PathNode()).right;
+                gate = m_pathNodes.value(++i, PathNode());
+                while (gate.id != -1 && gate.right == currRight)
+                {
+//                    cout << "currRight: " << currRight << endl;
+//                    cout << "gate.right: " << gate.right << endl;
+                    gate = m_pathNodes.value(++i, PathNode());
+                }
+
+                // on last triangle
+                if (gate.right == -1)
+                {
+                    m_pathActual.append(m_endPos + glm::vec3(0, -1, 0));
+                    return;
+                }
+                setVars(&apex, i, &gate, &leftI, &rightI, &left, &right, &vecL, &vecR, &verts);
+                cross = glm::cross(vecR, vecL);
+                angle = glm::orientedAngle(vecR, vecL, glm::normalize(cross));
+
+//                cout << "i: " << i << endl;
+//                cout << "apex: " << glm::to_string(apex) << endl;
+//                cout << "leftI: " << leftI << endl;
+//                cout << "rightI: " << rightI << endl;
+//                cout << "left: " << glm::to_string(left) << endl;
+//                cout << "right: " << glm::to_string(right) << endl;
+//                cout << "vecL: " << glm::to_string(vecL) << endl;
+//                cout << "vecR: " << glm::to_string(vecR) << endl;
+            }
+            else if (nextAngle < angle)
+            {
+                leftI = nextI;
+                left = next*.99f + right*.01f;
+                vecL = nextVec;
+                cross = nextCross;
+                angle = nextAngle;
+
+//                cout << "i: " << i << endl;
+//                cout << "apex: " << glm::to_string(apex) << endl;
+//                cout << "leftI: " << leftI << endl;
+//                cout << "rightI: " << rightI << endl;
+//                cout << "left: " << glm::to_string(left) << endl;
+//                cout << "right: " << glm::to_string(right) << endl;
+//                cout << "vecL: " << glm::to_string(vecL) << endl;
+//                cout << "vecR: " << glm::to_string(vecR) << endl;
+            }
+
+        }
+        else // end node
+        {
+//            cout << "eNDNode: " << endl;
+            // check left
+            next = m_endPos;
+            nextVec = glm::normalize(next - apex);
+            nextCross = glm::cross(nextVec, vecL);
+//            cout << "\tcheckLcross: " << (nextCross.y < 0) << endl;
+            if (nextCross.y < 0)
+            {
+                m_pathActual.append(left);
+                apex = left;
+                i = leftI;
+
+                // find next gate that doesn't include apex
+//                cout << "leftI: " << (leftI+1) << endl;
+                int currLeft = m_pathNodes.value(i, PathNode()).left;
+                gate = m_pathNodes.value(++i, PathNode());
+                while (gate.id != -1 && gate.left == currLeft)
+                {
+//                    cout << "currLeft: " << currLeft << endl;
+//                    cout << "gate.left: " << gate.left << endl;
+                    gate = m_pathNodes.value(++i, PathNode());
+                }
+
+                // on last triangle
+                if (gate.left == -1)
+                {
+                    m_pathActual.append(m_endPos + glm::vec3(0, -1, 0));
+                    return;
+                }
+                setVars(&apex, i, &gate, &leftI, &rightI, &left, &right, &vecL, &vecR, &verts);
+                cross = glm::cross(vecR, vecL);
+                angle = glm::orientedAngle(vecR, vecL, glm::normalize(cross));
+            }
+            else
+            {
+
+                // check right
+                nextCross = glm::cross(vecR, nextVec);
+//                cout << "\tcheckRcross: " << (nextCross.y < 0) << endl;
+                if (nextCross.y < 0)
+                {
+                    m_pathActual.append(right);
+//                    cout << "right: " << glm::to_string(right) << endl;
+                    apex = right;
+                    i = rightI;
+
+                    // find next gate that doesn't include apex
+//                    cout << "rightI: " << (rightI) << endl;
+                    int currRight = m_pathNodes.value(i, PathNode()).right;
+                    gate = m_pathNodes.value(++i, PathNode());
+//                    cout << "currRight: " << currRight << endl;
+                    while (gate.id != -1 && gate.right == currRight)
+                    {
+//                        cout << "currRight: " << currRight << endl;
+//                        cout << "gate.right: " << gate.right << endl;
+                        gate = m_pathNodes.value(++i, PathNode());
+                    }
+
+                    // on last triangle
+                    if (gate.right == -1)
+                    {
+//                        cout << glm::to_string(m_endPos + glm::vec3(0, -1, 0)) << endl;
+                        m_pathActual.append(m_endPos + glm::vec3(0, -1, 0));
+                        return;
+                    }
+                    setVars(&apex, i, &gate, &leftI, &rightI, &left, &right, &vecL, &vecR, &verts);
+                    cross = glm::cross(vecR, vecL);
+                    angle = glm::orientedAngle(vecR, vecL, glm::normalize(cross));
+                }
+                else
+                {
+                    m_pathActual.append(m_endPos + glm::vec3(0, -1, 0));
+                    return;
+                }
+
+            }
+
+        }
+
+        prevGate = gate;
+    }
+//    m_pathActual.append(m_endPos);
 }
 
 
