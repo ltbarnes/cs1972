@@ -48,9 +48,6 @@ private:
     Ellipsoid* m_ellipsoid;
     glm::vec3 m_point;
 
-//    MeshBuffer *m_mb;
-//    Triangle *m_test;
-
 };
 
 #endif // GAMESCREENTEST_H

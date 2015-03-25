@@ -37,6 +37,7 @@ struct RenderShape
     float shininess;
     float transparency;
     glm::mat4 trans;
+    glm::mat4 inv;
     QString texture;
     float repeatU, repeatV;
 };
@@ -49,6 +50,13 @@ struct Light
     glm::vec3 color;
     glm::vec3 posDir;   // position for point, direction for directional
     glm::vec3 function; // Attenuation function
+};
+
+struct ObjectsInfo
+{
+    QList<glm::mat4> invs;
+    QList<glm::vec3> colors;
+    QList<ShapeType> shapeType;
 };
 
 class Graphics
@@ -95,7 +103,7 @@ public:
     void setParticleForce(glm::vec3 force);
 
     // ray stuff
-    void rayAddObjects();
+    void rayAddObjects(ObjectsInfo *info);
     void rayDrawQuad();
 
     static GLuint loadShaders(const char *vertex_file_path, const char *fragment_file_path);

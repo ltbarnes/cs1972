@@ -104,10 +104,29 @@ void World::onTick(float secs)
     m_player->setCameraPos();
 }
 
-//void World::setCameraPos()
-//{
-//    m_player->setCameraPos();
-//}
+ObjectsInfo *World::getObjectInfo()
+{
+    ObjectsInfo *info;
+    info = new ObjectsInfo();
+
+    glm::mat4 inv;
+    glm::mat4 posMat;
+    QList<RenderShape*> rses;
+    foreach(MovableEntity *me, m_movableEntities)
+    {
+        posMat = glm::translate(glm::mat4(), me->getPosition());
+        rses.clear();
+        rses.append(me->getRenderShapes());
+        foreach(RenderShape *rs, rses)
+        {
+            inv = glm::inverse( posMat * rs->trans );
+            info->invs.append(inv);
+            info->colors.append(rs->color);
+        }
+    }
+
+    return info;
+}
 
 void World::onDraw(Graphics *g)
 {

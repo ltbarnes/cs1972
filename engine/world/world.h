@@ -29,12 +29,13 @@ public:
 
     virtual void onTick(float secs);
     virtual void onDraw(Graphics *g);
-//    void setCameraPos();
 
     void addManager(Manager *m);
     void setGravity(glm::vec3 gravity);
     void setPlayer(Player *player);
     Player *getPlayer();
+
+    ObjectsInfo *getObjectInfo();
 
     // mouse events
     virtual void onMouseMoved(QMouseEvent *e, float deltaX, float deltaY);
@@ -55,6 +56,7 @@ protected:
 
     QList<Manager *> m_managers;
     glm::vec3 m_gravity;
+
 };
 
 #endif // WORLD_H

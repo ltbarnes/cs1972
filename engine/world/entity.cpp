@@ -4,9 +4,6 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
 
-#include <iostream>
-using namespace std;
-
 Entity::Entity(glm::vec3 pos)
 {
     m_pos = pos;

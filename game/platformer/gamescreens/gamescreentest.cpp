@@ -7,8 +7,6 @@
 #include "geometriccollisionmanager.h"
 #include "triangle.h"
 
-//#include <glm/ext.hpp>
-
 GameScreenTest::GameScreenTest(Application *parent, int level)
     : Screen(parent)
 {
@@ -65,16 +63,6 @@ GameScreenTest::GameScreenTest(Application *parent, int level)
     m_drawNavMesh = false;
 
     m_ellipsoid = new Ellipsoid(glm::vec3(), glm::vec3(.25f, .5, .25f), "rayshape");
-
-
-    // ray cast attempt
-//    m_test = new Triangle(glm::vec3(0,2,-5),glm::vec3(-1,1,-5),glm::vec3(1,1,-5));
-//    QList<Triangle*> triTest;
-//    triTest.append(m_test);
-
-//    shader = m_parentApp->getShader(RAY);
-//    m_mb = new MeshBuffer();
-//    m_mb->setBuffer(shader, tris);
 }
 
 GameScreenTest::~GameScreenTest()
@@ -83,8 +71,6 @@ GameScreenTest::~GameScreenTest()
     delete m_nmh;
     delete m_world;
     delete m_ellipsoid;
-//    delete m_mb;
-//    delete m_test;
 }
 
 // update and render

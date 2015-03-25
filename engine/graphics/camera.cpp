@@ -181,7 +181,7 @@ void Camera::setViewMatrix()
 void Camera::setProjectionMatrix()
 {
     // Projection Matrices
-    float h = 2.0 * m_far * glm::tan(glm::radians(m_heightDegrees / 2.0));
+    float h = m_far * glm::tan(glm::radians(m_heightDegrees / 2.0));
     float w = m_aspectRatio * h;
 
     m_scale = glm::mat4(1.0 / (w / 2.0),       0.0,          0.0,     0.0,

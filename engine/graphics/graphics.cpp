@@ -487,17 +487,21 @@ void Graphics::drawParticles(glm::vec3 source, float fuzziness)
 
 
 
-void Graphics::rayAddObjects()
+void Graphics::rayAddObjects(ObjectsInfo *info)
 {
-    std::ostringstream os;
-    os << 0;
-    std::string indexString = "[" + os.str() + "]"; // e.g. [0], [1], etc.
+    int size = info->invs.size();
+    for (int i = 0; i < size; i++)
+    {
+        std::ostringstream os;
+        os << i;
+        std::string indexString = "[" + os.str() + "]"; // e.g. [0], [1], etc.
 
-    glm::mat4 inv = glm::translate(glm::mat4(), glm::vec3(0, 2, -5)) *
-            glm::scale(glm::mat4(), glm::vec3(.5, .5, 1));
-    inv = glm::inverse(inv);
-    glUniformMatrix4fv(glGetUniformLocation(m_rayShader, ("invs" + indexString).c_str()), 1, GL_FALSE, glm::value_ptr(inv));
-    glUniform1i(glGetUniformLocation(m_rayShader, "NUM_OBJECTS"), 1);
+        glUniformMatrix4fv(glGetUniformLocation(m_rayShader, ("invs" + indexString).c_str()), 1, GL_FALSE, glm::value_ptr(info->invs[i]));
+        glUniform3fv(glGetUniformLocation(m_rayShader, ("colors" + indexString).c_str()), 1, glm::value_ptr(info->colors[i]));
+    }
+    glUniform1i(glGetUniformLocation(m_rayShader, "NUM_OBJECTS"), size);
+
+    delete info;
 }
 
 

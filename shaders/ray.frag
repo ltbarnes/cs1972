@@ -15,8 +15,8 @@ uniform int NUM_OBJECTS = 0;
 uniform int NUM_LIGHTS = 1;
 
 uniform mat4 invs[10];
+uniform vec3 colors[10];
 // to be uniforms or blocks
-vec3 colors[10];
 vec3 lightPos[10];
 
 // Constants
@@ -94,7 +94,7 @@ int findT(in float a, in float b, in float c, out float t1, out float t2)
 
 ////////////////////SPHERE/////////////////////
 
-// assumes radius size 1.f
+// assumes radius size .5f
 vec4 intersectSphere(in vec4 p, in vec4 d)
 {
     vec4 n = vec4(0.0, 0.0, 0.0, INF);
@@ -103,7 +103,7 @@ vec4 intersectSphere(in vec4 p, in vec4 d)
     float t1, t2;
     float a = d.x * d.x + d.y * d.y + d.z * d.z;
     float b = 2.0 * p.x * d.x + 2.0 * p.y * d.y + 2.0 * p.z * d.z;
-    float c = p.x * p.x + p.y * p.y + p.z * p.z - 1;
+    float c = p.x * p.x + p.y * p.y + p.z * p.z - .25;
     int tees = findT(a, b, c, t1, t2);
 
     if (tees > 0)
@@ -220,6 +220,7 @@ vec3 calcObjectColorSolid(in int index, in vec3 point, in vec3 normal, in vec3 e
 
 vec3 calcWaterColor(in vec3 point, in vec3 normal, in vec3 eye)
 {
+
     vec3 w_i = normalize(point - eye);
     vec3 reflectVec = reflect(w_i, normal);
     vec3 refractVec = refract(w_i, normal, N_a / N_w);
@@ -227,13 +228,17 @@ vec3 calcWaterColor(in vec3 point, in vec3 normal, in vec3 eye)
     vec3 reflection;
     int colorIndex;
     vec3 bumpPoint = point + normal * 0.001;
+    if (intersectObjects(-1, vec4(bumpPoint, 1), vec4(normalize(-LIGHT_DIR), 0), colorIndex).w == INF)
+    {
+        vec4 n = intersectObjects(-1, vec4(bumpPoint, 1), vec4(reflectVec, 0), colorIndex);
 
-    vec4 n = intersectObjects(-1, vec4(bumpPoint, 1), vec4(reflectVec, 0), colorIndex);
-
-    if (n.w < INF)
-        reflection = calcObjectColorSolid(colorIndex, bumpPoint + reflectVec * n.w, n.xyz, point); // plus ambient
+        if (n.w < INF)
+            reflection = calcObjectColorSolid(colorIndex, bumpPoint + reflectVec * n.w, n.xyz, point);
+        else
+            reflection = texture(envMap, reflectVec).xyz;
+    }
     else
-        reflection = texture(envMap, reflectVec).xyz;
+        reflection = vec3(0);
 
     vec3 refraction = texture(envMap, refractVec).xyz * vec3(.5, .7, .5);
 
@@ -308,18 +313,25 @@ void main()
 //    tris[1] = vec3(-1,-1,-5);
 //    tris[2] = vec3(1,-1,-3);
 
-    colors[0] = vec3(1,0,0);
-    colors[1] = vec3(0,0,1);
+//    colors[0] = vec3(1,.5,0);
+//    colors[1] = vec3(1,.5,0);
+//    colors[2] = vec3(1,.5,0);
 
-//    invs[0] = mat4(2, 0, 0, 0,
-//                   0, 2, 0, 0,
+    // heh
+//    invs[0] = mat4(1, 0, 0, 0,
+//                   0, 1, 0, 0,
 //                   0, 0, 1, 0,
-//                   0,-6, 5, 1);
+//                   0,-3, 5, 1);
 
 //    invs[1] = mat4(1, 0, 0, 0,
 //                   0, 1, 0, 0,
 //                   0, 0, 1, 0,
-//                   0, 0, 0, 1);
+//                   0,-3, 4, 1);
+
+//    invs[2] = mat4(1.5, 0, 0, 0,
+//                   0, .5, 0, 0,
+//                   0, 0, 1.5, 0,
+//                   0,-2.5, 6.75, 1);
 //    invs[1][3] = vec4(-LIGHT_POS, 1);
     // end testing
 

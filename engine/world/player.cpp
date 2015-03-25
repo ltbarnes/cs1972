@@ -3,9 +3,6 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/norm.hpp>
 
-//#include <iostream>
-//using namespace std;
-
 Player::Player(ActionCamera *cam, glm::vec3 pos)
     : MovableEntity(pos)
 {
@@ -16,6 +13,8 @@ Player::Player(ActionCamera *cam, glm::vec3 pos)
     m_jump = false;
     m_canJump = false;
 
+    m_eyeHeight = .75f;
+
     setMass(1.f);
 }
 
@@ -24,6 +23,11 @@ Player::~Player()
 {
 }
 
+
+void Player::setEyeHeight(float height)
+{
+    m_eyeHeight = height;
+}
 
 void Player::onTick(float secs)
 {
@@ -59,13 +63,13 @@ void Player::onTick(float secs)
 
 void Player::setCameraPos()
 {
-    m_camera->setCenter(getPosition() + glm::vec3(0, EYE_HEIGHT, 0));
+    m_camera->setCenter(getPosition() + glm::vec3(0, m_eyeHeight, 0));
 }
 
 
 glm::vec3 Player::getEyePos()
 {
-    return (getPosition() + glm::vec3(0, EYE_HEIGHT, 0));
+    return (getPosition() + glm::vec3(0, m_eyeHeight, 0));
 }
 
 

@@ -5,8 +5,6 @@
 #include "actioncamera.h"
 #include <QMouseEvent>
 
-#define EYE_HEIGHT .75f
-
 class Player : public MovableEntity
 {
 public:
@@ -23,6 +21,8 @@ public:
 //    void decreaseHealth(int amount);
 //    int getHealth();
 
+    void setEyeHeight(float height);
+
     // mouse events
     virtual void onMouseMoved(QMouseEvent *e, float deltaX, float deltaY);
 
@@ -38,6 +38,9 @@ protected:
 
     int m_wsad;
     bool m_canJump, m_jump;
+
+private:
+    float m_eyeHeight;
 };
 
 #endif // PLAYER_H
