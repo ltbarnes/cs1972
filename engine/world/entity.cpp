@@ -54,6 +54,11 @@ QList<CollisionShape *> Entity::getCollisionShapes()
     return m_collisionShapes;
 }
 
+QList<RenderShape *> Entity::getRenderShapes()
+{
+    return m_renderShapes;
+}
+
 void Entity::addRenderShape(RenderShape *rs)
 {
     if (rs->transparency < 1.f)

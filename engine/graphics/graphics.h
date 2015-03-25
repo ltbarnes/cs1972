@@ -95,6 +95,7 @@ public:
     void setParticleForce(glm::vec3 force);
 
     // ray stuff
+    void rayAddObjects();
     void rayDrawQuad();
 
     static GLuint loadShaders(const char *vertex_file_path, const char *fragment_file_path);

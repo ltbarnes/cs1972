@@ -15,6 +15,7 @@ public:
     void setCube(float radius);
     void setTextures();
 
+    void bindTexture();
     void render();
 
 private:

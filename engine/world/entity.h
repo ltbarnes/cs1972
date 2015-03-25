@@ -28,6 +28,7 @@ public:
     void setPosition(glm::vec3 pos);
     glm::vec3 getPosition();
     QList<CollisionShape *> getCollisionShapes();
+    QList<RenderShape *> getRenderShapes();
 
     void addRenderShape(RenderShape *rs);
     virtual void addCollisionShape(CollisionShape *cs);

@@ -8,15 +8,27 @@ out vec4 fragColor;
 uniform vec2 viewport;
 uniform mat4 scale;
 uniform mat4 view;
+uniform samplerCube envMap;
 
-uniform int NUM_TRIS = 240;
-uniform int NUM_OBJECTS = 1;
+uniform int NUM_TRIS = 2;
+uniform int NUM_OBJECTS = 0;
 uniform int NUM_LIGHTS = 1;
 
+uniform mat4 invs[10];
 // to be uniforms or blocks
 vec3 colors[10];
-mat4 invs[10];
-uniform vec3 lightPos[10];
+vec3 lightPos[10];
+
+// Constants
+const float N_w = 1.336; // water
+const float N_a = 1.0001; // air
+//const float N_g = 1.513; // glass
+const float N_g = 2.0001;
+
+const float WATER_HEIGHT = 1.0;
+const vec3 LIGHT_DIR = vec3(-1, -1.2, .4);
+const vec3 LIGHT_COLOR = vec3(1, 1, 1);
+const float SHINE = 64.0;
 
 const float INF = 10000.0;
 const float EPS = 0.00001;
@@ -30,6 +42,19 @@ layout (std140) uniform triBlock {
 };
 
 
+
+//////////////////////////////////////////////
+//                PHYSICS                   //
+//////////////////////////////////////////////
+
+float fresnel(in vec3 i, in vec3 t, in vec3 norm, in float n1, in float n2)
+{
+    float cosi = dot(-i, norm);
+    float cost = dot(t, -norm);
+    float rp = (n2*cosi - n1*cost) / (n2*cosi + n1*cost);
+    float rs = (n1*cosi - n2*cost) / (n1*cosi + n2*cost);
+    return (rp*rp + rs*rs) * .5;
+}
 
 
 ///////////////////////////////////////////
@@ -106,137 +131,196 @@ vec4 intersectSphere(in vec4 p, in vec4 d)
     return n;
 }
 
-////////////////////TRIANGLE/////////////////////
+/////////////////////PLANE//////////////////////
 
-vec4 intersectTriangle(in vec4 p, in vec4 d, in int index)
+vec4 intersectPlaneXZ(in vec4 p, in vec4 d)
 {
-    vec3 v1 = tris[index].xyz;
-    vec3 v2 = tris[index+1].xyz;
-    vec3 v3 = tris[index+2].xyz;
-//    vec4 n = vec4(cross(v2 - v1, v3 - v1), INF);
-    vec4 n = vec4(tris[index+3].xyz, INF);
-    if (dot(d, n) > 0.0)
-        return n;
+    vec4 n = vec4(0, 0, 0, INF);
 
-    // intersect infinite plane
-    n.w = dot(-n.xyz, p.xyz - v1) / dot(n.xyz, d.xyz);
-    if (n.w < 0.0)
-        return vec4(n.xyz, INF);
-
-    vec3 point = p.xyz + d.xyz * n.w;
-
-    // check if collision point is within triangle
-    vec3 pab = cross(v1 - point, v2 - point);
-    vec3 pbc = cross(v2 - point, v3 - point);
-    vec3 pca = cross(v3 - point, v1 - point);
-
-    if (dot(pab, pbc) < EPS || dot(pbc, pca) < EPS)
+    n.w = WATER_HEIGHT - p.y / d.y;
+    if (n.w < EPS)
         n.w = INF;
 
+    if (n.w < INF)
+    {
+        // calc pos and normal for waves
+        n.xyz = vec3(0, 1, 0);
+    }
     return n;
 }
 
+/////////////////////ALL_OBJECTS//////////////////////
 
-vec3 calcColor(in int index, in vec3 point, in vec3 normal, in vec3 eye)
+vec4 intersectObjects(in int exception, in vec4 p, in vec4 d, out int colorIndex)
 {
-    return colors[index];
-}
-
-
-vec3 raytrace(in vec4 p, in vec4 d, in int depth)
-{
-    vec3 normal;
-    int colorIndex;
-    float bestT = INF;
-
+    vec4 bestN = vec4(0, 0, 0, INF);
     vec4 n;
-    int index;
-    vec3 v1, v2, v3;
-    vec4 v14, v24, v34;
-    vec3 point, pab, pbc, pca;
-    for (int i = 0; i < NUM_TRIS; ++i)
-    {
-        index = i * 3;
-//        n = intersectTriangle(p, d, i * 4);
-        ////////////////////////
-        v14 = tris[index];
-        v24 = tris[index+1];
-        v34 = tris[index+2];
-        n = vec4(v14.w, v24.w, v34.w, INF);
-
-
-        if (dot(d, n) < 0.0)
-        {
-            v1 = v14.xyz;
-            v2 = v24.xyz;
-            v3 = v34.xyz;
-            // intersect infinite plane
-            n.w = dot(-n.xyz, p.xyz - v1) / dot(n.xyz, d.xyz);
-            if (n.w < 0.0)
-                n = vec4(n.xyz, INF);
-            else
-            {
-                point = p.xyz + d.xyz * n.w;
-
-                // check if collision point is within triangle
-                pab = cross(v1 - point, v2 - point);
-                pbc = cross(v2 - point, v3 - point);
-                pca = cross(v3 - point, v1 - point);
-
-                if (dot(pab, pbc) < EPS || dot(pbc, pca) < EPS)
-                    n.w = INF;
-            }
-        }
-
-
-        /////////////////////
-        if (n.w < bestT)
-        {
-            bestT = n.w;
-            normal = n.xyz;
-            colorIndex = 0;
-        }
-    }
 
     for (int i = 0; i < NUM_OBJECTS; ++i)
     {
+        if (i == exception)
+            continue;
+
         vec4 p_shape = invs[i] * p;
         vec4 d_shape = invs[i] * d;
         n = intersectSphere(p_shape, d_shape);
-        if (n.w < bestT)
+        if (n.w < bestN.w)
         {
-            bestT = n.w;
-            normal = n.xyz;
-            colorIndex = i + 1;
+            bestN.w = n.w;
+            bestN.xyz = normalize(mat3(transpose(invs[i])) * n.xyz);
+            colorIndex = i;
         }
     }
+    return bestN;
+}
 
-    if (bestT < INF)
+
+vec4 intersectWorld(in int exception, in vec4 p, in vec4 d, out int colorIndex)
+{
+    vec4 bestN = vec4(0, 0, 0, INF);
+    vec4 n;
+
+    n = intersectObjects(exception, p, d, colorIndex);
+    if (n.w < bestN.w)
+        bestN = n;
+
+    n = intersectPlaneXZ(p, d);
+    if (n.w < bestN.w && d.y < 0.0)
     {
-        point = p.xyz + d.xyz * n.w;
-        return calcColor(colorIndex, point, n.xyz, p.xyz);
+        bestN = n;
+        colorIndex = -1;
+    }
+    return bestN;
+}
+
+
+///////////////////////////////////////////
+//                 COLORS                //
+///////////////////////////////////////////
+
+vec3 calcObjectColorSolid(in int index, in vec3 point, in vec3 normal, in vec3 eye)
+{
+    vec3 color = colors[index] * 0.2;
+//    vec3 vertexToLight = normalize(LIGHT_POS - point);
+    vec3 vertexToLight = normalize(-LIGHT_DIR);
+
+    // Add diffuse component
+    float diffuseIntensity = max(0.0, dot(vertexToLight, normal));
+    color = max(vec3(0), LIGHT_COLOR * colors[index] * diffuseIntensity);
+
+    // Add specular component
+    vec3 lightReflection = normalize(reflect(-vertexToLight, normal));
+    vec3 eyeDirection = normalize(eye - point);
+    float specIntensity = pow(max(0.0, dot(eyeDirection, lightReflection)), SHINE);
+    color += max(vec3(0), texture(envMap, vertexToLight).xyz * specIntensity);
+
+    return color;
+}
+
+
+vec3 calcWaterColor(in vec3 point, in vec3 normal, in vec3 eye)
+{
+    vec3 w_i = normalize(point - eye);
+    vec3 reflectVec = reflect(w_i, normal);
+    vec3 refractVec = refract(w_i, normal, N_a / N_w);
+
+    vec3 reflection;
+    int colorIndex;
+    vec3 bumpPoint = point + normal * 0.001;
+
+    vec4 n = intersectObjects(-1, vec4(bumpPoint, 1), vec4(reflectVec, 0), colorIndex);
+
+    if (n.w < INF)
+        reflection = calcObjectColorSolid(colorIndex, bumpPoint + reflectVec * n.w, n.xyz, point); // plus ambient
+    else
+        reflection = texture(envMap, reflectVec).xyz;
+
+    vec3 refraction = texture(envMap, refractVec).xyz * vec3(.5, .7, .5);
+
+    float F = fresnel(w_i, refractVec, normal, N_a, N_w);
+
+    return reflection * F + (1.0 - F) * refraction;
+}
+
+vec3 calcObjectColor(in int index, in vec3 point, in vec3 normal, in vec3 eye)
+{
+    vec3 w_i = normalize(point - eye);
+    vec3 reflectVec = reflect(w_i, normal);
+    vec3 refractVec = refract(w_i, normal, N_a / N_g);
+
+
+    int colorIndex;
+    vec3 bumpPoint = point + normal * 0.001;
+    vec4 n = intersectWorld(index, vec4(bumpPoint, 1), vec4(reflectVec, 0), colorIndex);
+
+    vec3 reflection = vec3(0,1,0);
+    if (n.w < INF)
+    {
+        vec3 newPoint = bumpPoint.xyz + reflectVec.xyz * n.w;
+
+        if (colorIndex == -1)
+            // calc ocean color
+            reflection = calcWaterColor(newPoint, n.xyz, eye.xyz);
+        else
+            // calc object colors
+            reflection = calcObjectColorSolid(colorIndex, newPoint, n.xyz, eye.xyz);
+    }
+    else
+        reflection = texture(envMap, reflectVec).xyz;
+
+    vec3 refraction = calcObjectColorSolid(index, point, normal, eye);
+
+    float F = fresnel(w_i, refractVec, normal, N_a, N_g);
+//F = 0;
+    return reflection * F + (1.0 - F) * refraction;
+}
+
+
+vec3 raytrace(in vec4 p, in vec4 d)
+{
+    int colorIndex;
+    vec4 n = intersectWorld(-1, p, d, colorIndex);
+
+    if (n.w < INF)
+    {
+        vec3 point = p.xyz + d.xyz * n.w;
+
+        // calc ocean color
+        if (colorIndex == -1)
+            return calcWaterColor(point, n.xyz, p.xyz);
+
+        // calc object colors
+        return calcObjectColor(colorIndex, point, n.xyz, p.xyz);
     }
 
-    return vec3(0);
+//    return vec3(0);
+    return texture(envMap, d.xyz).xyz;
 }
 
 
 
 
-void main(){
+void main()
+{
 
     // testing
 //    tris[0] = vec3(0,1,-5);
 //    tris[1] = vec3(-1,-1,-5);
 //    tris[2] = vec3(1,-1,-3);
 
-    colors[0] = vec3(0, 1, 0);
-    colors[1] = vec3(1);
+    colors[0] = vec3(1,0,0);
+    colors[1] = vec3(0,0,1);
 
-    invs[0] = mat4(2, 0, 0, 0,
-                   0, 1, 0, 0,
-                   0, 0, 2, 0,
-                   0, 0, 10, 1);
+//    invs[0] = mat4(2, 0, 0, 0,
+//                   0, 2, 0, 0,
+//                   0, 0, 1, 0,
+//                   0,-6, 5, 1);
+
+//    invs[1] = mat4(1, 0, 0, 0,
+//                   0, 1, 0, 0,
+//                   0, 0, 1, 0,
+//                   0, 0, 0, 1);
+//    invs[1][3] = vec4(-LIGHT_POS, 1);
     // end testing
 
     mat4 ftw = inverse(scale * view);
@@ -244,6 +328,6 @@ void main(){
     vec4 farWorld = ftw * vec4(pos, 1);
     vec4 dir = normalize(farWorld - eye);
 
-    vec3 color = raytrace(eye, dir, 0);
+    vec3 color = raytrace(eye, dir);
     fragColor = vec4(color, 1);
 }

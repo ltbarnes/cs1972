@@ -114,15 +114,6 @@ void Graphics::init()
     m_sparseLocs["repeatUV"] = glGetUniformLocation(m_sparseShader, "repeatUV");
 
 
-    m_cubeShader = Graphics::loadShaders(
-                ":/shaders/cubemap.vert",
-                ":/shaders/cubemap.frag");
-
-
-    m_cubeLocs["projection"] = glGetUniformLocation(m_cubeShader, "projection");
-    m_cubeLocs["view"] = glGetUniformLocation(m_cubeShader, "view");
-    m_cubeLocs["envMap"] = glGetUniformLocation(m_cubeShader, "envMap");
-
     m_rayShader = Graphics::loadShaders(
                 ":/shaders/ray.vert",
                 ":/shaders/ray.frag");
@@ -130,6 +121,16 @@ void Graphics::init()
     m_rayLocs["viewport"] = glGetUniformLocation(m_rayShader, "viewport");
     m_rayLocs["scale"] = glGetUniformLocation(m_rayShader, "scale");
     m_rayLocs["view"] = glGetUniformLocation(m_rayShader, "view");
+    m_rayLocs["envMap"] = glGetUniformLocation(m_rayShader, "envMap");
+
+
+    m_cubeShader = Graphics::loadShaders(
+                ":/shaders/cubemap.vert",
+                ":/shaders/cubemap.frag");
+
+    m_cubeLocs["projection"] = glGetUniformLocation(m_cubeShader, "projection");
+    m_cubeLocs["view"] = glGetUniformLocation(m_cubeShader, "view");
+    m_cubeLocs["envMap"] = glGetUniformLocation(m_cubeShader, "envMap");
 
     m_cubeMap->init();
 
@@ -205,6 +206,8 @@ GLuint Graphics::setGraphicsMode(GraphicsMode gm)
         glUniformMatrix4fv(m_rayLocs["view"], 1, GL_FALSE,
                 glm::value_ptr(m_currView));
         glUniform2f(m_rayLocs["viewport"], m_w, m_h);
+        glUniform1i(m_rayLocs["envMap"], 1);
+        m_cubeMap->bindTexture();
         break;
     case CUBEMAP:
         break;
@@ -353,7 +356,7 @@ void Graphics::drawCubeMap(Camera *camera)
             glm::value_ptr(camera->getProjectionMatrix()));
     glUniformMatrix4fv(m_cubeLocs["view"], 1, GL_FALSE,
             glm::value_ptr(camera->getViewMatrix()));
-    glUniform1i(glGetUniformLocation(m_cubeShader, "envMap"), 1);
+    glUniform1i(m_cubeLocs["envMap"], 1);
 
     m_cubeMap->render();
 
@@ -484,6 +487,19 @@ void Graphics::drawParticles(glm::vec3 source, float fuzziness)
 
 
 
+void Graphics::rayAddObjects()
+{
+    std::ostringstream os;
+    os << 0;
+    std::string indexString = "[" + os.str() + "]"; // e.g. [0], [1], etc.
+
+    glm::mat4 inv = glm::translate(glm::mat4(), glm::vec3(0, 2, -5)) *
+            glm::scale(glm::mat4(), glm::vec3(.5, .5, 1));
+    inv = glm::inverse(inv);
+    glUniformMatrix4fv(glGetUniformLocation(m_rayShader, ("invs" + indexString).c_str()), 1, GL_FALSE, glm::value_ptr(inv));
+    glUniform1i(glGetUniformLocation(m_rayShader, "NUM_OBJECTS"), 1);
+}
+
 
 void Graphics::rayDrawQuad()
 {
@@ -555,7 +571,9 @@ void Graphics::loadTexture(const QString &filename, const QString &key)
 }
 
 
-GLuint Graphics::loadShaders(const char *vertex_file_path, const char *fragment_file_path){
+GLuint Graphics::loadShaders(const char *vertex_file_path, const char *fragment_file_path)
+{
+    // NOTE: MUST INIT GLEW BEFORE USING THIS CODE
 
     // Create the shaders
     GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);

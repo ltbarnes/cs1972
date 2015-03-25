@@ -22,8 +22,8 @@ mat4 rotationMatrix(in vec3 axis, in float angle)
 }
 
 void main () {
-        texc = vec3(rotationMatrix(vec3(1, 0, 1), -PI / 2.0) * vec4(position, 1.0));
-	
+//        texc = vec3(rotationMatrix(vec3(0, 1, 0), -PI / 2.0) * vec4(position, 1.0));
+        texc = position.xyz;
 	mat3 v = mat3(view);
 
 	gl_Position = projection * mat4(v) * vec4(position, 1.0);

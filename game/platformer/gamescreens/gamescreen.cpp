@@ -12,6 +12,7 @@
 GameScreen::GameScreen(Application *parent, int level)
     : Screen(parent)
 {
+//    m_parentApp->setUseCubeMap(true);
 
     m_oh = new ObjectHandler();
     m_nmh = new NavMeshHandler();
@@ -31,6 +32,10 @@ GameScreen::GameScreen(Application *parent, int level)
         m_level = m_oh->getObject(":/objects/level_island.obj", shader, &tris);
         m_nmh->setObject(m_oh->getObject(":/objects/level_island_navmesh.obj", shader, navTris));
         m_nmh->createVBO();
+        break;
+    case 4:
+        m_levelTexture = "";
+        m_level = m_oh->getObject(":/objects/level_raceway.obj", shader, &tris);
         break;
     default: // 1
         m_levelTexture = "level_easy.png";
@@ -68,13 +73,13 @@ GameScreen::GameScreen(Application *parent, int level)
 
 
     // ray cast attempt
-//    m_test = new Triangle(glm::vec3(0,2,-5),glm::vec3(-1,1,-5),glm::vec3(1,1,-5));
-//    QList<Triangle*> triTest;
-//    triTest.append(m_test);
+    m_test = new Triangle(glm::vec3(0,2,-5),glm::vec3(-1,1,-5),glm::vec3(1,1,-5));
+    QList<Triangle*> triTest;
+    triTest.append(m_test);
 
-//    shader = m_parentApp->getShader(RAY);
-//    m_mb = new MeshBuffer();
-//    m_mb->setBuffer(shader, tris);
+    shader = m_parentApp->getShader(RAY);
+    m_mb = new MeshBuffer();
+    m_mb->setBuffer(shader, triTest);
 }
 
 GameScreen::~GameScreen()
@@ -83,8 +88,8 @@ GameScreen::~GameScreen()
     delete m_nmh;
     delete m_world;
     delete m_ellipsoid;
-//    delete m_mb;
-//    delete m_test;
+    delete m_mb;
+    delete m_test;
 }
 
 // update and render
@@ -132,75 +137,77 @@ void GameScreen::onTick(float secs  )
 
 void GameScreen::onRender(Graphics *g)
 {
-    g->setWorldColor(.1, .1, .1);
-    g->setColor(1, 1, 1, 1, 0);
+//    m_parentApp->setUseCubeMap(true);
+//    g->setWorldColor(.1, .1, .1);
+//    g->setColor(1, 1, 1, 1, 0);
 
 
-    Light light1;
-    light1.type = POINT;
-    light1.color = glm::vec3(.5f, 1, .5f);
-    light1.posDir = glm::vec3(0, 30, 0);
-    light1.id = 1;
+//    Light light1;
+//    light1.type = POINT;
+//    light1.color = glm::vec3(.5f, 1, .5f);
+//    light1.posDir = glm::vec3(0, 30, 0);
+//    light1.id = 1;
 
-    g->addLight(light1);
+//    g->addLight(light1);
 
-    m_world->onDraw(g);
+//    m_world->onDraw(g);
 
 
-    g->setTexture("");
-    g->setColor(.25f, .75f, 1, 1, 0);
-    glm::mat4 trans;
-    if (m_drawEllipsoid)
-    {
-        trans = glm::translate(glm::mat4(), m_ellipsoid->getPos()) *
-                glm::scale(glm::mat4(), m_ellipsoid->getDim() * 2.f);
-        g->drawSphere(trans);
-    }
-    if (m_drawPoint)
-    {
-        trans = glm::translate(glm::mat4(), m_point) *
-                glm::scale(glm::mat4(), glm::vec3(0.1f));
-        g->setColor(1, 0, 0, 1, 0);
-        g->drawSphere(trans);
-    }
+//    g->setTexture("");
+//    g->setColor(.25f, .75f, 1, 1, 0);
+//    glm::mat4 trans;
+//    if (m_drawEllipsoid)
+//    {
+//        trans = glm::translate(glm::mat4(), m_ellipsoid->getPos()) *
+//                glm::scale(glm::mat4(), m_ellipsoid->getDim() * 2.f);
+//        g->drawSphere(trans);
+//    }
+//    if (m_drawPoint)
+//    {
+//        trans = glm::translate(glm::mat4(), m_point) *
+//                glm::scale(glm::mat4(), glm::vec3(0.1f));
+//        g->setColor(1, 0, 0, 1, 0);
+//        g->drawSphere(trans);
+//    }
 
-    if (m_drawNavMesh && m_nmh->hasObject())
-    {
-        trans = glm::translate(glm::mat4(), glm::vec3(0, .3f, 0));
+//    if (m_drawNavMesh && m_nmh->hasObject())
+//    {
+//        trans = glm::translate(glm::mat4(), glm::vec3(0, .3f, 0));
 
-        g->setTransparentMode(true);
-        trans[3][1] += 0.01f;
-        m_nmh->drawPath(trans, g, glm::vec4(1, 1, 0, .3f));
-        g->setColor(1, 0, 1, .3f, 0);
-        trans[3][1] += 0.01f;
-        m_nmh->drawEnd(trans);
-        g->setColor(0, 0, 1, .3f, 0);
-        m_nmh->drawStart(trans);
-        g->setColor(0, 1, 1, .3f, 0);
-        m_nmh->draw(trans);
+//        g->setTransparentMode(true);
+//        trans[3][1] += 0.01f;
+//        m_nmh->drawPath(trans, g, glm::vec4(1, 1, 0, .3f));
+//        g->setColor(1, 0, 1, .3f, 0);
+//        trans[3][1] += 0.01f;
+//        m_nmh->drawEnd(trans);
+//        g->setColor(0, 0, 1, .3f, 0);
+//        m_nmh->drawStart(trans);
+//        g->setColor(0, 1, 1, .3f, 0);
+//        m_nmh->draw(trans);
 
-        g->setColor(0, 0, 0, 1, 0);
-        g->setTransparentMode(false);
-        m_nmh->drawLines(trans);
+//        g->setColor(0, 0, 0, 1, 0);
+//        g->setTransparentMode(false);
+//        m_nmh->drawLines(trans);
 
-        g->setTransparentMode(true);
-        g->setTexture(m_levelTexture);
-        g->setColor(1, 1, 1, .7f, 0);
-        m_level->draw(glm::mat4());
-        g->setTransparentMode(false);
-    } else
-    {
-        g->setAllWhite(true);
-        g->setTexture(m_levelTexture);
-        m_level->draw(glm::mat4());
-        g->setAllWhite(false);
-    }
+//        g->setTransparentMode(true);
+//        g->setTexture(m_levelTexture);
+//        g->setColor(1, 1, 1, .7f, 0);
+//        m_level->draw(glm::mat4());
+//        g->setTransparentMode(false);
+//    } else
+//    {
+//        g->setAllWhite(true);
+//        g->setTexture(m_levelTexture);
+//        m_level->draw(glm::mat4());
+//        g->setAllWhite(false);
+//    }
 
     // ray cast attempt
-//    g->setGraphicsMode(RAY);
-////    glBindBuffer(GL_UNIFORM_BUFFER, m_mb->getUBO());
-//    g->rayDrawQuad();
-////    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    g->setGraphicsMode(RAY);
+//    glBindBuffer(GL_UNIFORM_BUFFER, m_mb->getUBO());
+    g->rayAddObjects();
+    g->rayDrawQuad();
+//    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
