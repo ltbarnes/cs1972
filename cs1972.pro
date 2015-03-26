@@ -77,7 +77,8 @@ SOURCES += \
     engine/graphics/meshbuffer.cpp \
     game/platformer/gamescreens/gamescreentest.cpp \
     game/platformer/entities/racer.cpp \
-    game/platformer/entities/racerplayer.cpp
+    game/platformer/entities/racerplayer.cpp \
+    engine/collisions/collisionsphere.cpp
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.cpp \
 #    game/minecraft/gamescreens/gamescreen.cpp \
@@ -147,7 +148,8 @@ HEADERS += \
     engine/graphics/meshbuffer.h \
     game/platformer/gamescreens/gamescreentest.h \
     game/platformer/entities/racer.h \
-    game/platformer/entities/racerplayer.h
+    game/platformer/entities/racerplayer.h \
+    engine/collisions/collisionsphere.h
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.h \
 #    game/minecraft/gamescreens/gamescreen.h \

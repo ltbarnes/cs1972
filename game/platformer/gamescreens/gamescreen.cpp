@@ -6,11 +6,10 @@
 #include "racerplayer.h"
 #include "geometriccollisionmanager.h"
 #include "triangle.h"
-#include "racer.h"
 
 //#include <glm/ext.hpp>
 
-GameScreen::GameScreen(Application *parent, int level)
+GameScreen::GameScreen(Application *parent)
     : Screen(parent)
 {
     m_parentApp->setUseCubeMap(false);
@@ -22,31 +21,10 @@ GameScreen::GameScreen(Application *parent, int level)
     QList<Triangle *> tris;
     QList<Triangle *> *navTris = m_nmh->getTriangleList();
 
-    switch (level)
-    {
-    case 2:
-        m_levelTexture = "level_hard.png";
-        m_level = m_oh->getObject(":/objects/level_hard.obj", shader, &tris);
-        break;
-    case 3:
-        m_levelTexture = "level_island.png";
-        m_level = m_oh->getObject(":/objects/level_island.obj", shader, &tris);
-        m_nmh->setObject(m_oh->getObject(":/objects/level_island_navmesh.obj", shader, navTris));
-        m_nmh->createVBO();
-        break;
-    case 4:
-        m_levelTexture = "";
-        m_level = m_oh->getObject(":/objects/level_raceway.obj", shader, &tris);
-        break;
-    default: // 1
-        m_levelTexture = "level_easy.png";
-        m_level = m_oh->getObject(":/objects/level_easy.obj", shader, &tris);
-        m_nmh->setObject(m_oh->getObject(":/objects/level_easy_navmesh.obj", shader, navTris));
-        m_nmh->createVBO();
-        break;
-    }
-
-    cout << tris.size() << endl;
+    m_levelTexture = "";
+    m_level = m_oh->getObject(":/objects/level_raceway.obj", shader, &tris);
+    m_nmh->setObject(m_oh->getObject(":/objects/level_raceway_navmesh.obj", shader, navTris));
+    m_nmh->createVBO();
 
     m_world = new PlatformerWorld();
     m_world->addToMesh(tris);
@@ -88,8 +66,6 @@ GameScreen::~GameScreen()
     delete m_nmh;
     delete m_world;
     delete m_ellipsoid;
-//    delete m_mb;
-//    delete m_test;
 }
 
 // update and render
@@ -133,6 +109,8 @@ void GameScreen::onTick(float secs  )
 
     m_nmh->setStart(m_world->getPlayer()->getPosition());
     m_nmh->findPath();
+    m_nmh->setStart(m_world->getPlayer()->getPosition());
+    m_nmh->findPath();
 }
 
 void GameScreen::onRender(Graphics *g)
@@ -145,9 +123,9 @@ void GameScreen::onRender(Graphics *g)
 
 
         Light light1;
-        light1.type = POINT;
+        light1.type = DIRECTIONAL;
         light1.color = glm::vec3(.5f, 1, .5f);
-        light1.posDir = glm::vec3(0, 30, 0);
+        light1.posDir = glm::normalize(glm::vec3(-1, -1.2, .4));
         light1.id = 1;
 
         g->addLight(light1);

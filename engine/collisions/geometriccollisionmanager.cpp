@@ -35,8 +35,6 @@ void GeometricCollisionManager::manage(World *world, float)
     {
         QList<TriCollision *> cols = detectTriangleCollisions(ellis, triangles);
 
-//        if (!cols.isEmpty())
-//            cout << i << ": " << glm::to_string(cols.first()->colNorm) << endl;
         handleCollisions(cols);
 
         // delete collisions
@@ -130,7 +128,6 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
             para = rem - perp;
 
             glm::vec3 vel = me->getVelocity();
-//            cout << "vel: " << glm::to_string(vel) << endl;
             if (glm::length2(vel) > 0.000001f)
             {
                 glm::vec3 newVel = vel - vel * glm::abs(n);
@@ -140,7 +137,6 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
             }
             else
                 vel = glm::vec3();
-//            cout << "vel2: " << glm::to_string(vel) << endl;
             me->setVelocity(vel);
         }
         else

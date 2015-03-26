@@ -6,6 +6,7 @@
 #include <QList>
 
 class CollisionCylinder;
+class CollisionSphere;
 class Triangle;
 struct TriCollision;
 
@@ -34,6 +35,7 @@ public:
 
     virtual Collision *collides(CollisionShape *shape) = 0;
     virtual Collision *collidesCylinder(CollisionCylinder *cc) = 0;
+    virtual Collision *collidesSphere(CollisionSphere *cs) = 0;
     virtual void collidesTriangle(Triangle tri, glm::vec3 d, TriCollision *col) = 0;
 
 protected:

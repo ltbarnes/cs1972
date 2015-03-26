@@ -74,6 +74,11 @@ void Entity::onTick(float)
 {
 }
 
+glm::mat4 Entity::getRotation()
+{
+    return m_rotation;
+}
+
 void Entity::onDrawOpaque(Graphics *g)
 {
     glm::mat4 posMat = glm::translate(glm::mat4(), m_pos) * m_rotation;

@@ -150,7 +150,7 @@ void PlatformerMenu::onMouseMoved(QMouseEvent *, float deltaX, float deltaY)
 void PlatformerMenu::onMousePressed(QMouseEvent *e)
 {
     if (e->button() == Qt::LeftButton && m_level > 0)
-        m_parentApp->addScreen(new GameScreen(m_parentApp, m_level));
+        m_parentApp->addScreen(new GameScreen(m_parentApp));
 }
 
 void PlatformerMenu::onResize(int w, int h)

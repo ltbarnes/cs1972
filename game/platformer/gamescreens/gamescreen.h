@@ -7,13 +7,14 @@
 #include "ellipsoid.h"
 #include "navmeshhandler.h"
 #include "meshbuffer.h"
+#include "racer.h"
 
 class PlatformerPlayer; // TEMP, SHOULD BE IN WORLD
 
 class GameScreen : public Screen
 {
 public:
-    GameScreen(Application *parent, int level);
+    GameScreen(Application *parent);
     virtual ~GameScreen();
 
     // update and render
@@ -39,6 +40,8 @@ private:
     NavMeshHandler *m_nmh;
 
     PlatformerWorld *m_world;
+    Racer *m_racer1;
+    Racer *m_racer2;
 
     bool m_drawEllipsoid;
     bool m_drawPoint;
@@ -49,9 +52,6 @@ private:
     glm::vec3 m_point;
 
     bool m_graphicsCardDestructionMode;
-
-//    MeshBuffer *m_mb;
-//    Triangle *m_test;
 
 };
 

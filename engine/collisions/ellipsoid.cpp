@@ -146,4 +146,5 @@ void Ellipsoid::setPosition(glm::vec3 pos)
 
 void Ellipsoid::handleCollision(TriCollision) {}
 Collision *Ellipsoid::collides(CollisionShape *) { return NULL; }
+Collision *Ellipsoid::collidesSphere(CollisionSphere *) { return NULL; }
 Collision *Ellipsoid::collidesCylinder(CollisionCylinder *) { return NULL; }

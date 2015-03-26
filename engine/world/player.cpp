@@ -101,8 +101,8 @@ void Player::onKeyPressed(QKeyEvent *e)
     case Qt::Key_Minus:
     case Qt::Key_Underscore:
         m_offset += 1.f;
-        if (m_offset > 15.f)
-            m_offset = 15.f;
+        if (m_offset > 25.f)
+            m_offset = 25.f;
         m_camera->setOffset(m_offset);
         break;
     case Qt::Key_Plus:

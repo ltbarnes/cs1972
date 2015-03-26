@@ -27,6 +27,7 @@ public:
 
     void setPosition(glm::vec3 pos);
     glm::vec3 getPosition();
+    glm::mat4 getRotation();
     QList<CollisionShape *> getCollisionShapes();
     QList<RenderShape *> getRenderShapes();
 

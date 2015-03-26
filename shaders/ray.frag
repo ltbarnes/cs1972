@@ -6,8 +6,8 @@ out vec4 fragColor;
 
 
 uniform vec2 viewport;
-uniform mat4 scale;
-uniform mat4 view;
+uniform mat4 filmToWorld;
+uniform vec4 camEye;
 uniform samplerCube envMap;
 
 uniform int NUM_TRIS = 2;
@@ -200,13 +200,19 @@ vec4 intersectWorld(in int exception, in vec4 p, in vec4 d, out int colorIndex)
 
 vec3 calcObjectColorSolid(in int index, in vec3 point, in vec3 normal, in vec3 eye)
 {
-    vec3 color = colors[index] * 0.2;
+    vec3 color = colors[index] * 0.075;
 //    vec3 vertexToLight = normalize(LIGHT_POS - point);
+
+    int colorIndex;
+    vec3 bumpPoint = point + normal * EPS;
+    if (intersectObjects(index, vec4(bumpPoint, 1), vec4(normalize(-LIGHT_DIR), 0), colorIndex).w < INF)
+        return color;
+
     vec3 vertexToLight = normalize(-LIGHT_DIR);
 
     // Add diffuse component
     float diffuseIntensity = max(0.0, dot(vertexToLight, normal));
-    color = max(vec3(0), LIGHT_COLOR * colors[index] * diffuseIntensity);
+    color += max(vec3(0), LIGHT_COLOR * colors[index] * diffuseIntensity);
 
     // Add specular component
     vec3 lightReflection = normalize(reflect(-vertexToLight, normal));
@@ -335,11 +341,9 @@ void main()
 //    invs[1][3] = vec4(-LIGHT_POS, 1);
     // end testing
 
-    mat4 ftw = inverse(scale * view);
-    vec4 eye = inverse(view) * vec4(0, 0, 0, 1);
-    vec4 farWorld = ftw * vec4(pos, 1);
-    vec4 dir = normalize(farWorld - eye);
+    vec4 farWorld = filmToWorld * vec4(pos, 1);
+    vec4 dir = normalize(farWorld - camEye);
 
-    vec3 color = raytrace(eye, dir);
+    vec3 color = raytrace(camEye, dir);
     fragColor = vec4(color, 1);
 }

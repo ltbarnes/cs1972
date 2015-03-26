@@ -1,14 +1,14 @@
-#ifndef COLLISIONCYLINDER_H
-#define COLLISIONCYLINDER_H
+#ifndef COLLISIONSPHERE_H
+#define COLLISIONSPHERE_H
 
 #include "collisionshape.h"
 #include "entity.h"
 
-class CollisionCylinder : public CollisionShape
+class CollisionSphere : public CollisionShape
 {
 public:
-    CollisionCylinder(glm::vec3 pos, glm::vec3 dim, QString id);
-    virtual ~CollisionCylinder();
+    CollisionSphere(glm::vec3 pos, glm::vec3 dim, QString id);
+    virtual ~CollisionSphere();
 
     virtual Collision *collides(CollisionShape *cs);
     virtual Collision *collidesCylinder(CollisionCylinder *cc);
@@ -16,4 +16,4 @@ public:
     virtual void collidesTriangle(Triangle tri, glm::vec3 dest, TriCollision *col);
 };
 
-#endif // COLLISIONCYLINDER_H
+#endif // COLLISIONSPHERE_H

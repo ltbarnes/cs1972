@@ -119,8 +119,8 @@ void Graphics::init()
                 ":/shaders/ray.frag");
 
     m_rayLocs["viewport"] = glGetUniformLocation(m_rayShader, "viewport");
-    m_rayLocs["scale"] = glGetUniformLocation(m_rayShader, "scale");
-    m_rayLocs["view"] = glGetUniformLocation(m_rayShader, "view");
+    m_rayLocs["filmToWorld"] = glGetUniformLocation(m_rayShader, "filmToWorld");
+    m_rayLocs["camEye"] = glGetUniformLocation(m_rayShader, "camEye");
     m_rayLocs["envMap"] = glGetUniformLocation(m_rayShader, "envMap");
 
 
@@ -201,10 +201,10 @@ GLuint Graphics::setGraphicsMode(GraphicsMode gm)
         glUseProgram(m_rayShader);
 
         // Set scene uniforms.
-        glUniformMatrix4fv(m_rayLocs["scale"], 1, GL_FALSE,
-                glm::value_ptr(m_currScale));
-        glUniformMatrix4fv(m_rayLocs["view"], 1, GL_FALSE,
-                glm::value_ptr(m_currView));
+        glUniformMatrix4fv(m_rayLocs["filmToWorld"], 1, GL_FALSE,
+                glm::value_ptr(glm::inverse(m_currScale * m_currView)));
+        glUniform4fv(m_rayLocs["camEye"], 1,
+                glm::value_ptr((glm::inverse(m_currView) * glm::vec4(0, 0, 0, 1))));
         glUniform2f(m_rayLocs["viewport"], m_w, m_h);
         glUniform1i(m_rayLocs["envMap"], 1);
         m_cubeMap->bindTexture();

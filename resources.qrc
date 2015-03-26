@@ -39,5 +39,6 @@
         <file alias="level_island_navmesh_eroded.obj">res/objects/level_island_navmesh_eroded.obj</file>
         <file alias="test.obj">res/objects/test.obj</file>
         <file alias="level_raceway.obj">res/objects/level_raceway.obj</file>
+        <file alias="level_raceway_navmesh.obj">res/objects/level_raceway_navmesh.obj</file>
     </qresource>
 </RCC>

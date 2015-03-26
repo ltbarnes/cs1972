@@ -75,5 +75,6 @@ Collision *CollisionCylinder::collidesCylinder(CollisionCylinder *cc)
 }
 
 
+Collision *CollisionCylinder::collidesSphere(CollisionSphere *) { return NULL; }
 void CollisionCylinder::collidesTriangle(Triangle, glm::vec3, TriCollision *) {}
 

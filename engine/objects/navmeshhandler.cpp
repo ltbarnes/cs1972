@@ -305,9 +305,9 @@ static void setVars(glm::vec3 *apex, int i, PathNode *gate, int *leftI, int *rig
     *left = (*verts)[(*gate).left];
     *right = (*verts)[(*gate).right];
 
-    glm::vec3 temp = (*left)*.99f + (*right)*.001f;
-    *right = (*right)*.99f + (*left)*.001f;
-    *left = temp;
+//    glm::vec3 temp = (*left)*.99f + (*right)*.001f;
+//    *right = (*right)*.99f + (*left)*.001f;
+//    *left = temp;
 
     *vecL = glm::normalize((*left) - (*apex));
     *vecR = glm::normalize((*right) - (*apex));
@@ -346,17 +346,12 @@ void NavMeshHandler::simpleStupidFunnel()
     glm::vec3 cross = glm::cross(vecR, vecL);
     float angle = glm::orientedAngle(vecR, vecL, glm::normalize(cross));
 
-//    cout << "\tAngle: " << angle << endl;
-
     PathNode prevGate = gate;
 
     int size = m_pathNodes.size();
     for (int i = 1; i < size; i++)
     {
         gate = m_pathNodes[i];
-//        cout << "\t\t\t\tI: " << i << endl;
-//        cout << "prev: " << prevGate.left << ", " << prevGate.right << endl;
-//        cout << "gate: " << gate.left << ", " << gate.right << endl;
         if (prevGate.left == gate.left)
         {
             // try to move right
@@ -365,8 +360,6 @@ void NavMeshHandler::simpleStupidFunnel()
             nextVec = glm::normalize(next - apex);
             nextCross = glm::cross(nextVec, vecL);
             nextAngle = glm::orientedAngle(nextVec, vecL, glm::normalize(nextCross));
-//            cout << "\tnextAngle: " << nextAngle << endl;
-//            cout << "\tcross: " << (nextCross.y < 0) << endl;
             if (nextI == leftI) // edge length 0
             {
 //                m_pathActual.append(left);
@@ -379,20 +372,16 @@ void NavMeshHandler::simpleStupidFunnel()
                 i = leftI;
 
                 // find next gate that doesn't include apex
-//                cout << "leftI: " << (leftI) << endl;
                 int currLeft = m_pathNodes.value(i, PathNode()).left;
                 gate = m_pathNodes.value(++i, PathNode());
                 while (gate.id != -1 && gate.left == currLeft)
                 {
-//                    cout << "currLeft: " << currLeft << endl;
-//                    cout << "gate.left: " << gate.left << endl;
                     gate = m_pathNodes.value(++i, PathNode());
                 }
 
                 // on last triangle
                 if (gate.left == -1)
                 {
-//                    cout << "end" << endl;
                     m_pathActual.append(m_endPos + glm::vec3(0, -1, 0));
                     return;
                 }
@@ -403,19 +392,10 @@ void NavMeshHandler::simpleStupidFunnel()
             else if (nextAngle < angle)
             {
                 rightI = nextI;
-                right = next*.99f + left*.01f;
+                right = next;//*.99f + left*.01f;
                 vecR = nextVec;
                 cross = nextCross;
                 angle = nextAngle;
-
-//                cout << "i: " << i << endl;
-//                cout << "apex: " << glm::to_string(apex) << endl;
-//                cout << "leftI: " << leftI << endl;
-//                cout << "rightI: " << rightI << endl;
-//                cout << "left: " << glm::to_string(left) << endl;
-//                cout << "right: " << glm::to_string(right) << endl;
-//                cout << "vecL: " << glm::to_string(vecL) << endl;
-//                cout << "vecR: " << glm::to_string(vecR) << endl;
             }
         }
         else if (prevGate.right == gate.right)
@@ -427,8 +407,6 @@ void NavMeshHandler::simpleStupidFunnel()
             nextCross = glm::cross(vecR, nextVec);
             nextAngle = glm::orientedAngle(vecR, nextVec, glm::normalize(nextCross));
 
-//            cout << "\tnextAngle: " << nextAngle << endl;
-//            cout << "\tcross: " << (nextCross.y < 0) << endl;
             if (nextI == rightI) // edge length 0
             {
 //                m_pathActual.append(right);
@@ -441,13 +419,10 @@ void NavMeshHandler::simpleStupidFunnel()
                 i = rightI;
 
                 // find next gate that doesn't include apex
-//                cout << "rightI: " << (rightI+1) << endl;
                 int currRight = m_pathNodes.value(i, PathNode()).right;
                 gate = m_pathNodes.value(++i, PathNode());
                 while (gate.id != -1 && gate.right == currRight)
                 {
-//                    cout << "currRight: " << currRight << endl;
-//                    cout << "gate.right: " << gate.right << endl;
                     gate = m_pathNodes.value(++i, PathNode());
                 }
 
@@ -460,43 +435,22 @@ void NavMeshHandler::simpleStupidFunnel()
                 setVars(&apex, i, &gate, &leftI, &rightI, &left, &right, &vecL, &vecR, &verts);
                 cross = glm::cross(vecR, vecL);
                 angle = glm::orientedAngle(vecR, vecL, glm::normalize(cross));
-
-//                cout << "i: " << i << endl;
-//                cout << "apex: " << glm::to_string(apex) << endl;
-//                cout << "leftI: " << leftI << endl;
-//                cout << "rightI: " << rightI << endl;
-//                cout << "left: " << glm::to_string(left) << endl;
-//                cout << "right: " << glm::to_string(right) << endl;
-//                cout << "vecL: " << glm::to_string(vecL) << endl;
-//                cout << "vecR: " << glm::to_string(vecR) << endl;
             }
             else if (nextAngle < angle)
             {
                 leftI = nextI;
-                left = next*.99f + right*.01f;
+                left = next;//*.99f + right*.01f;
                 vecL = nextVec;
                 cross = nextCross;
                 angle = nextAngle;
-
-//                cout << "i: " << i << endl;
-//                cout << "apex: " << glm::to_string(apex) << endl;
-//                cout << "leftI: " << leftI << endl;
-//                cout << "rightI: " << rightI << endl;
-//                cout << "left: " << glm::to_string(left) << endl;
-//                cout << "right: " << glm::to_string(right) << endl;
-//                cout << "vecL: " << glm::to_string(vecL) << endl;
-//                cout << "vecR: " << glm::to_string(vecR) << endl;
             }
-
         }
         else // end node
         {
-//            cout << "eNDNode: " << endl;
             // check left
             next = m_endPos;
             nextVec = glm::normalize(next - apex);
             nextCross = glm::cross(nextVec, vecL);
-//            cout << "\tcheckLcross: " << (nextCross.y < 0) << endl;
             if (nextCross.y < 0)
             {
                 m_pathActual.append(left);
@@ -504,13 +458,10 @@ void NavMeshHandler::simpleStupidFunnel()
                 i = leftI;
 
                 // find next gate that doesn't include apex
-//                cout << "leftI: " << (leftI+1) << endl;
                 int currLeft = m_pathNodes.value(i, PathNode()).left;
                 gate = m_pathNodes.value(++i, PathNode());
                 while (gate.id != -1 && gate.left == currLeft)
                 {
-//                    cout << "currLeft: " << currLeft << endl;
-//                    cout << "gate.left: " << gate.left << endl;
                     gate = m_pathNodes.value(++i, PathNode());
                 }
 
@@ -529,30 +480,23 @@ void NavMeshHandler::simpleStupidFunnel()
 
                 // check right
                 nextCross = glm::cross(vecR, nextVec);
-//                cout << "\tcheckRcross: " << (nextCross.y < 0) << endl;
                 if (nextCross.y < 0)
                 {
                     m_pathActual.append(right);
-//                    cout << "right: " << glm::to_string(right) << endl;
                     apex = right;
                     i = rightI;
 
                     // find next gate that doesn't include apex
-//                    cout << "rightI: " << (rightI) << endl;
                     int currRight = m_pathNodes.value(i, PathNode()).right;
                     gate = m_pathNodes.value(++i, PathNode());
-//                    cout << "currRight: " << currRight << endl;
                     while (gate.id != -1 && gate.right == currRight)
                     {
-//                        cout << "currRight: " << currRight << endl;
-//                        cout << "gate.right: " << gate.right << endl;
                         gate = m_pathNodes.value(++i, PathNode());
                     }
 
                     // on last triangle
                     if (gate.right == -1)
                     {
-//                        cout << glm::to_string(m_endPos + glm::vec3(0, -1, 0)) << endl;
                         m_pathActual.append(m_endPos + glm::vec3(0, -1, 0));
                         return;
                     }
@@ -565,14 +509,10 @@ void NavMeshHandler::simpleStupidFunnel()
                     m_pathActual.append(m_endPos + glm::vec3(0, -1, 0));
                     return;
                 }
-
             }
-
         }
-
         prevGate = gate;
     }
-//    m_pathActual.append(m_endPos);
 }
 
 

@@ -114,7 +114,7 @@ ObjectsInfo *World::getObjectInfo()
     QList<RenderShape*> rses;
     foreach(MovableEntity *me, m_movableEntities)
     {
-        posMat = glm::translate(glm::mat4(), me->getPosition());
+        posMat = glm::translate(glm::mat4(), me->getPosition()) * me->getRotation();
         rses.clear();
         rses.append(me->getRenderShapes());
         foreach(RenderShape *rs, rses)
