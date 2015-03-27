@@ -1,9 +1,11 @@
 #include "platformermenu.h"
 #include "application.h"
 #include "gamescreen.h"
+//#include "gamescreentest.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
+//#include <glm/gtx/vector_angle.hpp>
 
 PlatformerMenu::PlatformerMenu(Application *parent)
     : Screen(parent)
@@ -29,6 +31,10 @@ PlatformerMenu::PlatformerMenu(Application *parent)
     m_cursor[3][2] = -.999f;
 
     m_level = 0;
+
+//    cout << (3.141592654 * 2 + glm::orientedAngle(glm::vec2(0,1), glm::vec2(1,0))) << endl;
+//    cout << glm::orientedAngle(glm::vec2(0,1), glm::vec2(0,-1)) << endl;
+//    cout << glm::orientedAngle(glm::vec2(0,1), glm::normalize(glm::vec2(-1,-1))) << endl;
 }
 
 PlatformerMenu::~PlatformerMenu()
@@ -151,6 +157,7 @@ void PlatformerMenu::onMousePressed(QMouseEvent *e)
 {
     if (e->button() == Qt::LeftButton && m_level > 0)
         m_parentApp->addScreen(new GameScreen(m_parentApp));
+//        m_parentApp->addScreen(new GameScreenTest(m_parentApp, m_level));
 }
 
 void PlatformerMenu::onResize(int w, int h)

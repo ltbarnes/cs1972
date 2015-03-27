@@ -3,9 +3,9 @@
 #include "obj.h"
 #include <QSet>
 
-//#include <iostream>
-//using namespace std;
-//#include <glm/ext.hpp>
+#include <iostream>
+using namespace std;
+#include <glm/ext.hpp>
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
@@ -211,6 +211,12 @@ int NavMeshHandler::findTriangle(glm::vec3 pos)
 }
 
 
+QList<glm::vec3> NavMeshHandler::getPath()
+{
+    return m_pathActual;
+}
+
+
 void NavMeshHandler::findPath()
 {
     if (m_start <= -1 || m_end <= -1)
@@ -311,25 +317,12 @@ static void setVars(glm::vec3 *apex, int i, PathNode *gate, int *leftI, int *rig
 
     *vecL = glm::normalize((*left) - (*apex));
     *vecR = glm::normalize((*right) - (*apex));
-
-
-//    cout << "i: " << i << endl;
-//    cout << "apex: " << glm::to_string(*apex) << endl;
-//    cout << "leftI: " << *leftI << endl;
-//    cout << "rightI: " << *rightI << endl;
-//    cout << "left: " << glm::to_string(*left) << endl;
-//    cout << "right: " << glm::to_string(*right) << endl;
-//    cout << "vecL: " << glm::to_string(*vecL) << endl;
-//    cout << "vecR: " << glm::to_string(*vecR) << endl;
 }
 
 
 void NavMeshHandler::simpleStupidFunnel()
 {
-//    const QList<OBJ::Tri> &tris = m_obj->triangles;
     const QList<glm::vec3> &verts = m_obj->vertices;
-
-//    cout << "\n\nSTART: " << endl;
 
     m_pathActual.append(m_startPos + glm::vec3(0, -1, 0));
     glm::vec3 apex = m_startPos + glm::vec3(0, -1, 0);

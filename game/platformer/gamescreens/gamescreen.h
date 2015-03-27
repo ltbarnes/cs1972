@@ -34,6 +34,8 @@ public:
     virtual void onKeyReleased(QKeyEvent *e);
 
 private:
+    void setWaypoints();
+
     ObjectHandler *m_oh;
     QString m_levelTexture;
     OBJ *m_level;

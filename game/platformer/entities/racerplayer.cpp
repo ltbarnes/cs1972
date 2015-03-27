@@ -58,7 +58,7 @@ void RacerPlayer::onTick(float secs)
     }
 
     glm::vec3 thrust = glm::normalize(glm::vec3(look.x, 0.f, look.z)) * force.z;
-//    thrust += glm::normalize(glm::vec3(-look.z, 0.f, look.x)) * force.x;
+
     if (glm::length2(thrust) > 0.00001)
         thrust = glm::normalize(thrust) * forceAmt;
 
@@ -67,7 +67,7 @@ void RacerPlayer::onTick(float secs)
     vel.y = thrust.y;
     applyForce(vel);
     MovableEntity::onTick(secs);
-    if (force.z < 0.f)
+    if (glm::dot(getVelocity(), glm::vec3(look)) < 0.f && force.z < 0.f)
         force.x = -force.x;
 
     m_rotation *= glm::rotate(glm::mat4(), glm::radians(force.x), glm::vec3(0, -1, 0));

@@ -25,15 +25,15 @@ void GeometricCollisionManager::manage(World *world, float)
 {
     int iterations = 4;
 
-    QList<MovableEntity*> ellis;
+    QList<MovableEntity*> mes;
     QList<Triangle*> triangles;
 
-    ellis.append(world->getPlayer());
+    mes.append(world->getMovableEntities());
     triangles = world->getMesh();
 
     for (int i = 0; i < iterations; i++)
     {
-        QList<TriCollision *> cols = detectTriangleCollisions(ellis, triangles);
+        QList<TriCollision *> cols = detectTriangleCollisions(mes, triangles);
 
         handleCollisions(cols);
 
@@ -50,6 +50,7 @@ QList<TriCollision* > GeometricCollisionManager::detectTriangleCollisions(
     float origT;
     QList<TriCollision *> cols;
     TriCollision col, best;
+
 
     foreach (MovableEntity *me, mes)
     {
@@ -106,6 +107,7 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
     foreach (TriCollision *col, cols)
     {
         MovableEntity *me = col->me;
+        assert(me != NULL);
         glm::vec3 &n = col->colNorm;
         glm::vec3 hit = me->getPosition() + col->dir * col->t + n * eps;
 
@@ -145,6 +147,7 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
         me->setDestination(hit + para);
         me->setPosition(hit);
 
+//        return;
         Collision c;
         c.impulse = n;
         me->handleCollision(&c);

@@ -50,12 +50,13 @@ GameScreen::GameScreen(Application *parent)
 
     m_ellipsoid = new Ellipsoid(glm::vec3(), glm::vec3(.25f, .5, .25f), "rayshape");
 
-    Racer *racer = new Racer(playerPos + glm::vec3(2, 0, 0), glm::vec3(0, 1, 1));
-    m_world->addMovableEntity(racer);
+    m_racer1 = new Racer(playerPos + glm::vec3(2, 0, 0), glm::vec3(0, 1, 1));
+    m_world->addMovableEntity(m_racer1);
 
-    racer = new Racer(playerPos + glm::vec3(-2, 0, 0), glm::vec3(1, 0, 1));
-    m_world->addMovableEntity(racer);
+    m_racer2 = new Racer(playerPos + glm::vec3(-2, 0, 0), glm::vec3(1, 0, 1));
+    m_world->addMovableEntity(m_racer2);
 
+    setWaypoints();
 
     m_graphicsCardDestructionMode = false;
 }
@@ -66,6 +67,22 @@ GameScreen::~GameScreen()
     delete m_nmh;
     delete m_world;
     delete m_ellipsoid;
+}
+
+void GameScreen::setWaypoints()
+{
+    QList<glm::vec3> waypoints;
+    waypoints.append(glm::vec3(81, 2, -55));
+    waypoints.append(glm::vec3(125, 2, 0));
+    waypoints.append(glm::vec3(81, 2, 55));
+    waypoints.append(glm::vec3(1, 2, 0));
+    waypoints.append(glm::vec3(-81, 2, -55));
+    waypoints.append(glm::vec3(-125, 2, 0));
+    waypoints.append(glm::vec3(-81, 2, 55));
+    waypoints.append(glm::vec3(-1, 2, 0));
+
+    m_racer1->setWaypoints(waypoints);
+    m_racer2->setWaypoints(waypoints);
 }
 
 // update and render
@@ -87,7 +104,6 @@ void GameScreen::onTick(float secs  )
         {
             m_drawEllipsoid = true;
             glm::vec3 pos = p + d * t;
-//            pos += tri->normal * m_ellipsoid->getDim();
             m_ellipsoid->setPosition(pos);
             m_nmh->setEnd(pos + glm::vec3(0, 1, 0));
         }
@@ -107,10 +123,8 @@ void GameScreen::onTick(float secs  )
     else
         m_drawPoint = false;
 
-    m_nmh->setStart(m_world->getPlayer()->getPosition());
-    m_nmh->findPath();
-    m_nmh->setStart(m_world->getPlayer()->getPosition());
-    m_nmh->findPath();
+    m_racer1->buildPath(m_nmh);
+    m_racer2->buildPath(m_nmh);
 }
 
 void GameScreen::onRender(Graphics *g)

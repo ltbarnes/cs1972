@@ -47,6 +47,8 @@ public:
     void setEnd(glm::vec3 pos);
     void findPath();
 
+    QList<glm::vec3> getPath();
+
 private:
     void buildGraph();
     void fillVertex(int *index, GLfloat *data, glm::vec3 v);
