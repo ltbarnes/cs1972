@@ -7,10 +7,10 @@
 RacerPlayer::RacerPlayer(ActionCamera *camera, glm::vec3 pos, glm::vec3 color)
     : Player(camera, pos)
 {
-    m_offset = 25.f;
+    m_offset = 35.f;
     m_camera->setOffset(m_offset);
     setEyeHeight(0.f);
-    m_lockCam = false;
+    m_lockCam = true;
 
     Ellipsoid *e = new Ellipsoid(glm::vec3(0, 0, 0), glm::vec3(.49f, .98f, .98f), "racer");
     e->updatePos(pos);
@@ -91,20 +91,72 @@ void RacerPlayer::onDrawTransparent(Graphics *g)
 
     if (!m_waypoints.isEmpty())
     {
+        glm::mat4 trans;
+
         int next = (m_currWaypoint + 1) % m_waypoints.size();
         g->setTransparentMode(true);
-
-        glm::mat4 trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
-                glm::scale(glm::mat4(), glm::vec3(7.f));
-        g->setColor(1, 0, 0, .3, 0);
-        g->drawSphere(trans);
 
         trans = glm::translate(glm::mat4(), m_waypoints[next]) *
                 glm::scale(glm::mat4(), glm::vec3(3.f));
         g->setColor(1, 0, 1, .3, 0);
         g->drawSphere(trans);
 
+        trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
+                glm::scale(glm::mat4(), glm::vec3(7.f));
+        g->setColor(1, 0, 0, .3, 0);
+        g->drawSphere(trans);
+
         g->setTransparentMode(false);
+    }
+}
+
+
+void RacerPlayer::onKeyPressed(QKeyEvent *e)
+{
+    switch (e->key())
+    {
+    case Qt::Key_W:
+        m_wsad |= 0b1000;
+        break;
+    case Qt::Key_S:
+        m_wsad |= 0b0100;
+        break;
+    case Qt::Key_A:
+        m_wsad |= 0b0010;
+        break;
+    case Qt::Key_D:
+        m_wsad |= 0b0001;
+        break;
+    case Qt::Key_Space:
+        m_jump = true;
+        break;
+    case Qt::Key_Minus:
+    case Qt::Key_Underscore:
+        m_offset += 1.f;
+        if (m_offset > 35.f)
+            m_offset = 35.f;
+        m_camera->setOffset(m_offset);
+        break;
+    case Qt::Key_Plus:
+    case Qt::Key_Equal:
+        m_offset -= 1.f;
+        if (m_offset < 0.f)
+            m_offset = 0.f;
+        m_camera->setOffset(m_offset);
+        break;
+    case Qt::Key_ParenRight:
+    case Qt::Key_0:
+        m_offset = 0.f;
+        m_camera->setOffset(m_offset);
+        break;
+    case Qt::Key_ParenLeft:
+    case Qt::Key_9:
+        m_offset = 35.f;
+        m_camera->setOffset(m_offset);
+        break;
+
+    default:
+        break;
     }
 }
 

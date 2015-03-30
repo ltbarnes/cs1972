@@ -12,7 +12,7 @@
 GameScreen::GameScreen(Application *parent)
     : Screen(parent)
 {
-    m_parentApp->setUseCubeMap(false);
+    m_parentApp->setUseCubeMap(true);
 
     m_oh = new ObjectHandler();
     m_nmh = new NavMeshHandler();
@@ -21,7 +21,7 @@ GameScreen::GameScreen(Application *parent)
     QList<Triangle *> tris;
     QList<Triangle *> *navTris = m_nmh->getTriangleList();
 
-    m_levelTexture = "";
+    m_levelTexture = "water.jpg";
     m_level = m_oh->getObject(":/objects/level_raceway.obj", shader, &tris);
     m_nmh->setObject(m_oh->getObject(":/objects/level_raceway_navmesh.obj", shader, navTris));
     m_nmh->createVBO();
@@ -220,7 +220,7 @@ void GameScreen::onRender(Graphics *g)
         } else
         {
             g->setAllWhite(true);
-            g->setTexture(m_levelTexture);
+            g->setTexture(m_levelTexture, 50.f, 50.f);
             m_level->draw(glm::mat4());
             g->setAllWhite(false);
         }
