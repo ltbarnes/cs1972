@@ -3,9 +3,9 @@
 #include "obj.h"
 #include <QSet>
 
-#include <iostream>
-using namespace std;
-#include <glm/ext.hpp>
+//#include <iostream>
+//using namespace std;
+//#include <glm/ext.hpp>
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>

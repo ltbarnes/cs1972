@@ -53,6 +53,8 @@ private:
     Ellipsoid* m_ellipsoid;
     glm::vec3 m_point;
 
+    float m_startTimer;
+
     bool m_graphicsCardDestructionMode;
 
 };

@@ -2,6 +2,7 @@
 #include "ellipsoid.h"
 
 #include <glm/gtx/norm.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 RacerPlayer::RacerPlayer(ActionCamera *camera, glm::vec3 pos, glm::vec3 color)
     : Player(camera, pos)
@@ -39,7 +40,7 @@ RacerPlayer::~RacerPlayer()
 
 void RacerPlayer::onTick(float secs)
 {
-    float forceAmt = 20.f;
+    float forceAmt = 25.f;
     glm::vec3 force = glm::vec3();
     if (m_wsad & 0b1000)
         force.z += 1;
@@ -76,7 +77,7 @@ void RacerPlayer::onTick(float secs)
 
     if (!m_waypoints.isEmpty())
     {
-        if (glm::distance2(getPosition(), m_waypoints[m_currWaypoint]) < 100.f)
+        if (glm::distance2(getPosition(), m_waypoints[m_currWaypoint]) < 50.f)
         {
             m_currWaypoint = (m_currWaypoint + 1) % m_waypoints.size();
         }
@@ -90,11 +91,19 @@ void RacerPlayer::onDrawTransparent(Graphics *g)
 
     if (!m_waypoints.isEmpty())
     {
+        int next = (m_currWaypoint + 1) % m_waypoints.size();
         g->setTransparentMode(true);
+
         glm::mat4 trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
-                glm::scale(glm::mat4(), glm::vec3(20.f));
+                glm::scale(glm::mat4(), glm::vec3(7.f));
         g->setColor(1, 0, 0, .3, 0);
         g->drawSphere(trans);
+
+        trans = glm::translate(glm::mat4(), m_waypoints[next]) *
+                glm::scale(glm::mat4(), glm::vec3(3.f));
+        g->setColor(1, 0, 1, .3, 0);
+        g->drawSphere(trans);
+
         g->setTransparentMode(false);
     }
 }
@@ -114,10 +123,23 @@ void RacerPlayer::onKeyReleased(QKeyEvent *e)
 }
 
 
-void RacerPlayer::setWaypoints(QList<glm::vec3> waypoints)
+void RacerPlayer::setWaypoints(QList<glm::vec3> waypoints, glm::vec3 startLoc)
 {
     m_waypoints.clear();
     m_waypoints.append(waypoints);
+    m_currWaypoint = 0;
+
+    glm::vec3 toWaypoint = startLoc - getPosition();
+    float angle = glm::orientedAngle(glm::normalize(toWaypoint), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0));
+    m_rotation = glm::rotate(glm::mat4(), -angle, glm::vec3(0, -1, 0));
+
+    glm::vec4 look = m_rotation * glm::vec4(0, 0, -1, 0);
+
+    look = glm::normalize(glm::vec4(look.x, 0, look.z, 0));
+    look.y = -.1f;
+    m_camera->setLook(glm::normalize(look));
+
+    this->setCameraPos();
 }
 
 

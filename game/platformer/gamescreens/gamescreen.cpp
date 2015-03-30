@@ -30,7 +30,7 @@ GameScreen::GameScreen(Application *parent)
     m_world->addToMesh(tris);
 
     ActionCamera *cam = new ActionCamera();
-    glm::vec3 playerPos = glm::vec3(0, 15, 0);
+    glm::vec3 playerPos = glm::vec3(0, 2, 0);
 
     cam->setCenter(playerPos);
     RacerPlayer *player = new RacerPlayer(cam, playerPos, glm::vec3(1, .5f, 0));
@@ -47,13 +47,14 @@ GameScreen::GameScreen(Application *parent)
     m_drawPoint = false;
     m_mouseDown = false;
     m_drawNavMesh = false;
+    m_startTimer = 3.f;
 
     m_ellipsoid = new Ellipsoid(glm::vec3(), glm::vec3(.25f, .5, .25f), "rayshape");
 
-    m_racer1 = new Racer(playerPos + glm::vec3(2, 4, 0), glm::vec3(0, 1, 1));
+    m_racer1 = new Racer(playerPos + glm::vec3(2, 0, 2), glm::vec3(0, 1, 1));
     m_world->addMovableEntity(m_racer1);
 
-    m_racer2 = new Racer(playerPos + glm::vec3(-2, 0, 0), glm::vec3(1, 0, 1));
+    m_racer2 = new Racer(playerPos + glm::vec3(-2, 0,-2), glm::vec3(1, 0, 1));
     m_world->addMovableEntity(m_racer2);
 
     setWaypoints(player);
@@ -82,21 +83,41 @@ void GameScreen::setWaypoints(RacerPlayer *player)
     waypoints.append(glm::vec3(-81, 2, 55));
     waypoints.append(glm::vec3(-10, 2, -15));
 
-    m_racer1->setWaypoints(waypoints);
-    m_racer2->setWaypoints(waypoints);
+    m_racer1->setWaypoints(waypoints, glm::vec3(  60, 2, -50));
+    m_racer2->setWaypoints(waypoints, glm::vec3(  60, 2, -50));
 
     // player
     waypoints.clear();
-    waypoints.append(glm::vec3(55, 2, -55));
-    waypoints.append(glm::vec3(120, 2, -35));
+    waypoints.append(glm::vec3(  60, 2, -50));
+    waypoints.append(glm::vec3( 100, 2, -60));
+    waypoints.append(glm::vec3( 130, 2, -30));
+    waypoints.append(glm::vec3( 125, 2,  30));
+    waypoints.append(glm::vec3( 100, 2,  58));
+    waypoints.append(glm::vec3(  60, 2,  60));
+    waypoints.append(glm::vec3(  30, 2,  37));
+    waypoints.append(glm::vec3( -60, 2, -50));
+    waypoints.append(glm::vec3(-100, 2, -60));
+    waypoints.append(glm::vec3(-130, 2, -30));
+    waypoints.append(glm::vec3(-125, 2,  30));
+    waypoints.append(glm::vec3(-100, 2,  58));
+    waypoints.append(glm::vec3( -60, 2,  60));
+    waypoints.append(glm::vec3( -30, 2,  37));
 
-    player->setWaypoints(waypoints);
+    player->setWaypoints(waypoints, glm::vec3(  60, 2, -50));
 
 }
 
 // update and render
 void GameScreen::onTick(float secs  )
 {
+
+    if (m_startTimer > 0.f)
+    {
+        m_startTimer -= secs;
+        cout << m_startTimer << endl;
+        return;
+    }
+
     m_world->onTick(secs);
 
     m_drawPoint = true;
@@ -216,7 +237,8 @@ void GameScreen::onRender(Graphics *g)
 
 void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
 {
-    m_world->onMouseMoved(e, deltaX, deltaY);
+    if (m_startTimer < 0.f)
+        m_world->onMouseMoved(e, deltaX, deltaY);
 }
 void GameScreen::onMousePressed(QMouseEvent *)
 {

@@ -38,10 +38,15 @@ Racer::~Racer()
 }
 
 
-void Racer::setWaypoints(QList<glm::vec3> waypoints)
+void Racer::setWaypoints(QList<glm::vec3> waypoints, glm::vec3 startLoc)
 {
     m_waypoints.clear();
     m_waypoints.append(waypoints);
+    m_currWaypoint = 0;
+
+    glm::vec3 toWaypoint = startLoc - getPosition();
+    float angle = glm::orientedAngle(glm::normalize(toWaypoint), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0));
+    m_rotation = glm::rotate(glm::mat4(), -angle, glm::vec3(0, -1, 0));
 }
 
 

@@ -13,7 +13,7 @@ public:
     virtual void onDrawTransparent(Graphics *g);
     virtual void onKeyReleased(QKeyEvent *e);
 
-    void setWaypoints(QList<glm::vec3> waypoints);
+    void setWaypoints(QList<glm::vec3> waypoints, glm::vec3 startLoc);
 
 private:
     QList<glm::vec3> m_waypoints;

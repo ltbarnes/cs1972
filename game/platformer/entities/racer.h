@@ -13,7 +13,7 @@ public:
     virtual void onTick(float secs);
     virtual void handleCollision(Collision *col);
 
-    void setWaypoints(QList<glm::vec3> waypoints);
+    void setWaypoints(QList<glm::vec3> waypoints, glm::vec3 startLoc);
     void buildPath(NavMeshHandler *nmh);
 
 private:
