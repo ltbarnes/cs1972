@@ -10,10 +10,14 @@ public:
     virtual ~RacerPlayer();
 
     virtual void onTick(float secs);
-
+    virtual void onDrawTransparent(Graphics *g);
     virtual void onKeyReleased(QKeyEvent *e);
 
+    void setWaypoints(QList<glm::vec3> waypoints);
+
 private:
+    QList<glm::vec3> m_waypoints;
+    int m_currWaypoint;
     bool m_lockCam;
 
 };

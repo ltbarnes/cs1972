@@ -498,6 +498,7 @@ void Graphics::rayAddObjects(ObjectsInfo *info)
 
         glUniformMatrix4fv(glGetUniformLocation(m_rayShader, ("invs" + indexString).c_str()), 1, GL_FALSE, glm::value_ptr(info->invs[i]));
         glUniform3fv(glGetUniformLocation(m_rayShader, ("colors" + indexString).c_str()), 1, glm::value_ptr(info->colors[i]));
+        glUniform1i(glGetUniformLocation(m_rayShader, ("types" + indexString).c_str()), info->shapeType[i]);
     }
     glUniform1i(glGetUniformLocation(m_rayShader, "NUM_OBJECTS"), size);
 

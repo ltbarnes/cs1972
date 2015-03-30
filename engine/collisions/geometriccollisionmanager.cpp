@@ -49,11 +49,11 @@ QList<TriCollision* > GeometricCollisionManager::detectTriangleCollisions(
 {
     float origT;
     QList<TriCollision *> cols;
-    TriCollision col, best;
 
 
     foreach (MovableEntity *me, mes)
     {
+        TriCollision col, best;
         best.me = me;
         QList<CollisionShape*> shapes = me->getCollisionShapes();
 
@@ -100,6 +100,8 @@ QList<TriCollision* > GeometricCollisionManager::detectTriangleCollisions(
 
 void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
 {
+//    cout << "size: " << cols.size() << endl;
+
     float eps = 0.00001f;
     glm::vec3 up = glm::vec3(0, 1, 0);
 
@@ -107,6 +109,7 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
     foreach (TriCollision *col, cols)
     {
         MovableEntity *me = col->me;
+//        cout << "colme: " << me << endl;
         assert(me != NULL);
         glm::vec3 &n = col->colNorm;
         glm::vec3 hit = me->getPosition() + col->dir * col->t + n * eps;
@@ -114,6 +117,7 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
         glm::vec3 rem = col->dir * col->tMinus;
         glm::vec3 para;
 
+//        cout << glm::to_string(col->colNorm) << endl;
         if (glm::length2(col->colNorm) > eps)
         {
             if (col->type == PLANE && glm::dot(n, up) > 0.0001f) // do ramp hack
@@ -147,7 +151,9 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
         me->setDestination(hit + para);
         me->setPosition(hit);
 
-//        return;
+//        cout << "me: " << me << endl;
+//        cout << glm::to_string(hit) << endl;
+
         Collision c;
         c.impulse = n;
         me->handleCollision(&c);

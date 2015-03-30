@@ -1,15 +1,17 @@
 #include "racer.h"
 #include "ellipsoid.h"
 
-#include <iostream>
-using namespace std;
-#include <glm/ext.hpp>
+//#include <iostream>
+//using namespace std;
+//#include <glm/ext.hpp>
 
 #include <glm/gtx/vector_angle.hpp>
 
 Racer::Racer(glm::vec3 pos, glm::vec3 color)
     : MovableEntity(pos)
 {
+    setMass(1.f);
+
     Ellipsoid *e = new Ellipsoid(glm::vec3(0, 0, 0), glm::vec3(.49f, .98f, .98f), "racer");
     e->updatePos(pos);
     this->addCollisionShape(e);

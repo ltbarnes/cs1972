@@ -1,6 +1,9 @@
 #include "world.h"
 #include "manager.h"
 
+//#include <iostream>
+//using namespace std;
+
 World::World()
 {
     m_staticEntities.clear();
@@ -89,6 +92,7 @@ void World::onTick(float secs)
     foreach(MovableEntity *me, m_movableEntities)
     {
         me->applyForce(m_gravity * me->getMass());
+//        cout << me << endl;
     }
 
     // update (tick) movableEntities
@@ -122,6 +126,7 @@ ObjectsInfo *World::getObjectInfo()
             inv = glm::inverse( posMat * rs->trans );
             info->invs.append(inv);
             info->colors.append(rs->color);
+            info->shapeType.append(rs->type);
         }
     }
 

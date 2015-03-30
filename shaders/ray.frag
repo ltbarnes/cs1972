@@ -14,8 +14,9 @@ uniform int NUM_TRIS = 2;
 uniform int NUM_OBJECTS = 0;
 uniform int NUM_LIGHTS = 1;
 
-uniform mat4 invs[10];
-uniform vec3 colors[10];
+uniform mat4 invs[20];
+uniform vec3 colors[20];
+uniform int types[20];
 // to be uniforms or blocks
 vec3 lightPos[10];
 
@@ -92,6 +93,67 @@ int findT(in float a, in float b, in float c, out float t1, out float t2)
     return 2;
 }
 
+///////////////////CYLINDER////////////////////
+
+vec4 intersectCylinder(in vec4 p, in vec4 d)
+{
+    vec4 n = vec4(0, 0, 0, INF);
+
+//    float horiz = p.x * p.x + p.z * p.z;
+//    float vert = abs(p.y);
+
+    // if p is in the shape don't register an intersection
+//    if ((EQ(horiz, .25) || horiz < .25) && (EQ(vert, 0.5) || vert < 0.5))
+//        return n;
+
+    float t1 = INF;
+    float t2 = INF;
+    vec4 v;
+
+    float a = d.x * d.x + d.z * d.z;
+    float b = 2.0 * p.x * d.x + 2.0 * p.z * d.z;
+    float c = p.x * p.x + p.z * p.z - 0.25;
+
+    int tees = findT(a, b, c, t1, t2);
+
+    if (tees > 0) {
+        v = p + t1 * d;
+        if (v.y > 0.5 || v.y < -0.5 || t1 < 0)
+            t1 = INF;
+        if (t1 < n.w) {
+            n = vec4(v.x, 0, v.z, t1);
+        }
+        if (tees > 1) {
+            v = p + t2 * d;
+            if (v.y > 0.5 || v.y < -0.5 || t2 < 0)
+                t2 = INF;
+            if (t2 < n.w) {
+                n = vec4(v.x, 0, v.z, t2);
+            }
+        }
+    }
+
+    float t3 = (0.5 - p.y) / d.y;
+    v = p + t3 * d;
+
+    if (v.x * v.x + v.z * v.z > 0.25 || t3 < 0.0)
+        t3 = INF;
+    if (t3 < n.w)
+        n = vec4(0, 1, 0, t3);
+
+    float t4 = (-0.5 - p.y) / d.y;
+    v = p + t4 * d;
+
+    if (v.x * v.x + v.z * v.z > 0.25 || t4 < 0.0)
+        t4 = INF;
+    if (t4 < n.w) {
+        n = vec4(0, -1, 0, t4);
+    }
+
+    return n;
+}
+
+
 ////////////////////SPHERE/////////////////////
 
 // assumes radius size .5f
@@ -163,7 +225,10 @@ vec4 intersectObjects(in int exception, in vec4 p, in vec4 d, out int colorIndex
 
         vec4 p_shape = invs[i] * p;
         vec4 d_shape = invs[i] * d;
-        n = intersectSphere(p_shape, d_shape);
+        if (types[i] == 3)
+            n = intersectCylinder(p_shape, d_shape);
+        if (types[i] == 4)
+            n = intersectSphere(p_shape, d_shape);
         if (n.w < bestN.w)
         {
             bestN.w = n.w;

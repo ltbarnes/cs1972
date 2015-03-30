@@ -30,9 +30,9 @@ GameScreen::GameScreen(Application *parent)
     m_world->addToMesh(tris);
 
     ActionCamera *cam = new ActionCamera();
-    cam->setCenter(glm::vec3(0, 2, 0));
+    glm::vec3 playerPos = glm::vec3(0, 15, 0);
 
-    glm::vec3 playerPos = glm::vec3(0, 2, 0);
+    cam->setCenter(playerPos);
     RacerPlayer *player = new RacerPlayer(cam, playerPos, glm::vec3(1, .5f, 0));
 
     GeometricCollisionManager *gcm = new GeometricCollisionManager();
@@ -50,13 +50,13 @@ GameScreen::GameScreen(Application *parent)
 
     m_ellipsoid = new Ellipsoid(glm::vec3(), glm::vec3(.25f, .5, .25f), "rayshape");
 
-    m_racer1 = new Racer(playerPos + glm::vec3(2, 0, 0), glm::vec3(0, 1, 1));
+    m_racer1 = new Racer(playerPos + glm::vec3(2, 4, 0), glm::vec3(0, 1, 1));
     m_world->addMovableEntity(m_racer1);
 
     m_racer2 = new Racer(playerPos + glm::vec3(-2, 0, 0), glm::vec3(1, 0, 1));
     m_world->addMovableEntity(m_racer2);
 
-    setWaypoints();
+    setWaypoints(player);
 
     m_graphicsCardDestructionMode = false;
 }
@@ -69,20 +69,29 @@ GameScreen::~GameScreen()
     delete m_ellipsoid;
 }
 
-void GameScreen::setWaypoints()
+void GameScreen::setWaypoints(RacerPlayer *player)
 {
+    // other racers
     QList<glm::vec3> waypoints;
     waypoints.append(glm::vec3(81, 2, -55));
     waypoints.append(glm::vec3(125, 2, 0));
     waypoints.append(glm::vec3(81, 2, 55));
-    waypoints.append(glm::vec3(1, 2, 0));
+    waypoints.append(glm::vec3(10, 2, -15));
     waypoints.append(glm::vec3(-81, 2, -55));
     waypoints.append(glm::vec3(-125, 2, 0));
     waypoints.append(glm::vec3(-81, 2, 55));
-    waypoints.append(glm::vec3(-1, 2, 0));
+    waypoints.append(glm::vec3(-10, 2, -15));
 
     m_racer1->setWaypoints(waypoints);
     m_racer2->setWaypoints(waypoints);
+
+    // player
+    waypoints.clear();
+    waypoints.append(glm::vec3(55, 2, -55));
+    waypoints.append(glm::vec3(120, 2, -35));
+
+    player->setWaypoints(waypoints);
+
 }
 
 // update and render
@@ -144,7 +153,6 @@ void GameScreen::onRender(Graphics *g)
 
         g->addLight(light1);
 
-        m_world->onDraw(g);
 
 
         g->setTexture("");
@@ -195,6 +203,7 @@ void GameScreen::onRender(Graphics *g)
             m_level->draw(glm::mat4());
             g->setAllWhite(false);
         }
+        m_world->onDraw(g);
     }
     else
     {

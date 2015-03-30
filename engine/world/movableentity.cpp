@@ -1,6 +1,10 @@
 #include "movableentity.h"
 #include "collisionshape.h"
 
+//#include <iostream>
+//using namespace std;
+//#include <glm/ext.hpp>
+
 MovableEntity::MovableEntity(glm::vec3 pos)
     : Entity(pos)
 {
@@ -43,9 +47,18 @@ void MovableEntity::setVelocity(glm::vec3 vel)
 
 void MovableEntity::onTick(float secs)
 {
+//    cout << "\t\n" << this << endl;
+//    cout << "pos: " << glm::to_string(getPosition()) << endl;
+//    cout << "vel: " << glm::to_string(getVelocity()) << endl;
+
+//    cout << m_force.y << endl;
+//    cout << m_mass << endl;
+
     m_vel += (m_force * secs / m_mass) + m_impulse * 1.f / m_mass;
 //    setPosition(getPosition() + m_vel * secs);
     m_destination = getPosition() + m_vel * secs;
+
+//    cout << (m_destination.y - getPosition().y) << endl;
 
     m_force = glm::vec3(0.f);
     m_impulse = glm::vec3(0.f);

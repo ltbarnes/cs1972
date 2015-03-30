@@ -9,7 +9,7 @@
 #include "meshbuffer.h"
 #include "racer.h"
 
-class PlatformerPlayer; // TEMP, SHOULD BE IN WORLD
+class RacerPlayer;
 
 class GameScreen : public Screen
 {
@@ -34,7 +34,7 @@ public:
     virtual void onKeyReleased(QKeyEvent *e);
 
 private:
-    void setWaypoints();
+    void setWaypoints(RacerPlayer *player);
 
     ObjectHandler *m_oh;
     QString m_levelTexture;

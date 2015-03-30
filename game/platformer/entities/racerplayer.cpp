@@ -27,6 +27,8 @@ RacerPlayer::RacerPlayer(ActionCamera *camera, glm::vec3 pos, glm::vec3 color)
     rs->repeatU = 1.f;
     rs->repeatV = 1.f;
     this->addRenderShape(rs);
+
+    m_currWaypoint = 0;
 }
 
 
@@ -37,7 +39,7 @@ RacerPlayer::~RacerPlayer()
 
 void RacerPlayer::onTick(float secs)
 {
-    float forceAmt = 30.f;
+    float forceAmt = 20.f;
     glm::vec3 force = glm::vec3();
     if (m_wsad & 0b1000)
         force.z += 1;
@@ -71,6 +73,30 @@ void RacerPlayer::onTick(float secs)
         force.x = -force.x;
 
     m_rotation *= glm::rotate(glm::mat4(), glm::radians(force.x), glm::vec3(0, -1, 0));
+
+    if (!m_waypoints.isEmpty())
+    {
+        if (glm::distance2(getPosition(), m_waypoints[m_currWaypoint]) < 100.f)
+        {
+            m_currWaypoint = (m_currWaypoint + 1) % m_waypoints.size();
+        }
+    }
+}
+
+
+void RacerPlayer::onDrawTransparent(Graphics *g)
+{
+    Player::onDrawTransparent(g);
+
+    if (!m_waypoints.isEmpty())
+    {
+        g->setTransparentMode(true);
+        glm::mat4 trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
+                glm::scale(glm::mat4(), glm::vec3(20.f));
+        g->setColor(1, 0, 0, .3, 0);
+        g->drawSphere(trans);
+        g->setTransparentMode(false);
+    }
 }
 
 
@@ -85,6 +111,13 @@ void RacerPlayer::onKeyReleased(QKeyEvent *e)
         Player::onKeyReleased(e);
         break;
     }
+}
+
+
+void RacerPlayer::setWaypoints(QList<glm::vec3> waypoints)
+{
+    m_waypoints.clear();
+    m_waypoints.append(waypoints);
 }
 
 
