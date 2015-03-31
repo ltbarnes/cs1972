@@ -47,6 +47,15 @@ bool RacerPlayer::checkFinishedLap()
 }
 
 
+glm::vec3 RacerPlayer::getCurrentWaypoint()
+{
+    if (m_waypoints.isEmpty())
+        return glm::vec3();
+
+    return m_waypoints[m_currWaypoint];
+}
+
+
 void RacerPlayer::onTick(float secs)
 {
     float forceAmt = 25.f;
@@ -113,12 +122,12 @@ void RacerPlayer::onDrawTransparent(Graphics *g)
 
             trans = glm::translate(glm::mat4(), m_waypoints[next]) *
                     glm::scale(glm::mat4(), glm::vec3(3.f));
-            g->setColor(1, 0, 1, .3, 0);
+            g->setColor(1, 0, 1, .2, 0);
             g->drawSphere(trans);
 
             trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
                     glm::scale(glm::mat4(), glm::vec3(7.f));
-            g->setColor(1, 0, 0, .3, 0);
+            g->setColor(0, 1, 1, .3, 0);
         }
         else
         {
@@ -242,12 +251,12 @@ ObjectsInfo *RacerPlayer::getWaypointInfo()
         trans = glm::translate(glm::mat4(), m_waypoints[next]) *
                 glm::scale(glm::mat4(), glm::vec3(3.f));
         info->invs.append(glm::inverse(trans));
-        info->colors.append(glm::vec4(1, 0, 1, .3));
+        info->colors.append(glm::vec4(1, 0, 1, .2));
         info->shapeType.append(SPHERE);
 
         trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
                 glm::scale(glm::mat4(), glm::vec3(7.f));
-        color = glm::vec4(1, 0, 0, .3);
+        color = glm::vec4(0, 1, 1, .3);
     }
     else
     {

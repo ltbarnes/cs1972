@@ -7,7 +7,7 @@ public:
     Constraint() {}
     virtual ~Constraint() {}
 
-//    virtual float solveConstraint(glm::v3)
+//    virtual float solveConstraint(gl)
 };
 
 #endif // CONSTRAINT_H

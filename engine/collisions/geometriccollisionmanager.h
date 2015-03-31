@@ -31,10 +31,13 @@ public:
 
     virtual void manage(World *world, float secs);
 
+    QList<Collision *> detectEllipsoidCollisions(QList<MovableEntity *> mes);
+
     QList<TriCollision *> detectTriangleCollisions(
             QList<MovableEntity *> mes, QList<Triangle *> tris);
 
-    void handleCollisions(QList<TriCollision *> cols);
+    void handleEllipsoidCollisions(QList<Collision *> cols);
+    void handleTriangleCollisions(QList<TriCollision *> cols);
 };
 
 #endif // GEOMETRICCOLLISIONMANAGER_H

@@ -31,16 +31,45 @@ void GeometricCollisionManager::manage(World *world, float)
     mes.append(world->getMovableEntities());
     triangles = world->getMesh();
 
+
+
     for (int i = 0; i < iterations; i++)
     {
-        QList<TriCollision *> cols = detectTriangleCollisions(mes, triangles);
+        QList<Collision *> cols = detectEllipsoidCollisions(mes);
+        handleEllipsoidCollisions(cols);
 
-        handleCollisions(cols);
+        QList<TriCollision *> colsT = detectTriangleCollisions(mes, triangles);
+        handleTriangleCollisions(colsT);
 
         // delete collisions
-        foreach (TriCollision *c, cols)
+        foreach(Collision *c, cols)
             delete c;
+        foreach (TriCollision *ct, colsT)
+            delete ct;
     }
+}
+
+
+QList<Collision *> GeometricCollisionManager::detectEllipsoidCollisions(QList<MovableEntity *> mes)
+{
+    QList<Collision *> cols;
+
+    int size = mes.size();
+    for (int i = 0; i < size-1; i++)
+    {
+        for (int j = i+1; j < size; j++)
+        {
+
+        }
+    }
+
+    return cols;
+}
+
+
+void GeometricCollisionManager::handleEllipsoidCollisions(QList<Collision *> cols)
+{
+
 }
 
 
@@ -98,10 +127,8 @@ QList<TriCollision* > GeometricCollisionManager::detectTriangleCollisions(
 }
 
 
-void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
+void GeometricCollisionManager::handleTriangleCollisions(QList<TriCollision *> cols)
 {
-//    cout << "size: " << cols.size() << endl;
-
     float eps = 0.00001f;
     glm::vec3 up = glm::vec3(0, 1, 0);
 
@@ -109,15 +136,13 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
     foreach (TriCollision *col, cols)
     {
         MovableEntity *me = col->me;
-//        cout << "colme: " << me << endl;
-        assert(me != NULL);
+
         glm::vec3 &n = col->colNorm;
         glm::vec3 hit = me->getPosition() + col->dir * col->t + n * eps;
 
         glm::vec3 rem = col->dir * col->tMinus;
         glm::vec3 para;
 
-//        cout << glm::to_string(col->colNorm) << endl;
         if (glm::length2(col->colNorm) > eps)
         {
             if (col->type == PLANE && glm::dot(n, up) > 0.0001f) // do ramp hack
@@ -150,9 +175,6 @@ void GeometricCollisionManager::handleCollisions(QList<TriCollision *> cols)
 
         me->setDestination(hit + para);
         me->setPosition(hit);
-
-//        cout << "me: " << me << endl;
-//        cout << glm::to_string(hit) << endl;
 
         Collision c;
         c.impulse = n;

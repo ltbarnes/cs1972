@@ -19,6 +19,7 @@ Camera::Camera()
     setProjectionMatrix();
 
     m_thirdDist = 0.f;
+    setFrustumMatrix();
 }
 
 Camera::~Camera()
@@ -64,6 +65,7 @@ void Camera::setAspectRatio(float a)
 {
     m_aspectRatio = a;
     setProjectionMatrix();
+    setFrustumMatrix();
 }
 
 //void Camera::setEye(glm::vec4 &eye)
@@ -92,6 +94,8 @@ void Camera::moveHorizontal(glm::vec2 dir)
 {
     m_eye += glm::normalize(glm::vec4(m_look.x, 0.f, m_look.z, 0.f)) * dir.x;
     m_eye += glm::normalize(glm::vec4(-m_look.z, 0.f, m_look.x, 0.f)) * dir.y;
+    setViewMatrix();
+    setFrustumMatrix();
 }
 
 void Camera::moveAlongU(float mag)

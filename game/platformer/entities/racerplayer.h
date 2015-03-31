@@ -17,6 +17,7 @@ public:
     virtual void onKeyReleased(QKeyEvent *e);
 
     bool checkFinishedLap();
+    glm::vec3 getCurrentWaypoint();
 
     void setWaypoints(QList<glm::vec3> waypoints, glm::vec3 startLoc = glm::vec3());
     ObjectsInfo *getWaypointInfo();

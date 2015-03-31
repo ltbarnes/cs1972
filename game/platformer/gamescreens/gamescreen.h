@@ -35,6 +35,7 @@ public:
 
 private:
     void setWaypoints(RacerPlayer *player);
+    void render2D(Graphics *g);
 
     ObjectHandler *m_oh;
     QString m_levelTexture;

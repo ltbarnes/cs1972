@@ -245,6 +245,8 @@ void GameScreen::onRender(Graphics *g)
             g->drawQuad(trans);
             g->setAllWhite(false);
         }
+        else
+            this->render2D(g);
     }
     else
     {
@@ -256,9 +258,47 @@ void GameScreen::onRender(Graphics *g)
     }
 }
 
+void GameScreen::render2D(Graphics *g)
+{
+    glm::mat4 trans;
+    glm::vec4 look = m_camera->getLook();
+    glm::vec3 pos = m_player->getPosition();
+    glm::vec3 wp = m_player->getCurrentWaypoint();
+
+    g->setGraphicsMode(DRAW2D);
+    g->setTexture("");
+
+    // no waypoints set
+    if (glm::dot(wp, wp) < 0.0001)
+        return;
+
+    glm::vec4 p = m_camera->getProjectionMatrix() *
+            m_camera->getViewMatrix() * glm::vec4(wp, 1);
+
+    p /= p.w;
+    // check if waypoint is within frustum
+    if (p.z >= 0 && p.z <= 1 && p.x >= -1 && p.x <= 1 && p.y >= -1 && p.y <= 1)
+        return;
+
+
+    glm::vec2 vec = glm::vec2(wp.x - pos.x, wp.z - pos.z);
+    vec = glm::normalize(vec);
+    glm::vec2 up = glm::normalize(glm::vec2(look.x, look.z));
+
+    float dot = glm::dot(up, vec);
+    float det = up.x*vec.y - up.y*vec.x;
+    float angle = std::atan2(det, dot);
+    trans = glm::rotate(glm::mat4(), -angle, glm::vec3(0, 0, 1));
+    trans *= glm::translate(glm::mat4(), glm::vec3(0, .9f, 0));
+    trans *= glm::scale(glm::mat4(), glm::vec3(.05f));
+
+    g->drawCone(trans);
+}
+
+
 void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
 {
-    if (m_startTimer < 0.f)
+    if (m_startTimer < 0.f && m_outcome == 0)
         m_world->onMouseMoved(e, deltaX, deltaY);
 }
 void GameScreen::onKeyReleased(QKeyEvent *e )
@@ -267,11 +307,13 @@ void GameScreen::onKeyReleased(QKeyEvent *e )
         m_drawNavMesh = !m_drawNavMesh;
     else if (e->key() == Qt::Key_G)
         m_graphicsCardDestructionMode = !m_graphicsCardDestructionMode;
+
     m_world->onKeyReleased(e);
 }
 void GameScreen::onMouseDragged(QMouseEvent *e, float deltaX, float deltaY)
 {
-    m_world->onMouseMoved(e, deltaX, deltaY);
+    if (m_startTimer < 0.f && m_outcome == 0)
+        m_world->onMouseMoved(e, deltaX, deltaY);
 }
 
 void GameScreen::onKeyPressed(QKeyEvent *e)
@@ -284,7 +326,8 @@ void GameScreen::onKeyPressed(QKeyEvent *e)
         m_parentApp->popScreens(1);
         break;
     default:
-        m_world->onKeyPressed(e);
+        if (m_startTimer < 0.f && m_outcome == 0)
+            m_world->onKeyPressed(e);
         break;
     }
 }
