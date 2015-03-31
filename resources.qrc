@@ -8,12 +8,14 @@
         <file alias="sparse.frag">shaders/sparse.frag</file>
         <file alias="ray.vert">shaders/ray.vert</file>
         <file alias="ray.frag">shaders/ray.frag</file>
+        <file alias="ray2.frag">shaders/ray2.frag</file>
     </qresource>
     <qresource prefix="/images">
         <file alias="one.jpg">res/images/one.jpg</file>
         <file alias="two.jpg">res/images/two.jpg</file>
         <file alias="three.jpg">res/images/three.jpg</file>
         <file alias="water.jpg">res/images/water.jpg</file>
+	<file alias="water2.jpg">res/images/water2.jpg</file>
     </qresource>
     <qresource prefix="/cubemap">
         <file alias="posx.png">res/cubemap/posx.png</file>

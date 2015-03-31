@@ -21,7 +21,7 @@ GameScreen::GameScreen(Application *parent)
     QList<Triangle *> tris;
     QList<Triangle *> *navTris = m_nmh->getTriangleList();
 
-    m_levelTexture = "water.jpg";
+    m_levelTexture = "water2.jpg";
     m_level = m_oh->getObject(":/objects/level_raceway.obj", shader, &tris);
     m_nmh->setObject(m_oh->getObject(":/objects/level_raceway_navmesh.obj", shader, navTris));
     m_nmh->createVBO();
@@ -114,7 +114,6 @@ void GameScreen::onTick(float secs  )
     if (m_startTimer > 0.f)
     {
         m_startTimer -= secs;
-        cout << m_startTimer << endl;
         return;
     }
 

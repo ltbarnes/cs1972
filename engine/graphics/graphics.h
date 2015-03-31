@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <QString>
 #include <QHash>
+#include <QTime>
 #include "camera.h"
 #include "cubemap.h"
 #include "shape.h"
@@ -153,6 +154,8 @@ private:
 
     glm::mat4 m_frustum;
     ParticleEmitter *m_pe;
+
+    QTime m_timer;
 };
 
 #endif // GRAPHICS_H

@@ -116,12 +116,13 @@ void Graphics::init()
 
     m_rayShader = Graphics::loadShaders(
                 ":/shaders/ray.vert",
-                ":/shaders/ray.frag");
+                ":/shaders/ray2.frag");
 
     m_rayLocs["viewport"] = glGetUniformLocation(m_rayShader, "viewport");
     m_rayLocs["filmToWorld"] = glGetUniformLocation(m_rayShader, "filmToWorld");
     m_rayLocs["camEye"] = glGetUniformLocation(m_rayShader, "camEye");
     m_rayLocs["envMap"] = glGetUniformLocation(m_rayShader, "envMap");
+    m_rayLocs["time"] = glGetUniformLocation(m_rayShader, "time");
 
 
     m_cubeShader = Graphics::loadShaders(
@@ -147,6 +148,8 @@ void Graphics::init()
 
     m_currentShader = m_defaultShader;
     m_pe->initGL(glGetAttribLocation(m_sparseShader, "position"));
+
+    m_timer.start();
 }
 
 
@@ -207,6 +210,7 @@ GLuint Graphics::setGraphicsMode(GraphicsMode gm)
                 glm::value_ptr((glm::inverse(m_currView) * glm::vec4(0, 0, 0, 1))));
         glUniform2f(m_rayLocs["viewport"], m_w, m_h);
         glUniform1i(m_rayLocs["envMap"], 1);
+        glUniform1f(m_rayLocs["time"], (m_timer.elapsed() * 0.001f));
         m_cubeMap->bindTexture();
         break;
     case CUBEMAP:

@@ -111,6 +111,14 @@ void RacerPlayer::onDrawTransparent(Graphics *g)
 }
 
 
+void RacerPlayer::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
+{
+    Player::onMouseMoved(e, deltaX, deltaY);
+    if (m_camera->getLook().y > 0.f)
+        m_camera->pitch(-deltaY * .1f);
+}
+
+
 void RacerPlayer::onKeyPressed(QKeyEvent *e)
 {
     switch (e->key())

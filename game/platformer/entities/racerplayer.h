@@ -11,6 +11,8 @@ public:
 
     virtual void onTick(float secs);
     virtual void onDrawTransparent(Graphics *g);
+
+    virtual void onMouseMoved(QMouseEvent *e, float deltaX, float deltaY);
     virtual void onKeyPressed(QKeyEvent *e);
     virtual void onKeyReleased(QKeyEvent *e);
 
