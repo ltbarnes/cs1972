@@ -135,8 +135,7 @@ void PlatformerMenu::onMouseMoved(QMouseEvent *, float deltaX, float deltaY)
     m_buttonIsland->setColor(c, c, c);
     if (m_buttonEasy->contains(newX, newY))
     {
-//        m_level = 1;
-        m_level = 4;
+        m_level = 1;
         m_buttonEasy->setColor(1, 1, 1);
     }
     else if (m_buttonHard->contains(newX, newY))
@@ -156,7 +155,7 @@ void PlatformerMenu::onMouseMoved(QMouseEvent *, float deltaX, float deltaY)
 void PlatformerMenu::onMousePressed(QMouseEvent *e)
 {
     if (e->button() == Qt::LeftButton && m_level > 0)
-        m_parentApp->addScreen(new GameScreen(m_parentApp));
+        m_parentApp->addScreen(new GameScreen(m_parentApp, m_level));
 //        m_parentApp->addScreen(new GameScreenTest(m_parentApp, m_level));
 }
 

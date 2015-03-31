@@ -125,7 +125,7 @@ ObjectsInfo *World::getObjectInfo()
         {
             inv = glm::inverse( posMat * rs->trans );
             info->invs.append(inv);
-            info->colors.append(rs->color);
+            info->colors.append(glm::vec4(rs->color, rs->transparency));
             info->shapeType.append(rs->type);
         }
     }

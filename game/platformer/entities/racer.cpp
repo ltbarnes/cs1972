@@ -30,11 +30,20 @@ Racer::Racer(glm::vec3 pos, glm::vec3 color)
     this->addRenderShape(rs);
 
     m_currWaypoint = 0;
+    m_finishedLap = false;
 }
 
 
 Racer::~Racer()
 {
+}
+
+
+bool Racer::checkFinishedLap()
+{
+    bool result = m_finishedLap;
+    m_finishedLap = false;
+    return result;
 }
 
 
@@ -44,18 +53,24 @@ void Racer::setWaypoints(QList<glm::vec3> waypoints, glm::vec3 startLoc)
     m_waypoints.append(waypoints);
     m_currWaypoint = 0;
 
-    glm::vec3 toWaypoint = startLoc - getPosition();
-    float angle = glm::orientedAngle(glm::normalize(toWaypoint), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0));
-    m_rotation = glm::rotate(glm::mat4(), -angle, glm::vec3(0, -1, 0));
+    if (glm::dot(startLoc, startLoc) > 0.0001f)
+    {
+        glm::vec3 toWaypoint = startLoc - getPosition();
+        float angle = glm::orientedAngle(glm::normalize(toWaypoint), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0));
+        m_rotation = glm::rotate(glm::mat4(), -angle, glm::vec3(0, -1, 0));
+    }
 }
 
 
 void Racer::buildPath(NavMeshHandler *nmh)
 {
+    m_path.clear();
+    if (m_waypoints.isEmpty())
+        return;
+
     nmh->setStart(getPosition());
     nmh->setEnd(m_waypoints[m_currWaypoint]);
     nmh->findPath();
-    m_path.clear();
     m_path.append(nmh->getPath());
 }
 
@@ -64,6 +79,8 @@ void Racer::onTick(float secs)
 {
 
     float forceAmt = 20.f;
+    if (m_waypoints.isEmpty())
+        forceAmt = 0.f;
 
     glm::vec4 look = m_rotation * glm::vec4(0, 0, -1, 0);
 
@@ -82,7 +99,11 @@ void Racer::onTick(float secs)
         return;
 
     if (m_path.size() == 2)
-        m_currWaypoint = (m_currWaypoint + 1) % m_waypoints.size();
+        if (++m_currWaypoint >= m_waypoints.size())
+        {
+            m_currWaypoint = 0;
+            m_finishedLap = true;
+        }
 
     glm::vec3 toWaypoint = m_path[1] - getPosition();
     float angle = glm::orientedAngle(glm::normalize(toWaypoint), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0));

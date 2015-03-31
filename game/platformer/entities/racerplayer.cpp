@@ -30,11 +30,20 @@ RacerPlayer::RacerPlayer(ActionCamera *camera, glm::vec3 pos, glm::vec3 color)
     this->addRenderShape(rs);
 
     m_currWaypoint = 0;
+    m_finishedLap = false;
 }
 
 
 RacerPlayer::~RacerPlayer()
 {
+}
+
+
+bool RacerPlayer::checkFinishedLap()
+{
+    bool result = m_finishedLap;
+    m_finishedLap = false;
+    return result;
 }
 
 
@@ -79,7 +88,11 @@ void RacerPlayer::onTick(float secs)
     {
         if (glm::distance2(getPosition(), m_waypoints[m_currWaypoint]) < 50.f)
         {
-            m_currWaypoint = (m_currWaypoint + 1) % m_waypoints.size();
+            if (++m_currWaypoint >= m_waypoints.size())
+            {
+                m_currWaypoint = 0;
+                m_finishedLap = true;
+            }
         }
     }
 }
@@ -92,18 +105,27 @@ void RacerPlayer::onDrawTransparent(Graphics *g)
     if (!m_waypoints.isEmpty())
     {
         glm::mat4 trans;
-
-        int next = (m_currWaypoint + 1) % m_waypoints.size();
         g->setTransparentMode(true);
 
-        trans = glm::translate(glm::mat4(), m_waypoints[next]) *
-                glm::scale(glm::mat4(), glm::vec3(3.f));
-        g->setColor(1, 0, 1, .3, 0);
-        g->drawSphere(trans);
+        if (m_waypoints.size() > 1)
+        {
+            int next = (m_currWaypoint + 1) % m_waypoints.size();
 
-        trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
-                glm::scale(glm::mat4(), glm::vec3(7.f));
-        g->setColor(1, 0, 0, .3, 0);
+            trans = glm::translate(glm::mat4(), m_waypoints[next]) *
+                    glm::scale(glm::mat4(), glm::vec3(3.f));
+            g->setColor(1, 0, 1, .3, 0);
+            g->drawSphere(trans);
+
+            trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
+                    glm::scale(glm::mat4(), glm::vec3(7.f));
+            g->setColor(1, 0, 0, .3, 0);
+        }
+        else
+        {
+            trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
+                    glm::scale(glm::mat4(), glm::vec3(8.5f));
+            g->setColor(0, 1, 0, .3, 0);
+        }
         g->drawSphere(trans);
 
         g->setTransparentMode(false);
@@ -189,17 +211,55 @@ void RacerPlayer::setWaypoints(QList<glm::vec3> waypoints, glm::vec3 startLoc)
     m_waypoints.append(waypoints);
     m_currWaypoint = 0;
 
-    glm::vec3 toWaypoint = startLoc - getPosition();
-    float angle = glm::orientedAngle(glm::normalize(toWaypoint), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0));
-    m_rotation = glm::rotate(glm::mat4(), -angle, glm::vec3(0, -1, 0));
+    if (glm::dot(startLoc, startLoc) > 0.0001f)
+    {
+        glm::vec3 toWaypoint = startLoc - getPosition();
+        float angle = glm::orientedAngle(glm::normalize(toWaypoint), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0));
+        m_rotation = glm::rotate(glm::mat4(), -angle, glm::vec3(0, -1, 0));
 
-    glm::vec4 look = m_rotation * glm::vec4(0, 0, -1, 0);
+        glm::vec4 look = m_rotation * glm::vec4(0, 0, -1, 0);
 
-    look = glm::normalize(glm::vec4(look.x, 0, look.z, 0));
-    look.y = -.1f;
-    m_camera->setLook(glm::normalize(look));
+        look = glm::normalize(glm::vec4(look.x, 0, look.z, 0));
+        look.y = -.1f;
+        m_camera->setLook(glm::normalize(look));
 
-    this->setCameraPos();
+        this->setCameraPos();
+    }
+}
+
+
+ObjectsInfo *RacerPlayer::getWaypointInfo()
+{
+    ObjectsInfo *info;
+    info = new ObjectsInfo();
+
+    glm::mat4 trans;
+    glm::vec4 color;
+    if (m_waypoints.size() > 1)
+    {
+        int next = (m_currWaypoint + 1) % m_waypoints.size();
+
+        trans = glm::translate(glm::mat4(), m_waypoints[next]) *
+                glm::scale(glm::mat4(), glm::vec3(3.f));
+        info->invs.append(glm::inverse(trans));
+        info->colors.append(glm::vec4(1, 0, 1, .3));
+        info->shapeType.append(SPHERE);
+
+        trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
+                glm::scale(glm::mat4(), glm::vec3(7.f));
+        color = glm::vec4(1, 0, 0, .3);
+    }
+    else
+    {
+        trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
+                glm::scale(glm::mat4(), glm::vec3(8.5f));
+        color = glm::vec4(0, 1, 0, .3);
+    }
+    info->invs.append(glm::inverse(trans));
+    info->colors.append(color);
+    info->shapeType.append(SPHERE);
+
+    return info;
 }
 
 

@@ -13,13 +13,16 @@ public:
     virtual void onTick(float secs);
     virtual void handleCollision(Collision *col);
 
-    void setWaypoints(QList<glm::vec3> waypoints, glm::vec3 startLoc);
+    bool checkFinishedLap();
+
+    void setWaypoints(QList<glm::vec3> waypoints, glm::vec3 startLoc = glm::vec3());
     void buildPath(NavMeshHandler *nmh);
 
 private:
     QList<glm::vec3> m_waypoints;
     QList<glm::vec3> m_path;
     int m_currWaypoint;
+    bool m_finishedLap;
 
 };
 

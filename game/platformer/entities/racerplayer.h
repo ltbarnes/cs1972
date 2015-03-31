@@ -16,12 +16,16 @@ public:
     virtual void onKeyPressed(QKeyEvent *e);
     virtual void onKeyReleased(QKeyEvent *e);
 
-    void setWaypoints(QList<glm::vec3> waypoints, glm::vec3 startLoc);
+    bool checkFinishedLap();
+
+    void setWaypoints(QList<glm::vec3> waypoints, glm::vec3 startLoc = glm::vec3());
+    ObjectsInfo *getWaypointInfo();
 
 private:
     QList<glm::vec3> m_waypoints;
     int m_currWaypoint;
     bool m_lockCam;
+    bool m_finishedLap;
 
 };
 

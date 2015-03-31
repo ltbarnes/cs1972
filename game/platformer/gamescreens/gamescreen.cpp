@@ -9,7 +9,7 @@
 
 //#include <glm/ext.hpp>
 
-GameScreen::GameScreen(Application *parent)
+GameScreen::GameScreen(Application *parent, int laps)
     : Screen(parent)
 {
     m_parentApp->setUseCubeMap(true);
@@ -30,26 +30,21 @@ GameScreen::GameScreen(Application *parent)
     m_world->addToMesh(tris);
 
     ActionCamera *cam = new ActionCamera();
-    glm::vec3 playerPos = glm::vec3(0, 2, 0);
+    glm::vec3 playerPos = glm::vec3(0, 1, 0);
 
     cam->setCenter(playerPos);
-    RacerPlayer *player = new RacerPlayer(cam, playerPos, glm::vec3(1, .5f, 0));
+    m_player = new RacerPlayer(cam, playerPos, glm::vec3(1, .5f, 0));
 
     GeometricCollisionManager *gcm = new GeometricCollisionManager();
     m_world->addManager(gcm);
 
-    m_world->setPlayer(player);
+    m_world->setPlayer(m_player);
     m_world->setGravity(glm::vec3(0, -10, 0));
 
     setCamera(cam);
 
-    m_drawEllipsoid = false;
-    m_drawPoint = false;
-    m_mouseDown = false;
     m_drawNavMesh = false;
     m_startTimer = 3.f;
-
-    m_ellipsoid = new Ellipsoid(glm::vec3(), glm::vec3(.25f, .5, .25f), "rayshape");
 
     m_racer1 = new Racer(playerPos + glm::vec3(2, 0, 2), glm::vec3(0, 1, 1));
     m_world->addMovableEntity(m_racer1);
@@ -57,9 +52,16 @@ GameScreen::GameScreen(Application *parent)
     m_racer2 = new Racer(playerPos + glm::vec3(-2, 0,-2), glm::vec3(1, 0, 1));
     m_world->addMovableEntity(m_racer2);
 
-    setWaypoints(player);
+    setWaypoints(m_player);
 
     m_graphicsCardDestructionMode = false;
+
+    m_laps[0] = 0;
+    m_laps[1] = 0;
+    m_laps[2] = 0;
+    m_maxLaps = laps;
+
+    m_outcome = 0;
 }
 
 GameScreen::~GameScreen()
@@ -67,43 +69,42 @@ GameScreen::~GameScreen()
     delete m_oh;
     delete m_nmh;
     delete m_world;
-    delete m_ellipsoid;
 }
 
 void GameScreen::setWaypoints(RacerPlayer *player)
 {
     // other racers
     QList<glm::vec3> waypoints;
-    waypoints.append(glm::vec3(81, 2, -55));
-    waypoints.append(glm::vec3(125, 2, 0));
-    waypoints.append(glm::vec3(81, 2, 55));
-    waypoints.append(glm::vec3(10, 2, -15));
-    waypoints.append(glm::vec3(-81, 2, -55));
-    waypoints.append(glm::vec3(-125, 2, 0));
-    waypoints.append(glm::vec3(-81, 2, 55));
-    waypoints.append(glm::vec3(-10, 2, -15));
+    waypoints.append(glm::vec3(  81, 1, -55));
+    waypoints.append(glm::vec3( 125, 1,   0));
+    waypoints.append(glm::vec3(  81, 1,  55));
+    waypoints.append(glm::vec3(  10, 1, -15));
+    waypoints.append(glm::vec3( -81, 1, -55));
+    waypoints.append(glm::vec3(-125, 1,   0));
+    waypoints.append(glm::vec3( -81, 1,  55));
+    waypoints.append(glm::vec3( -10, 1, -15));
 
-    m_racer1->setWaypoints(waypoints, glm::vec3(  60, 2, -50));
-    m_racer2->setWaypoints(waypoints, glm::vec3(  60, 2, -50));
+    m_racer1->setWaypoints(waypoints, glm::vec3(  60, 1, -50));
+    m_racer2->setWaypoints(waypoints, glm::vec3(  60, 1, -50));
 
     // player
     waypoints.clear();
-    waypoints.append(glm::vec3(  60, 2, -50));
-    waypoints.append(glm::vec3( 100, 2, -60));
-    waypoints.append(glm::vec3( 130, 2, -30));
-    waypoints.append(glm::vec3( 125, 2,  30));
-    waypoints.append(glm::vec3( 100, 2,  58));
-    waypoints.append(glm::vec3(  60, 2,  60));
-    waypoints.append(glm::vec3(  30, 2,  37));
-    waypoints.append(glm::vec3( -60, 2, -50));
-    waypoints.append(glm::vec3(-100, 2, -60));
-    waypoints.append(glm::vec3(-130, 2, -30));
-    waypoints.append(glm::vec3(-125, 2,  30));
-    waypoints.append(glm::vec3(-100, 2,  58));
-    waypoints.append(glm::vec3( -60, 2,  60));
-    waypoints.append(glm::vec3( -30, 2,  37));
+    waypoints.append(glm::vec3(  60, 1, -50));
+    waypoints.append(glm::vec3( 100, 1, -60));
+    waypoints.append(glm::vec3( 130, 1, -30));
+    waypoints.append(glm::vec3( 125, 1,  30));
+    waypoints.append(glm::vec3( 100, 1,  58));
+    waypoints.append(glm::vec3(  60, 1,  60));
+    waypoints.append(glm::vec3(  30, 1,  37));
+    waypoints.append(glm::vec3( -60, 1, -50));
+    waypoints.append(glm::vec3(-100, 1, -60));
+    waypoints.append(glm::vec3(-130, 1, -30));
+    waypoints.append(glm::vec3(-125, 1,  30));
+    waypoints.append(glm::vec3(-100, 1,  58));
+    waypoints.append(glm::vec3( -60, 1,  60));
+    waypoints.append(glm::vec3( -30, 1,  37));
 
-    player->setWaypoints(waypoints, glm::vec3(  60, 2, -50));
+    player->setWaypoints(waypoints, glm::vec3(  60, 1, -50));
 
 }
 
@@ -119,48 +120,53 @@ void GameScreen::onTick(float secs  )
 
     m_world->onTick(secs);
 
-    m_drawPoint = true;
-
-    glm::vec3 p = glm::vec3(m_world->getPlayer()->getEyePos());
-    glm::vec3 d = glm::vec3(m_camera->getLook());
-
-    float t;
-    Triangle *tri = m_world->intersectWorld(p, d, &t);
-
-    if (m_mouseDown)
-    {
-        if (tri)
-        {
-            m_drawEllipsoid = true;
-            glm::vec3 pos = p + d * t;
-            m_ellipsoid->setPosition(pos);
-            m_nmh->setEnd(pos + glm::vec3(0, 1, 0));
-        }
-    }
-
-    else if (m_drawEllipsoid)
-    {
-        float t2 = m_ellipsoid->intersectRayWorldSpace(p, d);
-        if (t2 < t)
-        {
-            t = t2;
-        }
-    }
-
-    if (t < INFINITY)
-        m_point = p + d * t;
-    else
-        m_drawPoint = false;
-
     m_racer1->buildPath(m_nmh);
     m_racer2->buildPath(m_nmh);
+
+    if (m_player->checkFinishedLap())
+        m_laps[0]++;
+    if (m_racer1->checkFinishedLap())
+        m_laps[1]++;
+    if (m_racer2->checkFinishedLap())
+        m_laps[2]++;
+
+    if (m_laps[0] == m_maxLaps)
+    {
+        QList<glm::vec3> waypoints;
+        waypoints.append(glm::vec3(  60, 1, -50));
+        m_player->setWaypoints(waypoints);
+    }
+    if (m_laps[1] == m_maxLaps)
+    {
+        QList<glm::vec3> waypoints;
+        waypoints.append(glm::vec3(  81, 1, -55));
+        m_racer1->setWaypoints(waypoints);
+    }
+    if (m_laps[2] == m_maxLaps)
+    {
+        QList<glm::vec3> waypoints;
+        waypoints.append(glm::vec3(  81, 1, -55));
+        m_racer2->setWaypoints(waypoints);
+    }
+    if (m_laps[0] > m_maxLaps && m_outcome == 0)
+    {
+        if (m_laps[1] > m_laps[0] && m_laps[2] > m_laps[0])
+            m_outcome = 3;
+        else if (m_laps[1] > m_laps[0] || m_laps[2] > m_laps[0])
+            m_outcome = 2;
+        else
+            m_outcome = 1;
+    }
+    if (m_laps[1] > m_maxLaps)
+        m_racer1->setWaypoints(QList<glm::vec3>());
+    if (m_laps[2] > m_maxLaps)
+        m_racer2->setWaypoints(QList<glm::vec3>());
 }
 
 void GameScreen::onRender(Graphics *g)
 {
     if (!m_graphicsCardDestructionMode)
     {
-//        m_parentApp->setUseCubeMap(true);
         g->setWorldColor(.1, .1, .1);
         g->setColor(1, 1, 1, 1, 0);
 
@@ -173,24 +179,9 @@ void GameScreen::onRender(Graphics *g)
 
         g->addLight(light1);
 
-
-
         g->setTexture("");
         g->setColor(.25f, .75f, 1, 1, 0);
         glm::mat4 trans;
-        if (m_drawEllipsoid)
-        {
-            trans = glm::translate(glm::mat4(), m_ellipsoid->getPos()) *
-                    glm::scale(glm::mat4(), m_ellipsoid->getDim() * 2.f);
-            g->drawSphere(trans);
-        }
-        if (m_drawPoint)
-        {
-            trans = glm::translate(glm::mat4(), m_point) *
-                    glm::scale(glm::mat4(), glm::vec3(0.1f));
-            g->setColor(1, 0, 0, 1, 0);
-            g->drawSphere(trans);
-        }
 
         if (m_drawNavMesh && m_nmh->hasObject())
         {
@@ -224,12 +215,43 @@ void GameScreen::onRender(Graphics *g)
             g->setAllWhite(false);
         }
         m_world->onDraw(g);
+
+        if (m_startTimer > 0.f)
+        {
+            glm::mat4 trans = glm::translate(glm::mat4(), glm::vec3(0,.4f,0)) *
+                    glm::scale(glm::mat4(), glm::vec3(.35f));
+            g->setGraphicsMode(DRAW2D);
+            g->setAllWhite(true);
+            if (m_startTimer > 2.f)
+                g->setTexture("three.jpg");
+            else if (m_startTimer > 1.f)
+                g->setTexture("two.jpg");
+            else
+                g->setTexture("one.jpg");
+            g->drawQuad(trans);
+            g->setAllWhite(false);
+        }
+        if (m_outcome > 0)
+        {
+            glm::mat4 trans = glm::scale(glm::mat4(), glm::vec3(.75f));
+            g->setGraphicsMode(DRAW2D);
+            g->setAllWhite(true);
+            if (m_outcome == 3)
+                g->setTexture("three.jpg");
+            else if (m_outcome == 2)
+                g->setTexture("two.jpg");
+            else
+                g->setTexture("one.jpg");
+            g->drawQuad(trans);
+            g->setAllWhite(false);
+        }
     }
     else
     {
         // ray cast attempt
         g->setGraphicsMode(RAY);
         g->rayAddObjects(m_world->getObjectInfo());
+        g->rayAddTransparents(m_player->getWaypointInfo());
         g->rayDrawQuad();
     }
 }
@@ -238,10 +260,6 @@ void GameScreen::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)
 {
     if (m_startTimer < 0.f)
         m_world->onMouseMoved(e, deltaX, deltaY);
-}
-void GameScreen::onMousePressed(QMouseEvent *)
-{
-    m_mouseDown = true;
 }
 void GameScreen::onKeyReleased(QKeyEvent *e )
 {
@@ -254,10 +272,6 @@ void GameScreen::onKeyReleased(QKeyEvent *e )
 void GameScreen::onMouseDragged(QMouseEvent *e, float deltaX, float deltaY)
 {
     m_world->onMouseMoved(e, deltaX, deltaY);
-}
-void GameScreen::onMouseReleased(QMouseEvent *)
-{
-    m_mouseDown = false;
 }
 
 void GameScreen::onKeyPressed(QKeyEvent *e)
@@ -277,4 +291,6 @@ void GameScreen::onKeyPressed(QKeyEvent *e)
 
 
 // unused in game
+void GameScreen::onMousePressed(QMouseEvent *) {}
+void GameScreen::onMouseReleased(QMouseEvent *) {}
 void GameScreen::onMouseWheel(QWheelEvent *) {}

@@ -21,9 +21,13 @@ uniform int NUM_TRANSPARENTS = 0;
 uniform int NUM_LIGHTS = 1;
 
 uniform mat4 invs[20];
-uniform mat4 invsT[10];
-uniform vec3 colors[20];
+uniform vec4 colors[20];
 uniform int types[20];
+
+uniform mat4 invsT[10];
+uniform vec4 colorsT[10];
+uniform int typesT[10];
+
 // to be uniforms or blocks
 vec3 lightPos[10];
 
@@ -63,7 +67,7 @@ const int ITER_GEOMETRY = 3;
 const int ITER_FRAGMENT = 5;
 const float SEA_HEIGHT = 0.1;
 const float SEA_CHOPPY = 2.0;
-const float SEA_SPEED = 0.3;
+const float SEA_SPEED = 0.5;
 const float SEA_FREQ = 0.6;
 const vec3 SEA_BASE = vec3(0.1,0.19,0.22);
 const vec3 SEA_WATER_COLOR = vec3(0.8,0.9,0.6);
@@ -133,7 +137,7 @@ float map(vec3 p) {
     for(int i = 0; i < ITER_GEOMETRY; i++) {        
       d = sea_octave((uv+SEA_TIME)*freq,choppy);
       d += sea_octave((uv-SEA_TIME)*freq,choppy);
-        h += d * amp;        
+        h += d * amp;// + sin(p.x * .1 + time) * .1;
       uv *= octave_m; freq *= 1.9; amp *= 0.22;
         choppy = mix(choppy,1.0,0.2);
     }
@@ -150,7 +154,7 @@ float map_detailed(vec3 p) {
     for(int i = 0; i < ITER_FRAGMENT; i++) {        
       d = sea_octave((uv+SEA_TIME)*freq,choppy);
       d += sea_octave((uv-SEA_TIME)*freq,choppy);
-        h += d * amp;        
+        h += d * amp;// + sin(p.x * .1 + time) * .1; // how to add waves
       uv *= octave_m; freq *= 1.9; amp *= 0.22;
         choppy = mix(choppy,1.0,0.2);
     }
@@ -214,7 +218,6 @@ vec3 oceanStuff(in vec3 ori, in vec3 dir)
     heightMapTracing(ori,dir,p);
     vec3 dist = p - ori;
     vec3 n = getNormal(p, dot(dist,dist) * EPSILON_NRM);
-//    vec3 light = normalize(vec3(0.0,1.0,0.8));
     vec3 light = normalize(-LIGHT_DIR);
 
     // color
@@ -451,6 +454,35 @@ vec4 intersectWorld(in int exception, in vec4 p, in vec4 d, out int colorIndex)
     return bestN;
 }
 
+//////////////////TRANSPARENT_OBJECTS////////////////////
+
+vec4 intersectTransparents(in vec4 p, in vec4 d, out float t)
+{
+    vec4 color = vec4(0);
+    float tempT;
+    t = INF;
+
+    for (int i = 0; i < NUM_TRANSPARENTS; ++i)
+    {
+        vec4 p_shape = invsT[i] * p;
+        vec4 d_shape = invsT[i] * d;
+        if (typesT[i] == 3)
+            tempT = intersectCylinder(p_shape, d_shape).w;
+        if (typesT[i] == 4)
+            tempT = intersectSphere(p_shape, d_shape).w;
+        if (tempT < t)
+        {
+            if (t == INF)
+                color = colorsT[i];
+            else
+                color.xyz = mix(color.xyz, colorsT[i].xyz, color.w);
+            t = tempT;
+        }
+    }
+
+    return color;
+}
+
 
 ///////////////////////////////////////////
 //                 COLORS                //
@@ -466,7 +498,7 @@ vec3 getTexturedSky(vec3 dir)
 
 vec3 calcObjectColorSolid(in int index, in vec3 point, in vec3 normal, in vec3 eye)
 {
-    vec3 color = colors[index] * 0.075;
+    vec3 color = colors[index].xyz * 0.075;
 //    vec3 vertexToLight = normalize(LIGHT_POS - point);
 
     int colorIndex;
@@ -478,7 +510,7 @@ vec3 calcObjectColorSolid(in int index, in vec3 point, in vec3 normal, in vec3 e
 
     // Add diffuse component
     float diffuseIntensity = max(0.0, dot(vertexToLight, normal));
-    color += max(vec3(0), LIGHT_COLOR * colors[index] * diffuseIntensity);
+    color += max(vec3(0), LIGHT_COLOR * colors[index].xyz * diffuseIntensity);
 
     // Add specular component
     vec3 lightReflection = normalize(reflect(-vertexToLight, normal));
@@ -566,7 +598,9 @@ vec3 calcObjectColor(in int index, in vec3 point, in vec3 normal, in vec3 eye)
 vec3 raytrace(in vec4 p, in vec4 d)
 {
     int colorIndex;
+    float t;
     vec4 n = intersectWorld(-1, p, d, colorIndex);
+    vec4 transColor = intersectTransparents(p, d, t);
 
     if (n.w < INF)
     {
@@ -574,9 +608,17 @@ vec3 raytrace(in vec4 p, in vec4 d)
 
         // calc ocean color
         if (colorIndex == -1)
-            return calcWaterColor(point, n.xyz, p.xyz);
+        {
+            if ((p + d * t).y < WATER_HEIGHT)
+                return calcWaterColor(point, n.xyz, p.xyz);
+
+            return mix(calcWaterColor(point, n.xyz, p.xyz), transColor.xyz, transColor.w);
+        }
 
         // calc object colors
+        if (t < n.w)
+            return mix(calcObjectColor(colorIndex, point, n.xyz, p.xyz), transColor.xyz, transColor.w);
+
         return calcObjectColor(colorIndex, point, n.xyz, p.xyz);
     }
 
@@ -586,7 +628,10 @@ vec3 raytrace(in vec4 p, in vec4 d)
                 oceanStuff(vec3(p), vec3(d)),
                 pow(smoothstep(0.0,-0.05,d.y),0.3));
 
-    return pow(color,vec3(0.75));
+    color = pow(color,vec3(0.75));
+
+
+    return mix(color, transColor.xyz, transColor.w);
 }
 
 

@@ -14,7 +14,7 @@ class RacerPlayer;
 class GameScreen : public Screen
 {
 public:
-    GameScreen(Application *parent);
+    GameScreen(Application *parent, int laps);
     virtual ~GameScreen();
 
     // update and render
@@ -42,18 +42,17 @@ private:
     NavMeshHandler *m_nmh;
 
     PlatformerWorld *m_world;
+    RacerPlayer *m_player;
     Racer *m_racer1;
     Racer *m_racer2;
 
-    bool m_drawEllipsoid;
-    bool m_drawPoint;
-    bool m_mouseDown;
+    int m_laps[3];
+    int m_maxLaps;
+
     bool m_drawNavMesh;
 
-    Ellipsoid* m_ellipsoid;
-    glm::vec3 m_point;
-
     float m_startTimer;
+    int m_outcome;
 
     bool m_graphicsCardDestructionMode;
 

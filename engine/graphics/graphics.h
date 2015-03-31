@@ -56,7 +56,7 @@ struct Light
 struct ObjectsInfo
 {
     QList<glm::mat4> invs;
-    QList<glm::vec3> colors;
+    QList<glm::vec4> colors;
     QList<ShapeType> shapeType;
 };
 
@@ -105,6 +105,7 @@ public:
 
     // ray stuff
     void rayAddObjects(ObjectsInfo *info);
+    void rayAddTransparents(ObjectsInfo *info);
     void rayDrawQuad();
 
     static GLuint loadShaders(const char *vertex_file_path, const char *fragment_file_path);
