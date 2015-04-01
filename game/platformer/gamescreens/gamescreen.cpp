@@ -115,6 +115,7 @@ void GameScreen::onTick(float secs  )
     if (m_startTimer > 0.f)
     {
         m_startTimer -= secs;
+        m_player->setCameraPos();
         return;
     }
 

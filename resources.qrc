@@ -15,7 +15,10 @@
         <file alias="two.jpg">res/images/two.jpg</file>
         <file alias="three.jpg">res/images/three.jpg</file>
         <file alias="water.jpg">res/images/water.jpg</file>
-	<file alias="water2.jpg">res/images/water2.jpg</file>
+       <file alias="water2.jpg">res/images/water2.jpg</file>
+       <file alias="laps1.png">res/images/laps1.png</file>
+       <file alias="laps2.png">res/images/laps2.png</file>
+	   <file alias="laps3.png">res/images/laps3.png</file>
     </qresource>
     <qresource prefix="/cubemap">
         <file alias="posx.png">res/cubemap/posx.png</file>

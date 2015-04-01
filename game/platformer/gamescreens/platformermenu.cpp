@@ -15,17 +15,17 @@ PlatformerMenu::PlatformerMenu(Application *parent)
     m_buttonEasy = new Button();
     m_buttonEasy->setCenter(0.f, 0.f);
     m_buttonEasy->setSize(.4, .5);
-    m_buttonEasy->setImage("imageEasy.png");
+    m_buttonEasy->setImage("laps1.png");
 
     m_buttonHard = new Button();
     m_buttonHard->setCenter(-.6f, 0.f);
     m_buttonHard->setSize(.4, .5);
-    m_buttonHard->setImage("imageHard.png");
+    m_buttonHard->setImage("laps2.png");
 
     m_buttonIsland = new Button();
     m_buttonIsland->setCenter(.6f, 0.f);
     m_buttonIsland->setSize(.4, .5);
-    m_buttonIsland->setImage("imageIsland.png");
+    m_buttonIsland->setImage("laps3.png");
 
     m_cursor = glm::scale(glm::mat4(), glm::vec3(.05, .05, .05));
     m_cursor[3][2] = -.999f;
