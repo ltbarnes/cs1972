@@ -270,7 +270,7 @@ void GameScreen::render2D(Graphics *g)
     g->setTexture("");
 
     // no waypoints set
-    if (glm::dot(wp, wp) < 0.0001)
+    if (glm::dot(wp, wp) < 0.0001f)
         return;
 
     glm::vec4 p = m_camera->getProjectionMatrix() *

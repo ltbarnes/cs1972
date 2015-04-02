@@ -71,7 +71,7 @@ GameScreenTest::~GameScreenTest()
 }
 
 // update and render
-void GameScreenTest::onTick(float secs  )
+void GameScreenTest::onTick(float secs)
 {
     m_world->onTick(secs);
 
@@ -128,7 +128,6 @@ void GameScreenTest::onRender(Graphics *g)
     g->addLight(light1);
 
     m_world->onDraw(g);
-
 
     g->setTexture("");
     g->setColor(.25f, .75f, 1, 1, 0);
@@ -192,6 +191,20 @@ void GameScreenTest::onKeyReleased(QKeyEvent *e )
 {
     if (e->key() == Qt::Key_N)
         m_drawNavMesh = !m_drawNavMesh;
+    else if (e->key() == Qt::Key_Shift)
+    {
+        glm::vec3 p = glm::vec3(m_world->getPlayer()->getEyePos());
+        glm::vec3 d = glm::vec3(m_camera->getLook());
+
+        float t = m_ellipsoid->intersectRayWorldSpace(p, d);
+        if (t < std::numeric_limits<float>::infinity())
+        {
+            glm::vec3 pos = p + d * t;
+
+            m_ellipsoid->setPosition(pos);
+            m_nmh->setEnd(pos + glm::vec3(0, 1, 0));
+        }
+    }
     m_world->onKeyReleased(e);
 }
 void GameScreenTest::onMouseDragged(QMouseEvent *e, float deltaX, float deltaY)

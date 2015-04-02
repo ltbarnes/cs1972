@@ -9,64 +9,37 @@ Geometric Engine Requirements
 ========================================
 [ ] Pathfinding and navigation across a loaded navigation mesh
 	[ ] Construct a graph from a navigation mesh loaded from an OBJ file
+		### buildGraph() in engine/objects/NavMeshHandler.
 	[ ] Query for the polygon in the mesh directly under a point
+		### findTriangle() in NavMeshHandler
 	[ ] Search through the graph for a path between two points (feel free to use BFS)
+		### buildGraph() and findGraph() functions in NavMeshHandler
 	[ ] Path generation using the simple stupid funnel algorithm
+		### simpleStupidFunnel() function in NavMeshHandler
 
 Game Requirements
 ========================================
 [ ] The game must follow all requirements from platformer2
+	### believe so.
 [ ] The player must be able to toggle a visualization of navigation using a key input
-	### press 'N'
+	### press 'N'. handled in engine/objects/NavMeshHandler.
 	[ ] The visualization must render the navigation mesh
-		### yep
+		### draw() method
 	[ ] The visualization must render the shortest path from the current player position to a target point
-		### yep
+		### drawPath() method
 	[ ] The target point must be visualized by an ellipsoid (it does not have to collide)
-		### yep
+		### game/gamescreens/GameScreenTest class onRender() method
 	[ ] The player must be able to change the target point by raycasting the environment (place the center at the result)
-		### yep
+		### drag mouse. handled in GameScreenTest.
 	[ ] The player must be able to change the target point by raycasting the target point (place the center at the result)
-		### hold shift then click otherwise it will just raycast the environment again
+		### press shift to reset the center. Otherwise it will just raycast the environment again
 
 
 Issues:
 
-	I'm sure there are plenty of bugs but I haven't noticed any yet in my very limited testing.
-	-FPS prints to the console.
-	-Compiled with Qt5.2.0
-
-
-~Hours:
-  20
-
-
-
-
-
-
-
-Project: Platformer 4
-Student: Logan Barnes (ltbarnes)
-
-
-COMPILED USING QT 5.2.0!!!
-
-Game Requirements
-========================================
-[ ] The game must have at least one type of enemy that uses path-finding over a navigation mesh
-[ ] This enemy must interact with the player in some way (e.g. push the player off ledges, shoot at the player, damage the player directly)
-[ ] The game must have a non-arbitrary and reasonably achievable win or loss condition
-[ ] The game must be resettable upon win or loss without restarting the program
-[ ] The game can never enter an unwinnable or unloseable state
-[ ] The game must use orthographic projection to display some form of game UI
-
-
-Issues:
-
-	I'm sure there are plenty of bugs but I haven't noticed any yet in my very limited testing.
-	-FPS prints to the console.
-	-Compiled with Qt5.2.0
+	- The target ellipsoid position is projected up a bit so it finds the triangle under it even though its center is technically on the ground.
+	- FPS prints to the console.
+	- Compiled with Qt5.2.0
 
 
 ~Hours:
