@@ -171,11 +171,10 @@ void GameScreen::onRender(Graphics *g)
         g->setWorldColor(.1, .1, .1);
         g->setColor(1, 1, 1, 1, 0);
 
-
         Light light1;
         light1.type = DIRECTIONAL;
         light1.color = glm::vec3(.5f, 1, .5f);
-        light1.posDir = glm::normalize(glm::vec3(-1, -1.2, .4));
+        light1.posDir = glm::normalize(glm::vec3(-0.89f, -0.41f, -0.2f));
         light1.id = 1;
 
         g->addLight(light1);
@@ -238,11 +237,11 @@ void GameScreen::onRender(Graphics *g)
             g->setGraphicsMode(DRAW2D);
             g->setAllWhite(true);
             if (m_outcome == 3)
-                g->setTexture("third.jpg");
+                g->setTexture("third.png");
             else if (m_outcome == 2)
-                g->setTexture("second.jpg");
+                g->setTexture("second.png");
             else
-                g->setTexture("first.jpg");
+                g->setTexture("first.png");
             g->drawQuad(trans);
             g->setAllWhite(false);
         }
