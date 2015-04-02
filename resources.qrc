@@ -11,12 +11,6 @@
         <file alias="ray2.frag">shaders/ray2.frag</file>
     </qresource>
     <qresource prefix="/images">
-        <file alias="level_easy.png">res/images/level_easy_rot.png</file>
-        <file alias="level_hard.png">res/images/level_hard_rot.png</file>
-        <file alias="level_island.png">res/images/level_island_rot.png</file>
-        <file alias="imageEasy.png">res/images/imageEasy.png</file>
-        <file alias="imageHard.png">res/images/imageHard.png</file>
-        <file alias="imageIsland.png">res/images/imageIsland.png</file>
         <file alias="one.jpg">res/images/one.jpg</file>
         <file alias="two.jpg">res/images/two.jpg</file>
         <file alias="three.jpg">res/images/three.jpg</file>
