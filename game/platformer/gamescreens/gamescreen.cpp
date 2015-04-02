@@ -149,7 +149,8 @@ void GameScreen::onTick(float secs  )
         waypoints.append(glm::vec3(  81, 1, -55));
         m_racer2->setWaypoints(waypoints);
     }
-    if (m_laps[0] > m_maxLaps && m_outcome == 0)
+    if (m_outcome == 0 && (m_laps[0] > m_maxLaps ||
+                           (m_laps[2] > m_maxLaps && m_laps[1] > m_maxLaps)))
     {
         if (m_laps[1] > m_laps[0] && m_laps[2] > m_laps[0])
             m_outcome = 3;
@@ -233,7 +234,7 @@ void GameScreen::onRender(Graphics *g)
         }
         if (m_outcome > 0)
         {
-            glm::mat4 trans = glm::scale(glm::mat4(), glm::vec3(.75f));
+            glm::mat4 trans = glm::scale(glm::mat4(), glm::vec3(.7f, .75f, .1f));
             g->setGraphicsMode(DRAW2D);
             g->setAllWhite(true);
             if (m_outcome == 3)
@@ -318,6 +319,24 @@ void GameScreen::onMouseDragged(QMouseEvent *e, float deltaX, float deltaY)
 
 void GameScreen::onKeyPressed(QKeyEvent *e)
 {
+    if (m_outcome > 0)
+    {
+        switch (e->key())
+        {
+        case Qt::Key_W:
+        case Qt::Key_A:
+        case Qt::Key_S:
+        case Qt::Key_D:
+        case Qt::Key_G:
+        case Qt::Key_N:
+            break;
+        default:
+            m_parentApp->popScreens(1);
+            break;
+        }
+        return;
+    }
+
     switch (e->key())
     {
     case Qt::Key_Back:
