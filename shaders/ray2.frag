@@ -38,7 +38,7 @@ const float N_a = 1.0001; // air
 const float N_g = 2.0001;
 
 const float WATER_HEIGHT = 0.0;
-const vec3 LIGHT_DIR = vec3(-1, -1.2, .4);
+const vec3 LIGHT_DIR = vec3(-0.89, -0.41, -0.2);
 const vec3 LIGHT_COLOR = vec3(1, 1, 1);
 const float SHINE = 64.0;
 
@@ -491,6 +491,7 @@ vec4 intersectTransparents(in vec4 p, in vec4 d, out float t)
 vec3 getTexturedSky(vec3 dir)
 {
     vec3 color = texture(envMap, dir.xyz).xyz;
+    return color;
     float fade = pow(1.0 - max(dir.y, 0), 50.0);
     color = color + fade * (vec3(1) - color);
     return color;

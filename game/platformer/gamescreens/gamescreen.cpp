@@ -238,11 +238,11 @@ void GameScreen::onRender(Graphics *g)
             g->setGraphicsMode(DRAW2D);
             g->setAllWhite(true);
             if (m_outcome == 3)
-                g->setTexture("three.jpg");
+                g->setTexture("third.jpg");
             else if (m_outcome == 2)
-                g->setTexture("two.jpg");
+                g->setTexture("second.jpg");
             else
-                g->setTexture("one.jpg");
+                g->setTexture("first.jpg");
             g->drawQuad(trans);
             g->setAllWhite(false);
         }

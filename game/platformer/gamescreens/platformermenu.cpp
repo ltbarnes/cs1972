@@ -31,10 +31,6 @@ PlatformerMenu::PlatformerMenu(Application *parent)
     m_cursor[3][2] = -.999f;
 
     m_level = 0;
-
-//    cout << (3.141592654 * 2 + glm::orientedAngle(glm::vec2(0,1), glm::vec2(1,0))) << endl;
-//    cout << glm::orientedAngle(glm::vec2(0,1), glm::vec2(0,-1)) << endl;
-//    cout << glm::orientedAngle(glm::vec2(0,1), glm::normalize(glm::vec2(-1,-1))) << endl;
 }
 
 PlatformerMenu::~PlatformerMenu()

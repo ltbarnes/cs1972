@@ -1,48 +1,65 @@
-Project: Platformer 2
+Project: Platformer 3
 Student: Logan Barnes (ltbarnes)
 
 
 COMPILED USING QT 5.2.0!!!
 
 
-Common Engine Requirements
-========================================
-[ ] Able to load OBJ models using the support code
-	### engine/common/OBJ
-[ ] Able to render OBJ models using the support code
-	### had to to a little adjusting for the new API
-[ ] Stores only one copy of any single model (never load the same model twice)
-	### engine/common/ObjectHander keeps track of loaded objects
-
 Geometric Engine Requirements
 ========================================
-[ ] Analytic collision response
-	
-	#################### RETRY ######################
-	### I believe I located the zero vector that was being normalized and haven't had any random black screens in a while.
-	### Fixed some other issues with camera positions and such too.
-	#################################################
-
-	[ ] Collision response slides for at least N iterations of the sweep test in the plane horizontal to collision (N = 4 is a good value)
-		### engine/collisions/GeometricCollisionManager sets the iteration count in the manage() function.
-	[ ] Collision response implement with the straight sliding hack for ramps
-		### in engine/collisions/GeometricCollisionManager handleCollisions() method
+[ ] Pathfinding and navigation across a loaded navigation mesh
+	[ ] Construct a graph from a navigation mesh loaded from an OBJ file
+	[ ] Query for the polygon in the mesh directly under a point
+	[ ] Search through the graph for a path between two points (feel free to use BFS)
+	[ ] Path generation using the simple stupid funnel algorithm
 
 Game Requirements
 ========================================
-[ ] Collision debugger support code is not present
-	### couldn't really use it with the new API anyway
-[ ] Movement and view controls must be the same as warmup and minecraft (including gravity and jumping)
-	### yup. engine/world/Player is a generic class to handle this since it's a requirement for every game.
-	### game/platformer/entities/PlatformerPlayer implements the Player class for platformer.
-[ ] The camera must be able to use a 3rd-person view
-	### press + or - to zoom
-[ ] The player must be drawn as an ellipsoid
-	### added in the game/platformer/gamescreens/GameScreen adds this in the constructor.
-[ ] The game must have a menu screen that allows the player to choose between different levels (different OBJ models)
-	### game/platformer/gamescreens/PlatformerMenu
-[ ] The player must be able to return to the menu screen without restarting the program
-	### press backspace
+[ ] The game must follow all requirements from platformer2
+[ ] The player must be able to toggle a visualization of navigation using a key input
+	### press 'N'
+	[ ] The visualization must render the navigation mesh
+		### yep
+	[ ] The visualization must render the shortest path from the current player position to a target point
+		### yep
+	[ ] The target point must be visualized by an ellipsoid (it does not have to collide)
+		### yep
+	[ ] The player must be able to change the target point by raycasting the environment (place the center at the result)
+		### yep
+	[ ] The player must be able to change the target point by raycasting the target point (place the center at the result)
+		### hold shift then click otherwise it will just raycast the environment again
+
+
+Issues:
+
+	I'm sure there are plenty of bugs but I haven't noticed any yet in my very limited testing.
+	-FPS prints to the console.
+	-Compiled with Qt5.2.0
+
+
+~Hours:
+  20
+
+
+
+
+
+
+
+Project: Platformer 4
+Student: Logan Barnes (ltbarnes)
+
+
+COMPILED USING QT 5.2.0!!!
+
+Game Requirements
+========================================
+[ ] The game must have at least one type of enemy that uses path-finding over a navigation mesh
+[ ] This enemy must interact with the player in some way (e.g. push the player off ledges, shoot at the player, damage the player directly)
+[ ] The game must have a non-arbitrary and reasonably achievable win or loss condition
+[ ] The game must be resettable upon win or loss without restarting the program
+[ ] The game can never enter an unwinnable or unloseable state
+[ ] The game must use orthographic projection to display some form of game UI
 
 
 Issues:

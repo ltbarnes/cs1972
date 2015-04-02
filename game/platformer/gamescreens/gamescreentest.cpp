@@ -7,9 +7,12 @@
 #include "geometriccollisionmanager.h"
 #include "triangle.h"
 
+//#include <glm/ext.hpp>
+
 GameScreenTest::GameScreenTest(Application *parent, int level)
     : Screen(parent)
 {
+    m_parentApp->setUseCubeMap(true);
 
     m_oh = new ObjectHandler();
     m_nmh = new NavMeshHandler();
@@ -92,7 +95,7 @@ void GameScreenTest::onTick(float secs  )
         {
             m_drawEllipsoid = true;
             glm::vec3 pos = p + d * t;
-//            pos += tri->normal * m_ellipsoid->getDim();
+
             m_ellipsoid->setPosition(pos);
             m_nmh->setEnd(pos + glm::vec3(0, 1, 0));
         }
@@ -181,12 +184,6 @@ void GameScreenTest::onRender(Graphics *g)
         m_level->draw(glm::mat4());
         g->setAllWhite(false);
     }
-
-    // ray cast attempt
-//    g->setGraphicsMode(RAY);
-////    glBindBuffer(GL_UNIFORM_BUFFER, m_mb->getUBO());
-//    g->rayDrawQuad();
-////    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void GameScreenTest::onMouseMoved(QMouseEvent *e, float deltaX, float deltaY)

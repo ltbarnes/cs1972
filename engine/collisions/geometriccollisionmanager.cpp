@@ -67,7 +67,7 @@ QList<Collision *> GeometricCollisionManager::detectEllipsoidCollisions(QList<Mo
 }
 
 
-void GeometricCollisionManager::handleEllipsoidCollisions(QList<Collision *> cols)
+void GeometricCollisionManager::handleEllipsoidCollisions(QList<Collision *> )
 {
 
 }
@@ -78,7 +78,6 @@ QList<TriCollision* > GeometricCollisionManager::detectTriangleCollisions(
 {
     float origT;
     QList<TriCollision *> cols;
-
 
     foreach (MovableEntity *me, mes)
     {
