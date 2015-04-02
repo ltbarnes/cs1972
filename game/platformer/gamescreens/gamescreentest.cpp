@@ -7,13 +7,9 @@
 #include "geometriccollisionmanager.h"
 #include "triangle.h"
 
-//#include <glm/ext.hpp>
-
 GameScreenTest::GameScreenTest(Application *parent, int level)
     : Screen(parent)
 {
-    m_parentApp->setUseCubeMap(true);
-
     m_oh = new ObjectHandler();
     m_nmh = new NavMeshHandler();
     GLuint shader = m_parentApp->getShader(DEFAULT);
@@ -40,8 +36,6 @@ GameScreenTest::GameScreenTest(Application *parent, int level)
         m_nmh->createVBO();
         break;
     }
-
-    cout << tris.size() << endl;
 
     m_world = new PlatformerWorld();
     m_world->addToMesh(tris);
