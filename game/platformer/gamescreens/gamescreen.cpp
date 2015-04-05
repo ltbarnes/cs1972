@@ -4,6 +4,7 @@
 #include "player.h"
 #include "staticentity.h"
 #include "racerplayer.h"
+#include "collisionmanager.h"
 #include "geometriccollisionmanager.h"
 #include "triangle.h"
 
@@ -36,7 +37,9 @@ GameScreen::GameScreen(Application *parent, int laps)
     m_player = new RacerPlayer(cam, playerPos, glm::vec3(1, .5f, 0));
 
     GeometricCollisionManager *gcm = new GeometricCollisionManager();
+    CollisionManager *cm = new CollisionManager();
     m_world->addManager(gcm);
+    m_world->addManager(cm);
 
     m_world->setPlayer(m_player);
     m_world->setGravity(glm::vec3(0, -10, 0));

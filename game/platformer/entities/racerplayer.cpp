@@ -86,7 +86,7 @@ void RacerPlayer::onTick(float secs)
 
     glm::vec3 vel = (thrust - m_vel);
     vel.y = thrust.y;
-    applyForce(vel);
+    applyForce(vel * 5.f);
     MovableEntity::onTick(secs);
     if (glm::dot(getVelocity(), glm::vec3(look)) < 0.f && force.z < 0.f)
         force.x = -force.x;
