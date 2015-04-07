@@ -68,7 +68,7 @@ GameScreen::GameScreen(Application *parent, int laps)
 
     shader = m_parentApp->getShader(RAY);
     m_mb = new MeshBuffer();
-    m_mb->setBuffer(shader, tris);
+//    m_mb->setBuffer(shader, tris);
 
     m_parentApp->getShader(DEFAULT);
 
@@ -215,8 +215,6 @@ void GameScreen::onRender(Graphics *g)
             g->setTexture(m_levelTexture, 50.f, 50.f);
             m_level->draw(glm::mat4());
             g->setAllWhite(false);
-
-            m_course->draw(g);
         }
         m_world->onDraw(g);
 
@@ -255,12 +253,24 @@ void GameScreen::onRender(Graphics *g)
     else
     {
         // ray cast attempt
-        g->setGraphicsMode(RAY);
-        m_mb->bindBuffer();
-        g->rayAddObjects(m_world->getObjectInfo());
+        GLuint shader = g->setGraphicsMode(RAY);
+//        m_mb->bindBuffer();
+
+        ObjectsInfo* oi = m_world->getObjectInfo();
+        int objSize = oi->invs.size();
+        g->rayAddObjects(oi);
+
+        oi = m_course->getObjectInfo();
+        int cylSize = oi->invs.size();
+        g->rayAddObjects(oi, objSize);
+
+        glUniform1i(glGetUniformLocation(shader, "NUM_OBJECTS"), objSize);
+        glUniform1i(glGetUniformLocation(shader, "NUM_CYLS"), cylSize);
+
         g->rayAddTransparents(m_player->getWaypointInfo());
         g->rayDrawQuad();
-        m_mb->unbindBuffer();
+
+//        m_mb->unbindBuffer();
     }
 }
 

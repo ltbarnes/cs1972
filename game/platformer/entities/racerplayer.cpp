@@ -8,7 +8,7 @@
 RacerPlayer::RacerPlayer(ActionCamera *camera, glm::vec3 pos, glm::vec3 color)
     : Player(camera, pos)
 {
-    m_offset = 35.f;
+    m_offset = 15.f;
     m_camera->setOffset(m_offset);
     setEyeHeight(0.f);
     m_lockCam = true;

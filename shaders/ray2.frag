@@ -17,12 +17,13 @@ uniform float time;
 
 uniform int NUM_TRIS = 64;
 uniform int NUM_OBJECTS = 0;
+uniform int NUM_CYLS = 0;
 uniform int NUM_TRANSPARENTS = 0;
 uniform int NUM_LIGHTS = 1;
 
-uniform mat4 invs[20];
-uniform vec4 colors[20];
-uniform int types[20];
+uniform mat4 invs[30];
+uniform vec4 colors[30];
+uniform int types[30];
 
 uniform mat4 invsT[10];
 uniform vec4 colorsT[10];
@@ -41,6 +42,10 @@ const float WATER_HEIGHT = 0.0;
 const vec3 LIGHT_DIR = vec3(-0.89, -0.41, -0.2);
 const vec3 LIGHT_COLOR = vec3(1, 1, 1);
 const float SHINE = 64.0;
+
+const int CYLINDER = 3;
+const int SPHERE = 4;
+const int CONE = 5;
 
 const float INF = 10000.0;
 const float EPS = 0.00001;
@@ -384,7 +389,7 @@ vec4 intersectSphere(in vec4 p, in vec4 d)
 
 ////////////////////CONE/////////////////////
 
-vec4 intersectsCone(vec4 p, vec4 d)
+vec4 intersectCone(vec4 p, vec4 d)
 {
     vec4 n = vec4(0, 0, 0, INF);
 
@@ -432,19 +437,19 @@ vec4 intersectsCone(vec4 p, vec4 d)
 
 /////////////////////PLANE//////////////////////
 
-vec4 intersectPlaneXZ(in vec4 p, in vec4 d)
+vec4 intersectPlaneXZ(in vec4 p, in vec4 d, float radius)
 {
     vec4 n = vec4(0, 0, 0, INF);
 
     n.w = WATER_HEIGHT - p.y / d.y;
     vec3 point = p.xyz + d.xyz * n.w;
-    float radius = 700.0;
+//    float radius = 700.0;
     if (n.w < EPS || point.x * point.x + point.z * point.z > radius * radius)
         n.w = INF;
 
     if (n.w < INF)
     {
-        n.xyz = vec3(0, 1, 0);
+        n.xyz = point;
     }
     return n;
 }
@@ -493,67 +498,35 @@ vec4 intersectTris(vec4 p, vec4 d)
 
         result.w = t;
         break;
-
-//        w0 = p0 - t1;
-//        a = -dot(n,w0);
-//        b = dot(n,dir);
-//        if (abs(b) < EPS) {     // ray is  parallel to triangle plane
-//            if (a == 0)                 // ray lies in triangle plane
-//                continue;
-//            else
-//                continue;              // ray disjoint from plane
-//        }
-
-//        // get intersect point of ray with triangle plane
-//        r = a / b;
-//        if (r < 0.0)                    // ray goes away from triangle
-//            continue;                   // => no intersect
-//        // for a segment, also test if (r > 1.0) => no intersect
-
-//        point = p0 + r * dir;            // intersect point of ray and plane
-
-//        // is I inside T?
-//        float    uu, uv, vv, wu, wv, D;
-//        uu = dot(u,u);
-//        uv = dot(u,v);
-//        vv = dot(v,v);
-//        w = point - t1;
-//        wu = dot(w,u);
-//        wv = dot(w,v);
-//        D = uv * uv - uu * vv;
-
-//        // get and test parametric coords
-//        float s, t;
-//        s = (uv * wv - vv * wu) / D;
-//        if (s < 0.0 || s > 1.0)         // I is outside T
-//            continue;
-//        t = (uv * wu - uu * wv) / D;
-//        if (t < 0.0 || (s + t) > 1.0)  // I is outside T
-//            continue;
-
-//        result.w = r;                      // I is in T
-//        break;
     }
 
     return result;
 }
 
-/////////////////////ALL_OBJECTS//////////////////////
 
-vec4 intersectSpheres(in int exception, in vec4 p, in vec4 d, out int colorIndex)
+vec4 intersectOneType(in int exception, in int start, in int end, in vec4 p, in vec4 d, in int type, out int colorIndex)
 {
     vec4 bestN = vec4(0, 0, 0, INF);
     vec4 n;
 
-    for (int i = 0; i < NUM_OBJECTS; ++i)
+    for (int i = start; i < end; ++i)
     {
         if (i == exception)
             continue;
 
         vec4 p_shape = invs[i] * p;
         vec4 d_shape = invs[i] * d;
-        if (types[i] == 4)
-            n = intersectSphere(p_shape, d_shape);
+        if (types[i] == type)
+        {
+            if (type == CYLINDER)
+                n = intersectCylinder(p_shape, d_shape);
+            else if (type == SPHERE)
+                n = intersectSphere(p_shape, d_shape);
+            else if (type == CONE)
+                n = intersectCone(p_shape, d_shape);
+            else
+                continue;
+        }
         else
             continue;
         if (n.w < bestN.w)
@@ -565,6 +538,42 @@ vec4 intersectSpheres(in int exception, in vec4 p, in vec4 d, out int colorIndex
     }
     return bestN;
 }
+
+
+///////////////////////WATER/////////////////////////
+
+vec4 intersectsWater(in vec4 p, in vec4 d, out int colorIndex)
+{
+    vec4 point = intersectPlaneXZ(p, d, 150.0);
+
+    if (point.w < INF)
+    {
+        vec4 p_shape;
+
+        int size = NUM_CYLS + NUM_OBJECTS;
+        for (int i = NUM_OBJECTS; i < size; i++)
+        {
+            p_shape = invs[i] * vec4(point.xyz, 1);
+
+            if (dot(p_shape.xz,p_shape.xz) < .25 && p_shape.y < .5 && p_shape.y > -.5)
+            {
+                colorIndex = -1;
+                return vec4(0,1,0,point.w);
+            }
+        }
+
+        // didn't intersect inside cylinder
+        float t = point.w;
+        point.w = 1;
+        point = intersectOneType(-1, NUM_OBJECTS, NUM_CYLS + NUM_OBJECTS, point, d, CYLINDER, colorIndex);
+        if (point.w < INF)
+            p.w += t;
+    }
+
+    return point;
+}
+
+/////////////////////ALL_OBJECTS//////////////////////
 
 vec4 intersectObjects(in int exception, in vec4 p, in vec4 d, out int colorIndex)
 {
@@ -578,12 +587,12 @@ vec4 intersectObjects(in int exception, in vec4 p, in vec4 d, out int colorIndex
 
         vec4 p_shape = invs[i] * p;
         vec4 d_shape = invs[i] * d;
-        if (types[i] == 3)
+        if (types[i] == CYLINDER)
             n = intersectCylinder(p_shape, d_shape);
-        else if (types[i] == 4)
+        else if (types[i] == SPHERE)
             n = intersectSphere(p_shape, d_shape);
-        else if (types[i] == 5)
-            n = intersectsCone(p_shape, d_shape);
+        else if (types[i] == CONE)
+            n = intersectCone(p_shape, d_shape);
         else
             continue;
         if (n.w < bestN.w)
@@ -607,11 +616,13 @@ vec4 intersectWorld(in int exception, in vec4 p, in vec4 d, out int colorIndex)
         bestN = n;
 
 //    n = intersectPlaneXZ(p, d);
-    n = intersectTris(p, d);
+//    n = intersectTris(p, d);
+    int tempColorIndex;
+    n = intersectsWater(p, d, tempColorIndex);
     if (n.w < bestN.w && d.y < 0.0)
     {
         bestN = n;
-        colorIndex = -1;
+        colorIndex = tempColorIndex;
     }
     return bestN;
 }
@@ -628,10 +639,14 @@ vec4 intersectTransparents(in vec4 p, in vec4 d, out float t)
     {
         vec4 p_shape = invsT[i] * p;
         vec4 d_shape = invsT[i] * d;
-        if (typesT[i] == 3)
+        if (typesT[i] == CYLINDER)
             tempT = intersectCylinder(p_shape, d_shape).w;
-        if (typesT[i] == 4)
+        else if (typesT[i] == SPHERE)
             tempT = intersectSphere(p_shape, d_shape).w;
+        else if (typesT[i] == CONE)
+            tempT = intersectCone(p_shape, d_shape).w;
+        else
+            continue;
         if (tempT < t)
         {
             if (t == INF)
@@ -706,9 +721,9 @@ vec3 calcWaterColor(in vec3 p, in vec3 norm, in vec3 eye)
     vec3 reflection;
     int colorIndex;
     vec3 bumpPoint = point + normal * 0.001;
-    if (intersectSpheres(-1, vec4(bumpPoint, 1), vec4(normalize(-LIGHT_DIR), 0), colorIndex).w == INF)
+    if (intersectOneType(-1, 0, NUM_OBJECTS, vec4(bumpPoint, 1), vec4(normalize(-LIGHT_DIR), 0), SPHERE, colorIndex).w == INF)
     {
-        vec4 n = intersectSpheres(-1, vec4(bumpPoint, 1), vec4(reflectVec, 0), colorIndex);
+        vec4 n = intersectOneType(-1, 0, NUM_OBJECTS,vec4(bumpPoint, 1), vec4(reflectVec, 0), SPHERE, colorIndex);
 
         if (n.w < INF)
             reflection = calcObjectColorSolid(colorIndex, bumpPoint + reflectVec * n.w, n.xyz, point);
@@ -781,13 +796,16 @@ vec3 raytrace(in vec4 p, in vec4 d)
         // calc object colors
         if (t < n.w)
         {
-            if (types[colorIndex] == 4)
+            if (types[colorIndex] != CYLINDER)
                 return mix(calcObjectColor(colorIndex, point, n.xyz, p.xyz), transColor.xyz, transColor.w);
             else
                 return mix(calcObjectColorSolid(colorIndex, point, n.xyz, p.xyz), transColor.xyz, transColor.w);
         }
 
-        return calcObjectColor(colorIndex, point, n.xyz, p.xyz);
+        if (types[colorIndex] != CYLINDER)
+            return calcObjectColor(colorIndex, point, n.xyz, p.xyz);
+        else
+            return calcObjectColorSolid(colorIndex, point, n.xyz, p.xyz);
     }
 
     vec3 color = getTexturedSky(d.xyz);

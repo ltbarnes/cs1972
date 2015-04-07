@@ -124,7 +124,7 @@ void Racer::buildPath(NavMeshHandler *nmh)
 void Racer::onTick(float secs)
 {
 
-    float forceAmt = 22.5f;
+    float forceAmt = 24.5f;
     if (m_waypoints.isEmpty())
         forceAmt = 0.f;
 
