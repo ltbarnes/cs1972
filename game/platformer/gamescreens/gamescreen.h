@@ -36,6 +36,7 @@ public:
 private:
     void setWaypoints(RacerPlayer *player);
     void render2D(Graphics *g);
+    glm::vec2 projectPointToScreen(glm::vec3 point, bool normalize, bool *inFrustum);
 
     ObjectHandler *m_oh;
     QString m_levelTexture;
@@ -56,6 +57,7 @@ private:
     int m_outcome;
 
     bool m_graphicsCardDestructionMode;
+    MeshBuffer *m_mb;
 
 };
 

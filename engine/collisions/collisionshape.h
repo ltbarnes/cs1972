@@ -10,6 +10,11 @@ class CollisionSphere;
 class Triangle;
 struct TriCollision;
 
+enum CollisionShapeType
+{
+    COLLISION_CYLINDER, COLLISION_ELLIPSOID, COLLISION_SPHERE, NUM_COLLISION_TYPES
+};
+
 class CollisionShape
 {
 public:
@@ -32,6 +37,8 @@ public:
     QString getID() { return m_id; }
     float getMass() { return m_mass; }
     bool isReactable() { return m_reactable; }
+
+    virtual CollisionShapeType getType() = 0;
 
     virtual Collision *collides(CollisionShape *shape) = 0;
     virtual Collision *collidesCylinder(CollisionCylinder *cc) = 0;

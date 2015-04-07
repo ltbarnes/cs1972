@@ -3,6 +3,10 @@
 #include "triangle.h"
 #include <glm/common.hpp>
 
+//#include <iostream>
+//using namespace std;
+//#include <glm/gtx/string_cast.hpp>
+
 CollisionCylinder::CollisionCylinder(glm::vec3 pos, glm::vec3 dim, QString id)
     : CollisionShape(pos, dim, id)
 {
@@ -11,6 +15,13 @@ CollisionCylinder::CollisionCylinder(glm::vec3 pos, glm::vec3 dim, QString id)
 CollisionCylinder::~CollisionCylinder()
 {
 }
+
+
+CollisionShapeType CollisionCylinder::getType()
+{
+    return COLLISION_CYLINDER;
+}
+
 
 Collision *CollisionCylinder::collides(CollisionShape *cs)
 {

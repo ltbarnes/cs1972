@@ -16,6 +16,12 @@ Ellipsoid::~Ellipsoid()
 }
 
 
+CollisionShapeType Ellipsoid::getType()
+{
+    return COLLISION_ELLIPSOID;
+}
+
+
 float Ellipsoid::intersectRayWorldSpace(glm::vec3 p, glm::vec3 d)
 {
     p = (p - getPos()) * glm::vec3(1 / m_dim.x, 1 / m_dim.y, 1 / m_dim.z);

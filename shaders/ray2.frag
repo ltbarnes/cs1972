@@ -15,7 +15,7 @@ uniform samplerCube envMap;
 uniform float time;
 
 
-uniform int NUM_TRIS = 2;
+uniform int NUM_TRIS = 60;
 uniform int NUM_OBJECTS = 0;
 uniform int NUM_TRANSPARENTS = 0;
 uniform int NUM_LIGHTS = 1;
@@ -45,7 +45,7 @@ const float SHINE = 64.0;
 const float INF = 10000.0;
 const float EPS = 0.00001;
 
-const int TRI_SIZE = 4096;
+const int TRI_SIZE = 1024;
 
 layout (std140) uniform triBlock {
     vec4 tris[TRI_SIZE];
@@ -294,13 +294,6 @@ vec4 intersectCylinder(in vec4 p, in vec4 d)
 {
     vec4 n = vec4(0, 0, 0, INF);
 
-//    float horiz = p.x * p.x + p.z * p.z;
-//    float vert = abs(p.y);
-
-    // if p is in the shape don't register an intersection
-//    if ((EQ(horiz, .25) || horiz < .25) && (EQ(vert, 0.5) || vert < 0.5))
-//        return n;
-
     float t1 = INF;
     float t2 = INF;
     vec4 v;
@@ -388,6 +381,55 @@ vec4 intersectSphere(in vec4 p, in vec4 d)
     return n;
 }
 
+
+////////////////////CONE/////////////////////
+
+vec4 intersectsCone(vec4 p, vec4 d)
+{
+    vec4 n = vec4(0, 0, 0, INF);
+
+    float t1 = INF;
+    float t2 = INF;
+    float a = d.x * d.x + d.z * d.z - d.y * d.y / 4.0;
+    float b = 2 * p.x * d.x + 2 * p.z * d.z - (2 * p.y * d.y - d.y) / 4.0;// + d.y or - d.y?
+    float c = p.x * p.x + p.z * p.z - (p.y * p.y - p.y + .25) / 4.0;
+
+    int tees = findT(a, b, c, t1, t2);
+
+    float mag;
+    vec4 v;
+
+    if (tees >= 1) {
+        v = p + t1 * d;
+        if (v.y > 0.5 || v.y < -0.5 || t1 < 0)
+            t1 = INF;
+        if (t1 < n.w) {
+            mag = sqrt(v.x * v.x + v.z * v.z);
+            n = vec4(v.x, 0.5 * mag, v.z, t1);
+        }
+        if (tees == 2) {
+            v = p + t2 * d;
+            if (v.y > 0.5 || v.y < -0.5 || t2 < 0)
+                t2 = INF;
+            if (t2 < n.w) {
+                mag = sqrt(v.x * v.x + v.z * v.z);
+                n = vec4(v.x, 0.5 * mag, v.z, t2);
+            }
+        }
+    }
+
+    float t3 = (-0.5 - p.y) / d.y;
+    v = p + t3 * d;
+
+    if (v.x * v.x + v.z * v.z > 0.25 || t3 < 0)
+        t3 = INF;
+    if (t3 < n.w) {
+        n = vec4(0, -1, 0, t3);
+    }
+    return n;
+}
+
+
 /////////////////////PLANE//////////////////////
 
 vec4 intersectPlaneXZ(in vec4 p, in vec4 d)
@@ -423,8 +465,10 @@ vec4 intersectObjects(in int exception, in vec4 p, in vec4 d, out int colorIndex
         vec4 d_shape = invs[i] * d;
         if (types[i] == 3)
             n = intersectCylinder(p_shape, d_shape);
-        if (types[i] == 4)
+        else if (types[i] == 4)
             n = intersectSphere(p_shape, d_shape);
+        else if (types[i] == 5)
+            n = intersectsCone(p_shape, d_shape);
         if (n.w < bestN.w)
         {
             bestN.w = n.w;
@@ -481,6 +525,19 @@ vec4 intersectTransparents(in vec4 p, in vec4 d, out float t)
     }
 
     return color;
+}
+
+
+vec4 intersectTris(vec4 p, vec4 d)
+{
+    vec4 n = vec4(0, 1, 0, INF);
+
+    for (int i = 0; i < NUM_TRIS; i++)
+    {
+
+    }
+
+    return n;
 }
 
 
@@ -618,19 +675,28 @@ vec3 raytrace(in vec4 p, in vec4 d)
 
         // calc object colors
         if (t < n.w)
-            return mix(calcObjectColor(colorIndex, point, n.xyz, p.xyz), transColor.xyz, transColor.w);
+        {
+            if (types[colorIndex] == 4)
+                return mix(calcObjectColor(colorIndex, point, n.xyz, p.xyz), transColor.xyz, transColor.w);
+            else
+                return mix(calcObjectColorSolid(colorIndex, point, n.xyz, p.xyz), transColor.xyz, transColor.w);
+        }
 
         return calcObjectColor(colorIndex, point, n.xyz, p.xyz);
     }
 
     vec3 color = getTexturedSky(d.xyz);
 
-    color = mix(color,
-                oceanStuff(vec3(p), vec3(d)),
-                pow(smoothstep(0.0,-0.05,d.y),0.3));
+    n = intersectTris(p, d);
 
-    color = pow(color,vec3(0.75));
+    if (n.w > INF)
+    {
+        color = mix(color,
+                    oceanStuff(vec3(p), vec3(d)),
+                    pow(smoothstep(0.0,-0.05,d.y),0.3));
 
+        color = pow(color,vec3(0.75));
+    }
 
     return mix(color, transColor.xyz, transColor.w);
 }

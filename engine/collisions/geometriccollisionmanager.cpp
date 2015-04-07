@@ -87,6 +87,9 @@ QList<TriCollision* > GeometricCollisionManager::detectTriangleCollisions(
 
         foreach (CollisionShape *cs, shapes)
         {
+            if (cs->getType() == COLLISION_CYLINDER)
+                continue;
+
             glm::vec3 d = (me->getDestination() - cs->getPos());
             origT = glm::length(d);
             if (origT < 0.00001f)
@@ -177,7 +180,7 @@ void GeometricCollisionManager::handleTriangleCollisions(QList<TriCollision *> c
 
         Collision c;
         c.impulse = n;
-        me->handleCollision(&c);
+//        me->handleCollision(&c);
     }
 }
 

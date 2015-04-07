@@ -8,7 +8,7 @@
 #include "geometriccollisionmanager.h"
 #include "triangle.h"
 
-//#include <glm/ext.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 GameScreen::GameScreen(Application *parent, int laps)
     : Screen(parent)
@@ -65,6 +65,12 @@ GameScreen::GameScreen(Application *parent, int laps)
     m_maxLaps = laps;
 
     m_outcome = 0;
+
+    shader = m_parentApp->getShader(RAY);
+    m_mb = new MeshBuffer();
+    m_mb->setBuffer(shader, tris);
+
+    m_parentApp->getShader(DEFAULT);
 }
 
 GameScreen::~GameScreen()
@@ -72,42 +78,30 @@ GameScreen::~GameScreen()
     delete m_oh;
     delete m_nmh;
     delete m_world;
+    delete m_mb;
 }
 
 void GameScreen::setWaypoints(RacerPlayer *player)
 {
     // other racers
     QList<glm::vec3> waypoints;
-    waypoints.append(glm::vec3(  81, 1, -55));
-    waypoints.append(glm::vec3( 125, 1,   0));
-    waypoints.append(glm::vec3(  81, 1,  55));
-    waypoints.append(glm::vec3(  10, 1, -15));
-    waypoints.append(glm::vec3( -81, 1, -55));
-    waypoints.append(glm::vec3(-125, 1,   0));
-    waypoints.append(glm::vec3( -81, 1,  55));
-    waypoints.append(glm::vec3( -10, 1, -15));
+    waypoints.append(glm::vec3(  59, 1, -60));
+    waypoints.append(glm::vec3( 101, 1, -60));
+    waypoints.append(glm::vec3( 130, 1, -29));
+    waypoints.append(glm::vec3( 130, 1,  29));
+    waypoints.append(glm::vec3( 101, 1,  60));
+    waypoints.append(glm::vec3(  59, 1,  60));
+    waypoints.append(glm::vec3( -59, 1, -60));
+    waypoints.append(glm::vec3(-101, 1, -60));
+    waypoints.append(glm::vec3(-130, 1, -29));
+    waypoints.append(glm::vec3(-130, 1,  29));
+    waypoints.append(glm::vec3(-101, 1,  60));
+    waypoints.append(glm::vec3( -59, 1,  60));
 
-    m_racer1->setWaypoints(waypoints, glm::vec3(  60, 1, -50));
-    m_racer2->setWaypoints(waypoints, glm::vec3(  60, 1, -50));
+    player->setWaypoints(waypoints, waypoints[0]);
 
-    // player
-    waypoints.clear();
-    waypoints.append(glm::vec3(  60, 1, -50));
-    waypoints.append(glm::vec3( 100, 1, -60));
-    waypoints.append(glm::vec3( 130, 1, -30));
-    waypoints.append(glm::vec3( 125, 1,  30));
-    waypoints.append(glm::vec3( 100, 1,  58));
-    waypoints.append(glm::vec3(  60, 1,  60));
-    waypoints.append(glm::vec3(  30, 1,  37));
-    waypoints.append(glm::vec3( -60, 1, -50));
-    waypoints.append(glm::vec3(-100, 1, -60));
-    waypoints.append(glm::vec3(-130, 1, -30));
-    waypoints.append(glm::vec3(-125, 1,  30));
-    waypoints.append(glm::vec3(-100, 1,  58));
-    waypoints.append(glm::vec3( -60, 1,  60));
-    waypoints.append(glm::vec3( -30, 1,  37));
-
-    player->setWaypoints(waypoints, glm::vec3(  60, 1, -50));
+    m_racer1->setWaypoints(waypoints, waypoints[0]);
+    m_racer2->setWaypoints(waypoints, waypoints[0]);
 
 }
 
@@ -137,19 +131,19 @@ void GameScreen::onTick(float secs  )
     if (m_laps[0] == m_maxLaps)
     {
         QList<glm::vec3> waypoints;
-        waypoints.append(glm::vec3(  60, 1, -50));
+        waypoints.append(glm::vec3(  59, 1, -60));
         m_player->setWaypoints(waypoints);
     }
     if (m_laps[1] == m_maxLaps)
     {
         QList<glm::vec3> waypoints;
-        waypoints.append(glm::vec3(  81, 1, -55));
+        waypoints.append(glm::vec3(  59, 1, -60));
         m_racer1->setWaypoints(waypoints);
     }
     if (m_laps[2] == m_maxLaps)
     {
         QList<glm::vec3> waypoints;
-        waypoints.append(glm::vec3(  81, 1, -55));
+        waypoints.append(glm::vec3(  59, 1, -60));
         m_racer2->setWaypoints(waypoints);
     }
     if (m_outcome == 0 && (m_laps[0] > m_maxLaps ||
@@ -177,7 +171,7 @@ void GameScreen::onRender(Graphics *g)
 
         Light light1;
         light1.type = DIRECTIONAL;
-        light1.color = glm::vec3(.5f, 1, .5f);
+        light1.color = glm::vec3(1);
         light1.posDir = glm::normalize(glm::vec3(-0.89f, -0.41f, -0.2f));
         light1.id = 1;
 
@@ -256,47 +250,68 @@ void GameScreen::onRender(Graphics *g)
     {
         // ray cast attempt
         g->setGraphicsMode(RAY);
+        m_mb->bindBuffer();
         g->rayAddObjects(m_world->getObjectInfo());
         g->rayAddTransparents(m_player->getWaypointInfo());
         g->rayDrawQuad();
+        m_mb->unbindBuffer();
     }
 }
 
 void GameScreen::render2D(Graphics *g)
 {
     glm::mat4 trans;
-    glm::vec4 look = m_camera->getLook();
-    glm::vec3 pos = m_player->getPosition();
     glm::vec3 wp = m_player->getCurrentWaypoint();
 
     g->setGraphicsMode(DRAW2D);
     g->setTexture("");
 
-    // no waypoints set
-    if (glm::dot(wp, wp) < 0.0001f)
-        return;
+    bool inFrustum;
+    glm::vec2 screenP;
 
-    glm::vec4 p = m_camera->getProjectionMatrix() *
-            m_camera->getViewMatrix() * glm::vec4(wp, 1);
+    // waypoints set
+    if (glm::dot(wp, wp) >= 0.0001f)
+    {
+        screenP = projectPointToScreen(wp, true, &inFrustum);
 
-    p /= p.w;
+        if (!inFrustum)
+        {
+            float dot = glm::dot(glm::vec2(0, 1), screenP);
+            float angle = std::atan2(-screenP.x, dot);
+            trans = glm::rotate(glm::mat4(), angle, glm::vec3(0, 0, 1));
+            trans *= glm::translate(glm::mat4(), glm::vec3(0, .95f, 0));
+            trans *= glm::scale(glm::mat4(), glm::vec3(.05f));
+
+            g->drawCone(trans);
+        }
+        else
+        {
+            wp.y += m_player->getWaypointRadius() + 1.5f + std::sin(g->getElapsedTime() * .01);
+            screenP = projectPointToScreen(wp, false, &inFrustum);
+
+            trans = glm::translate(glm::mat4(), glm::vec3(screenP, 0));
+            trans *= glm::rotate(glm::mat4(), glm::pi<float>(), glm::vec3(0, 0, 1));
+            trans *= glm::scale(glm::mat4(), glm::vec3(.05f));
+
+            g->drawCone(trans);
+        }
+    }
+}
+
+
+glm::vec2 GameScreen::projectPointToScreen(glm::vec3 point, bool normalize, bool *inFrustum)
+{
+    // normalized screen space
+    glm::vec4 sp = m_camera->getProjectionMatrix() *
+                   m_camera->getViewMatrix() * glm::vec4(point, 1);
+    sp *= 1.f / glm::abs(sp.w);
+
     // check if waypoint is within frustum
-    if (p.z >= 0 && p.z <= 1 && p.x >= -1 && p.x <= 1 && p.y >= -1 && p.y <= 1)
-        return;
+    *inFrustum = sp.z > 0 && sp.z < 1 && sp.x >= -1 && sp.x <= 1 && sp.y >= -1 && sp.y <= 1;
 
-
-    glm::vec2 vec = glm::vec2(wp.x - pos.x, wp.z - pos.z);
-    vec = glm::normalize(vec);
-    glm::vec2 up = glm::normalize(glm::vec2(look.x, look.z));
-
-    float dot = glm::dot(up, vec);
-    float det = up.x*vec.y - up.y*vec.x;
-    float angle = std::atan2(det, dot);
-    trans = glm::rotate(glm::mat4(), -angle, glm::vec3(0, 0, 1));
-    trans *= glm::translate(glm::mat4(), glm::vec3(0, .9f, 0));
-    trans *= glm::scale(glm::mat4(), glm::vec3(.05f));
-
-    g->drawCone(trans);
+    if (normalize)
+        return glm::normalize(glm::vec2(sp));
+    return glm::vec2(sp);
 }
 
 

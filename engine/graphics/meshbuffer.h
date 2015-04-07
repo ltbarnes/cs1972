@@ -13,6 +13,8 @@ public:
 
     void setBuffer(GLuint shader, QList<Triangle *> tris);
     GLuint getUBO();
+    void bindBuffer();
+    void unbindBuffer();
 
 private:
     GLuint m_ubo;

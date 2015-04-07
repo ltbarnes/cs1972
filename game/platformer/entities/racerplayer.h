@@ -18,6 +18,7 @@ public:
 
     bool checkFinishedLap();
     glm::vec3 getCurrentWaypoint();
+    float getWaypointRadius();
 
     void setWaypoints(QList<glm::vec3> waypoints, glm::vec3 startLoc = glm::vec3());
     ObjectsInfo *getWaypointInfo();
@@ -27,6 +28,8 @@ private:
     int m_currWaypoint;
     bool m_lockCam;
     bool m_finishedLap;
+
+    float m_waypointRadius;
 
 };
 

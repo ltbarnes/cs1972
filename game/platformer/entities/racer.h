@@ -11,7 +11,6 @@ public:
     virtual ~Racer();
 
     virtual void onTick(float secs);
-    virtual void handleCollision(Collision *col);
 
     bool checkFinishedLap();
 

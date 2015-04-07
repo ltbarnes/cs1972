@@ -332,6 +332,19 @@ glm::mat4 Graphics::getFrustum()
 }
 
 
+int Graphics::getElapsedTime()
+{
+    m_timer.elapsed();
+}
+
+
+
+
+
+
+
+
+
 void Graphics::setPlayer(glm::vec3 player, int mode)
 {
     glUniform3fv(m_sparseLocs["player"], 1, glm::value_ptr(player));

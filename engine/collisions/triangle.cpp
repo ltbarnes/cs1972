@@ -5,14 +5,16 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/norm.hpp>
 
-Triangle::Triangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3){
+Triangle::Triangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3)
+{
     vertices[0] = v1;
     vertices[1] = v2;
     vertices[2] = v3;
     normal = glm::normalize(glm::cross(vertices[1] - vertices[0], vertices[2] - vertices[0]));
 }
 
-Triangle Triangle::scale(glm::vec3 basis){
+Triangle Triangle::scale(glm::vec3 basis)
+{
     return Triangle(vertices[0]*basis, vertices[1]*basis, vertices[2]*basis);
 }
 

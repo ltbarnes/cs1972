@@ -10,6 +10,8 @@ public:
     CollisionSphere(glm::vec3 pos, glm::vec3 dim, QString id);
     virtual ~CollisionSphere();
 
+    virtual CollisionShapeType getType();
+
     virtual Collision *collides(CollisionShape *cs);
     virtual Collision *collidesCylinder(CollisionCylinder *cc);
     virtual Collision *collidesSphere(CollisionSphere *cs);

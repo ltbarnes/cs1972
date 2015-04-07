@@ -70,12 +70,10 @@ SOURCES += \
     game/platformer/gamescreens/platformermenu.cpp \
     game/platformer/gamescreens/gamescreen.cpp \
     game/platformer/world/platformerworld.cpp \
-    game/platformer/entities/platformerplayer.cpp \
     engine/objects/navmeshhandler.cpp \
     engine/shapes/line.cpp \
     engine/graphics/raygraphics.cpp \
     engine/graphics/meshbuffer.cpp \
-    game/platformer/gamescreens/gamescreentest.cpp \
     game/platformer/entities/racer.cpp \
     game/platformer/entities/racerplayer.cpp \
     engine/collisions/collisionsphere.cpp \

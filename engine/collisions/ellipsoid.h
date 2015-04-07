@@ -11,6 +11,8 @@ public:
     Ellipsoid(glm::vec3 center, glm::vec3 radius, QString id);
     virtual ~Ellipsoid();
 
+    virtual CollisionShapeType getType();
+
     virtual Collision *collides(CollisionShape *shape);
     virtual Collision *collidesCylinder(CollisionCylinder *cc);
     virtual Collision *collidesSphere(CollisionSphere *cs);

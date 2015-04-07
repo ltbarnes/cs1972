@@ -1,5 +1,6 @@
 #include "racerplayer.h"
 #include "ellipsoid.h"
+#include "collisioncylinder.h"
 
 #include <glm/gtx/norm.hpp>
 #include <glm/gtx/vector_angle.hpp>
@@ -12,9 +13,15 @@ RacerPlayer::RacerPlayer(ActionCamera *camera, glm::vec3 pos, glm::vec3 color)
     setEyeHeight(0.f);
     m_lockCam = true;
 
-    Ellipsoid *e = new Ellipsoid(glm::vec3(0, 0, 0), glm::vec3(.49f, .98f, .98f), "racer");
+    m_waypointRadius = 10.f;
+
+    Ellipsoid *e = new Ellipsoid(glm::vec3(0), glm::vec3(.98f), "racer");
     e->updatePos(pos);
     this->addCollisionShape(e);
+
+    CollisionCylinder *c = new CollisionCylinder(glm::vec3(0), glm::vec3(1.98f), "racer");
+    c->updatePos(pos);
+    this->addCollisionShape(c);
 
     RenderShape *rs;
     rs = new RenderShape();
@@ -22,7 +29,48 @@ RacerPlayer::RacerPlayer(ActionCamera *camera, glm::vec3 pos, glm::vec3 color)
     rs->color = color;
     rs->shininess = 32.f;
     rs->transparency = 1.f;
-    rs->trans = glm::scale(glm::mat4(), glm::vec3(.99f, .99f, 1.98f));
+    rs->trans = glm::scale(glm::mat4(), glm::vec3(2, .5, 2));
+    rs->inv = glm::inverse(rs->trans);
+    rs->texture = "";
+    rs->repeatU = 1.f;
+    rs->repeatV = 1.f;
+    this->addRenderShape(rs);
+
+    rs = new RenderShape();
+    rs->type = CONE;
+    rs->color = color;
+    rs->shininess = 32.f;
+    rs->transparency = 1.f;
+    rs->trans = glm::translate(glm::mat4(), glm::vec3(.3, .2, .6))
+              * glm::scale(glm::mat4(), glm::vec3(.5f))
+              * glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(-1, 0, 0));
+    rs->inv = glm::inverse(rs->trans);
+    rs->texture = "";
+    rs->repeatU = 1.f;
+    rs->repeatV = 1.f;
+    this->addRenderShape(rs);
+
+    rs = new RenderShape();
+    rs->type = CONE;
+    rs->color = color;
+    rs->shininess = 32.f;
+    rs->transparency = 1.f;
+    rs->trans = glm::translate(glm::mat4(), glm::vec3(-.3, .2, .6))
+            * glm::scale(glm::mat4(), glm::vec3(.5f))
+            * glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(-1, 0, 0));
+    rs->inv = glm::inverse(rs->trans);
+    rs->texture = "";
+    rs->repeatU = 1.f;
+    rs->repeatV = 1.f;
+    this->addRenderShape(rs);
+
+    rs = new RenderShape();
+    rs->type = SPHERE;
+    rs->color = glm::vec3(1);
+    rs->shininess = 32.f;
+    rs->transparency = 1.f;
+    rs->trans = glm::translate(glm::mat4(), glm::vec3(0, .2, -.5))
+              * glm::scale(glm::mat4(), glm::vec3(.5,.4,.5));
     rs->inv = glm::inverse(rs->trans);
     rs->texture = "";
     rs->repeatU = 1.f;
@@ -56,6 +104,12 @@ glm::vec3 RacerPlayer::getCurrentWaypoint()
 }
 
 
+float RacerPlayer::getWaypointRadius()
+{
+    return m_waypointRadius;
+}
+
+
 void RacerPlayer::onTick(float secs)
 {
     float forceAmt = 25.f;
@@ -63,12 +117,11 @@ void RacerPlayer::onTick(float secs)
     if (m_wsad & 0b1000)
         force.z += 1;
     if (m_wsad & 0b0100)
-        force.z -= 1;
+        force.z = 0;
     if (m_wsad & 0b0010)
         force.x -= 1;
     if (m_wsad & 0b0001)
         force.x += 1;
-
 
     glm::vec4 look = m_rotation * glm::vec4(0, 0, -1, 0);
     if (m_lockCam)
@@ -95,7 +148,7 @@ void RacerPlayer::onTick(float secs)
 
     if (!m_waypoints.isEmpty())
     {
-        if (glm::distance2(getPosition(), m_waypoints[m_currWaypoint]) < 50.f)
+        if (glm::distance2(getPosition(), m_waypoints[m_currWaypoint]) < m_waypointRadius * m_waypointRadius)
         {
             if (++m_currWaypoint >= m_waypoints.size())
             {
@@ -121,18 +174,18 @@ void RacerPlayer::onDrawTransparent(Graphics *g)
             int next = (m_currWaypoint + 1) % m_waypoints.size();
 
             trans = glm::translate(glm::mat4(), m_waypoints[next]) *
-                    glm::scale(glm::mat4(), glm::vec3(3.f));
+                    glm::scale(glm::mat4(), glm::vec3(m_waypointRadius * .8f));
             g->setColor(1, 0, 1, .2, 0);
             g->drawSphere(trans);
 
             trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
-                    glm::scale(glm::mat4(), glm::vec3(7.f));
+                    glm::scale(glm::mat4(), glm::vec3(m_waypointRadius * 1.9f));
             g->setColor(0, 1, 1, .3, 0);
         }
         else
         {
             trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
-                    glm::scale(glm::mat4(), glm::vec3(8.5f));
+                    glm::scale(glm::mat4(), glm::vec3(m_waypointRadius * 2.2f));
             g->setColor(0, 1, 0, .3, 0);
         }
         g->drawSphere(trans);
@@ -249,19 +302,19 @@ ObjectsInfo *RacerPlayer::getWaypointInfo()
         int next = (m_currWaypoint + 1) % m_waypoints.size();
 
         trans = glm::translate(glm::mat4(), m_waypoints[next]) *
-                glm::scale(glm::mat4(), glm::vec3(3.f));
+                glm::scale(glm::mat4(), glm::vec3(m_waypointRadius * .8f));
         info->invs.append(glm::inverse(trans));
         info->colors.append(glm::vec4(1, 0, 1, .2));
         info->shapeType.append(SPHERE);
 
         trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
-                glm::scale(glm::mat4(), glm::vec3(7.f));
+                glm::scale(glm::mat4(), glm::vec3(m_waypointRadius * 1.9f));
         color = glm::vec4(0, 1, 1, .3);
     }
     else
     {
         trans = glm::translate(glm::mat4(), m_waypoints[m_currWaypoint]) *
-                glm::scale(glm::mat4(), glm::vec3(8.5f));
+                glm::scale(glm::mat4(), glm::vec3(m_waypointRadius * 2.2f));
         color = glm::vec4(0, 1, 0, .3);
     }
     info->invs.append(glm::inverse(trans));

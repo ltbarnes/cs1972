@@ -83,6 +83,7 @@ public:
     void setAllWhite(bool allWhite);
 
     glm::mat4 getFrustum();
+    int getElapsedTime();
 
     void useCubeMap(bool use);
     bool cubeMapIsActive();

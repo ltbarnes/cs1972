@@ -12,6 +12,12 @@ CollisionSphere::~CollisionSphere()
 {
 }
 
+
+CollisionShapeType CollisionSphere::getType()
+{
+    return COLLISION_SPHERE;
+}
+
 Collision *CollisionSphere::collides(CollisionShape *cs)
 {
     return cs->collidesSphere(this);

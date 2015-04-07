@@ -45,7 +45,7 @@ void MeshBuffer::setBuffer(GLuint shader, QList<Triangle*> tris)
     glGenBuffers (1, &m_ubo);
 
     // Allocate storage for the UBO
-    glBindBuffer (GL_UNIFORM_BUFFER, m_ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, m_ubo);
 //    glBufferData (GL_UNIFORM_BUFFER, sizeof (GLfloat) * TRI_SIZE, data, GL_DYNAMIC_DRAW);
 
     GLuint blockIndex = glGetUniformBlockIndex(shader, "triBlock");
@@ -57,7 +57,7 @@ void MeshBuffer::setBuffer(GLuint shader, QList<Triangle*> tris)
 
 
     // Unbind buffers.
-//    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     delete[] data;
 }
@@ -65,6 +65,16 @@ void MeshBuffer::setBuffer(GLuint shader, QList<Triangle*> tris)
 GLuint MeshBuffer::getUBO()
 {
     return m_ubo;
+}
+
+void MeshBuffer::bindBuffer()
+{
+    glBindBuffer (GL_UNIFORM_BUFFER, m_ubo);
+}
+
+void MeshBuffer::unbindBuffer()
+{
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 
