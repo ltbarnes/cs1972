@@ -74,3 +74,19 @@ void Course::draw(Graphics *g)
 }
 
 
+ObjectsInfo *Course::getObjectInfo()
+{
+    ObjectsInfo *info;
+    info = new ObjectsInfo();
+
+    foreach(RenderShape *rs, m_cylinders)
+    {
+        info->invs.append(rs->inv);
+        info->colors.append(glm::vec4(rs->color, rs->transparency));
+        info->shapeType.append(rs->type);
+    }
+
+    return info;
+}
+
+

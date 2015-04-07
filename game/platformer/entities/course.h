@@ -11,6 +11,7 @@ public:
     virtual ~Course();
 
     void draw(Graphics *g);
+    ObjectsInfo *getObjectInfo();
 
 private:
     void addCylinder(glm::mat4 trans);

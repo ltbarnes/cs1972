@@ -706,9 +706,9 @@ vec3 calcWaterColor(in vec3 p, in vec3 norm, in vec3 eye)
     vec3 reflection;
     int colorIndex;
     vec3 bumpPoint = point + normal * 0.001;
-    if (intersectObjects(-1, vec4(bumpPoint, 1), vec4(normalize(-LIGHT_DIR), 0), colorIndex).w == INF)
+    if (intersectSpheres(-1, vec4(bumpPoint, 1), vec4(normalize(-LIGHT_DIR), 0), colorIndex).w == INF)
     {
-        vec4 n = intersectObjects(-1, vec4(bumpPoint, 1), vec4(reflectVec, 0), colorIndex);
+        vec4 n = intersectSpheres(-1, vec4(bumpPoint, 1), vec4(reflectVec, 0), colorIndex);
 
         if (n.w < INF)
             reflection = calcObjectColorSolid(colorIndex, bumpPoint + reflectVec * n.w, n.xyz, point);
