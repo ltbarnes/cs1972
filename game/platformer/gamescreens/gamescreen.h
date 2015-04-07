@@ -8,6 +8,7 @@
 #include "navmeshhandler.h"
 #include "meshbuffer.h"
 #include "racer.h"
+#include "course.h"
 
 class RacerPlayer;
 
@@ -42,6 +43,8 @@ private:
     QString m_levelTexture;
     OBJ *m_level;
     NavMeshHandler *m_nmh;
+
+    Course *m_course;
 
     PlatformerWorld *m_world;
     RacerPlayer *m_player;

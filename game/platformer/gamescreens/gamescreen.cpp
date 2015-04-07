@@ -71,6 +71,8 @@ GameScreen::GameScreen(Application *parent, int laps)
     m_mb->setBuffer(shader, tris);
 
     m_parentApp->getShader(DEFAULT);
+
+    m_course = new Course();
 }
 
 GameScreen::~GameScreen()
@@ -79,6 +81,7 @@ GameScreen::~GameScreen()
     delete m_nmh;
     delete m_world;
     delete m_mb;
+    delete m_course;
 }
 
 void GameScreen::setWaypoints(RacerPlayer *player)
@@ -108,6 +111,7 @@ void GameScreen::setWaypoints(RacerPlayer *player)
 // update and render
 void GameScreen::onTick(float secs  )
 {
+    secs = glm::min(secs, .25f);
 
     if (m_startTimer > 0.f)
     {
@@ -211,6 +215,8 @@ void GameScreen::onRender(Graphics *g)
             g->setTexture(m_levelTexture, 50.f, 50.f);
             m_level->draw(glm::mat4());
             g->setAllWhite(false);
+
+            m_course->draw(g);
         }
         m_world->onDraw(g);
 

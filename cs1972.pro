@@ -77,7 +77,8 @@ SOURCES += \
     game/platformer/entities/racer.cpp \
     game/platformer/entities/racerplayer.cpp \
     engine/collisions/collisionsphere.cpp \
-    engine/particles/verletmanager.cpp
+    engine/particles/verletmanager.cpp \
+    game/platformer/entities/course.cpp
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.cpp \
 #    game/minecraft/gamescreens/gamescreen.cpp \
@@ -150,7 +151,8 @@ HEADERS += \
     game/platformer/entities/racerplayer.h \
     engine/collisions/collisionsphere.h \
     engine/particles/verletmanager.h \
-    engine/particles/constraint.h
+    engine/particles/constraint.h \
+    game/platformer/entities/course.h
 ### minecraft
 #    game/minecraft/gamescreens/minecraftmenu.h \
 #    game/minecraft/gamescreens/gamescreen.h \

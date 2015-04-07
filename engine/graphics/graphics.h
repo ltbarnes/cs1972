@@ -105,7 +105,7 @@ public:
     void setParticleForce(glm::vec3 force);
 
     // ray stuff
-    void rayAddObjects(ObjectsInfo *info);
+    void rayAddObjects(ObjectsInfo *info, int start = 0);
     void rayAddTransparents(ObjectsInfo *info);
     void rayDrawQuad();
 

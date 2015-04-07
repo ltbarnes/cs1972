@@ -334,7 +334,7 @@ glm::mat4 Graphics::getFrustum()
 
 int Graphics::getElapsedTime()
 {
-    m_timer.elapsed();
+    return m_timer.elapsed();
 }
 
 
@@ -504,10 +504,10 @@ void Graphics::drawParticles(glm::vec3 source, float fuzziness)
 
 
 
-void Graphics::rayAddObjects(ObjectsInfo *info)
+void Graphics::rayAddObjects(ObjectsInfo *info, int start)
 {
-    int size = info->invs.size();
-    for (int i = 0; i < size; i++)
+    int size = info->invs.size() + start;
+    for (int i = start; i < size; i++)
     {
         std::ostringstream os;
         os << i;

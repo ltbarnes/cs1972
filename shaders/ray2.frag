@@ -15,7 +15,7 @@ uniform samplerCube envMap;
 uniform float time;
 
 
-uniform int NUM_TRIS = 60;
+uniform int NUM_TRIS = 64;
 uniform int NUM_OBJECTS = 0;
 uniform int NUM_TRANSPARENTS = 0;
 uniform int NUM_LIGHTS = 1;
@@ -449,7 +449,122 @@ vec4 intersectPlaneXZ(in vec4 p, in vec4 d)
     return n;
 }
 
+
+//////////////////TRIANGLES////////////////////
+
+vec4 intersectTris(vec4 p, vec4 d)
+{
+    vec4 result = vec4(0, 1, 0, INF);
+
+    vec3 p0 = vec3(p);
+    vec3 dir = vec3(d);
+
+    vec3 point;
+
+    vec3    t1, t2, t3;           // triangle points
+    vec3    u, v, n;              // triangle vectors
+    vec3    w0, w;                // ray vectors
+    float   r, a, b;              // params to calc ray-plane intersect
+    float t;
+    vec3 pab, pbc, pca;
+    int index;
+
+    for (int i = 0; i < NUM_TRIS; i++)
+    {
+        index = i*3;
+        t1 = tris[index].xyz;
+        t2 = tris[index+1].xyz;
+        t3 = tris[index+2].xyz;
+
+        n.x = tris[index].w;
+        n.y = tris[index+1].w;
+        n.z = tris[index+2].w;
+
+        t = dot(-n, p0 - t1) / dot(n, dir);
+        point = p0 + dir * t;
+
+        // check if collision point is within triangle
+        pab = cross(t1 - point, t2 - point);
+        pbc = cross(t2 - point, t3 - point);
+        pca = cross(t3 - point, t1 - point);
+
+        if (t < 0.f || dot(pab, pbc) < 0.00001f || dot(pbc, pca) < 0.00001f)
+            continue;
+
+        result.w = t;
+        break;
+
+//        w0 = p0 - t1;
+//        a = -dot(n,w0);
+//        b = dot(n,dir);
+//        if (abs(b) < EPS) {     // ray is  parallel to triangle plane
+//            if (a == 0)                 // ray lies in triangle plane
+//                continue;
+//            else
+//                continue;              // ray disjoint from plane
+//        }
+
+//        // get intersect point of ray with triangle plane
+//        r = a / b;
+//        if (r < 0.0)                    // ray goes away from triangle
+//            continue;                   // => no intersect
+//        // for a segment, also test if (r > 1.0) => no intersect
+
+//        point = p0 + r * dir;            // intersect point of ray and plane
+
+//        // is I inside T?
+//        float    uu, uv, vv, wu, wv, D;
+//        uu = dot(u,u);
+//        uv = dot(u,v);
+//        vv = dot(v,v);
+//        w = point - t1;
+//        wu = dot(w,u);
+//        wv = dot(w,v);
+//        D = uv * uv - uu * vv;
+
+//        // get and test parametric coords
+//        float s, t;
+//        s = (uv * wv - vv * wu) / D;
+//        if (s < 0.0 || s > 1.0)         // I is outside T
+//            continue;
+//        t = (uv * wu - uu * wv) / D;
+//        if (t < 0.0 || (s + t) > 1.0)  // I is outside T
+//            continue;
+
+//        result.w = r;                      // I is in T
+//        break;
+    }
+
+    return result;
+}
+
 /////////////////////ALL_OBJECTS//////////////////////
+
+vec4 intersectSpheres(in int exception, in vec4 p, in vec4 d, out int colorIndex)
+{
+    vec4 bestN = vec4(0, 0, 0, INF);
+    vec4 n;
+
+    for (int i = 0; i < NUM_OBJECTS; ++i)
+    {
+        if (i == exception)
+            continue;
+
+        vec4 p_shape = invs[i] * p;
+        vec4 d_shape = invs[i] * d;
+        if (types[i] == 4)
+            n = intersectSphere(p_shape, d_shape);
+        else
+            continue;
+        if (n.w < bestN.w)
+        {
+            bestN.w = n.w;
+            bestN.xyz = normalize(mat3(transpose(invs[i])) * n.xyz);
+            colorIndex = i;
+        }
+    }
+    return bestN;
+}
 
 vec4 intersectObjects(in int exception, in vec4 p, in vec4 d, out int colorIndex)
 {
@@ -469,6 +584,8 @@ vec4 intersectObjects(in int exception, in vec4 p, in vec4 d, out int colorIndex
             n = intersectSphere(p_shape, d_shape);
         else if (types[i] == 5)
             n = intersectsCone(p_shape, d_shape);
+        else
+            continue;
         if (n.w < bestN.w)
         {
             bestN.w = n.w;
@@ -489,7 +606,8 @@ vec4 intersectWorld(in int exception, in vec4 p, in vec4 d, out int colorIndex)
     if (n.w < bestN.w)
         bestN = n;
 
-    n = intersectPlaneXZ(p, d);
+//    n = intersectPlaneXZ(p, d);
+    n = intersectTris(p, d);
     if (n.w < bestN.w && d.y < 0.0)
     {
         bestN = n;
@@ -528,18 +646,6 @@ vec4 intersectTransparents(in vec4 p, in vec4 d, out float t)
 }
 
 
-vec4 intersectTris(vec4 p, vec4 d)
-{
-    vec4 n = vec4(0, 1, 0, INF);
-
-    for (int i = 0; i < NUM_TRIS; i++)
-    {
-
-    }
-
-    return n;
-}
-
 
 ///////////////////////////////////////////
 //                 COLORS                //
@@ -549,9 +655,9 @@ vec3 getTexturedSky(vec3 dir)
 {
     vec3 color = texture(envMap, dir.xyz).xyz;
     return color;
-    float fade = pow(1.0 - max(dir.y, 0), 50.0);
-    color = color + fade * (vec3(1) - color);
-    return color;
+//    float fade = pow(1.0 - max(dir.y, 0), 50.0);
+//    color = color + fade * (vec3(1) - color);
+//    return color;
 }
 
 vec3 calcObjectColorSolid(in int index, in vec3 point, in vec3 normal, in vec3 eye)
@@ -591,7 +697,6 @@ vec3 calcWaterColor(in vec3 p, in vec3 norm, in vec3 eye)
     heightMapTracing(ori,w_i,point);
     vec3 dist = point - ori;
     vec3 normal = getNormal(point, dot(dist,dist) * EPSILON_NRM);
-//    vec3 light = normalize(vec3(0.0,1.0,0.8));
     vec3 light = normalize(-LIGHT_DIR);
 
 
@@ -601,9 +706,9 @@ vec3 calcWaterColor(in vec3 p, in vec3 norm, in vec3 eye)
     vec3 reflection;
     int colorIndex;
     vec3 bumpPoint = point + normal * 0.001;
-    if (intersectObjects(-1, vec4(bumpPoint, 1), vec4(normalize(-LIGHT_DIR), 0), colorIndex).w == INF)
+    if (intersectSpheres(-1, vec4(bumpPoint, 1), vec4(normalize(-LIGHT_DIR), 0), colorIndex).w == INF)
     {
-        vec4 n = intersectObjects(-1, vec4(bumpPoint, 1), vec4(reflectVec, 0), colorIndex);
+        vec4 n = intersectSpheres(-1, vec4(bumpPoint, 1), vec4(reflectVec, 0), colorIndex);
 
         if (n.w < INF)
             reflection = calcObjectColorSolid(colorIndex, bumpPoint + reflectVec * n.w, n.xyz, point);
@@ -629,7 +734,7 @@ vec3 calcObjectColor(in int index, in vec3 point, in vec3 normal, in vec3 eye)
 
     int colorIndex;
     vec3 bumpPoint = point + normal * 0.001;
-    vec4 n = intersectWorld(index, vec4(bumpPoint, 1), vec4(reflectVec, 0), colorIndex);
+    vec4 n = intersectSpheres(index, vec4(bumpPoint, 1), vec4(reflectVec, 0), colorIndex);
 
     vec3 reflection = vec3(0,1,0);
     if (n.w < INF)
@@ -687,16 +792,14 @@ vec3 raytrace(in vec4 p, in vec4 d)
 
     vec3 color = getTexturedSky(d.xyz);
 
-    n = intersectTris(p, d);
+//    if (true)
+//    {
+//        color = mix(color,
+//                    oceanStuff(vec3(p), vec3(d)),
+//                    pow(smoothstep(0.0,-0.05,d.y),0.3));
 
-    if (n.w > INF)
-    {
-        color = mix(color,
-                    oceanStuff(vec3(p), vec3(d)),
-                    pow(smoothstep(0.0,-0.05,d.y),0.3));
-
-        color = pow(color,vec3(0.75));
-    }
+//        color = pow(color,vec3(0.75));
+//    }
 
     return mix(color, transColor.xyz, transColor.w);
 }
@@ -704,7 +807,6 @@ vec3 raytrace(in vec4 p, in vec4 d)
 
 // main
 void main() {
-
     vec4 farWorld = filmToWorld * vec4(pos, 1);
     vec4 dir = normalize(farWorld - camEye);
         
