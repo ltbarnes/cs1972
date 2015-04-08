@@ -22,6 +22,7 @@
         <file alias="first.png">res/images/first.png</file>
         <file alias="second.png">res/images/second.png</file>
         <file alias="third.png">res/images/third.png</file>
+        <file alias="death.png">res/images/death.png</file>
     </qresource>
     <qresource prefix="/cubemap">
         <file alias="posx.jpg">res/cubemap/posx.jpg</file>

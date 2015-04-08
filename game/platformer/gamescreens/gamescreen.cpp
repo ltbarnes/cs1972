@@ -122,6 +122,12 @@ void GameScreen::onTick(float secs  )
 
     m_world->onTick(secs);
 
+    if (m_outcome == 0 && m_player->getPosition().y < 0.f)
+    {
+        m_outcome = 4;
+        m_graphicsCardDestructionMode = false;
+    }
+
     m_racer1->buildPath(m_nmh);
     m_racer2->buildPath(m_nmh);
 
@@ -241,7 +247,9 @@ void GameScreen::onRender(Graphics *g)
             glm::mat4 trans = glm::scale(glm::mat4(), glm::vec3(.7f, .75f, .1f));
             g->setGraphicsMode(DRAW2D);
             g->setAllWhite(true);
-            if (m_outcome == 3)
+            if (m_outcome == 4)
+                g->setTexture("death.png");
+            else if (m_outcome == 3)
                 g->setTexture("third.png");
             else if (m_outcome == 2)
                 g->setTexture("second.png");
