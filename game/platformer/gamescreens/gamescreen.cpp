@@ -215,6 +215,8 @@ void GameScreen::onRender(Graphics *g)
             g->setTexture(m_levelTexture, 50.f, 50.f);
             m_level->draw(glm::mat4());
             g->setAllWhite(false);
+
+            m_course->draw(g);
         }
         m_world->onDraw(g);
 

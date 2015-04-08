@@ -303,6 +303,9 @@ vec4 intersectCylinder(in vec4 p, in vec4 d)
     float t2 = INF;
     vec4 v;
 
+    if (dot(p.xz,p.xz) < .25 && p.y < .5 && p.y > -.5)
+        return n;
+
     float a = d.x * d.x + d.z * d.z;
     float b = 2.0 * p.x * d.x + 2.0 * p.z * d.z;
     float c = p.x * p.x + p.z * p.z - 0.25;
@@ -443,7 +446,6 @@ vec4 intersectPlaneXZ(in vec4 p, in vec4 d, float radius)
 
     n.w = WATER_HEIGHT - p.y / d.y;
     vec3 point = p.xyz + d.xyz * n.w;
-//    float radius = 700.0;
     if (n.w < EPS || point.x * point.x + point.z * point.z > radius * radius)
         n.w = INF;
 
@@ -508,6 +510,7 @@ vec4 intersectOneType(in int exception, in int start, in int end, in vec4 p, in 
 {
     vec4 bestN = vec4(0, 0, 0, INF);
     vec4 n;
+    colorIndex = -2;
 
     for (int i = start; i < end; ++i)
     {
@@ -562,15 +565,14 @@ vec4 intersectsWater(in vec4 p, in vec4 d, out int colorIndex)
             }
         }
 
-        // didn't intersect inside cylinder
+        // point not inside cylinder
         float t = point.w;
-        point.w = 1;
-        point = intersectOneType(-1, NUM_OBJECTS, NUM_CYLS + NUM_OBJECTS, point, d, CYLINDER, colorIndex);
+        point = intersectOneType(-1, NUM_OBJECTS, NUM_CYLS + NUM_OBJECTS, vec4(point.xyz,1), d, CYLINDER, colorIndex);
         if (point.w < INF)
-            p.w += t;
+            point.w += t;
     }
-
     return point;
+
 }
 
 /////////////////////ALL_OBJECTS//////////////////////
