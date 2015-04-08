@@ -159,6 +159,7 @@ void GameScreen::onTick(float secs  )
             m_outcome = 2;
         else
             m_outcome = 1;
+        m_graphicsCardDestructionMode = false;
     }
     if (m_laps[1] > m_maxLaps)
         m_racer1->setWaypoints(QList<glm::vec3>());
@@ -216,7 +217,7 @@ void GameScreen::onRender(Graphics *g)
             m_level->draw(glm::mat4());
             g->setAllWhite(false);
 
-            m_course->draw(g);
+//            m_course->draw(g);
         }
         m_world->onDraw(g);
 
@@ -256,7 +257,6 @@ void GameScreen::onRender(Graphics *g)
     {
         // ray cast attempt
         GLuint shader = g->setGraphicsMode(RAY);
-//        m_mb->bindBuffer();
 
         ObjectsInfo* oi = m_world->getObjectInfo();
         int objSize = oi->invs.size();
@@ -271,8 +271,6 @@ void GameScreen::onRender(Graphics *g)
 
         g->rayAddTransparents(m_player->getWaypointInfo());
         g->rayDrawQuad();
-
-//        m_mb->unbindBuffer();
     }
 }
 

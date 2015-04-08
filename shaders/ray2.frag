@@ -21,6 +21,7 @@ uniform int NUM_CYLS = 0;
 uniform int NUM_TRANSPARENTS = 0;
 uniform int NUM_LIGHTS = 1;
 
+uniform mat4 trans[30];
 uniform mat4 invs[30];
 uniform vec4 colors[30];
 uniform int types[30];
@@ -519,10 +520,15 @@ vec4 intersectOneType(in int exception, in int start, in int end, in vec4 p, in 
 
         vec4 p_shape = invs[i] * p;
         vec4 d_shape = invs[i] * d;
+        vec4 d_norm = normalize(d_shape);
         if (types[i] == type)
         {
             if (type == CYLINDER)
-                n = intersectCylinder(p_shape, d_shape);
+            {
+                n = intersectCylinder(p_shape, d_norm);
+                vec4 newP = trans[i] * (p_shape + d_norm * n.w);
+                n.w = length(newP - p);
+            }
             else if (type == SPHERE)
                 n = intersectSphere(p_shape, d_shape);
             else if (type == CONE)
@@ -569,7 +575,13 @@ vec4 intersectsWater(in vec4 p, in vec4 d, out int colorIndex)
         float t = point.w;
         point = intersectOneType(-1, NUM_OBJECTS, NUM_CYLS + NUM_OBJECTS, vec4(point.xyz,1), d, CYLINDER, colorIndex);
         if (point.w < INF)
+        {
+//            vec4 pl = invs[colorIndex] * vec4(point.xyz,1);
+//            vec4 dl = normalize(invs[colorIndex] * d);
+//            vec4 newP = inverse(invs[colorIndex]) * (pl + dl * point.w);
+//            point.w = length(newP - vec4(point.xyz,1)) + t;
             point.w += t;
+        }
     }
     return point;
 

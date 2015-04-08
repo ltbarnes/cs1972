@@ -11,66 +11,66 @@ Course::Course()
 
     // diag "X"
     glm::mat4 trans;
-//    trans = glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(1,0,1)) *
-//            glm::scale(glm::mat4(), glm::vec3(diagWidth, 183.848f, diagWidth));
-//    addCylinder(trans);
+    trans = glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(1,0,1)) *
+            glm::scale(glm::mat4(), glm::vec3(diagWidth, 183.848f, diagWidth));
+    addCylinder(trans);
 
     trans = glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(-1,0,1)) *
             glm::scale(glm::mat4(), glm::vec3(diagWidth, 183.848f, diagWidth));
     addCylinder(trans);
 
-//    // horizontal
-//    trans = glm::translate(glm::mat4(), glm::vec3(80,0,-60)) *
-//            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(0,0,1)) *
-//            glm::scale(glm::mat4(), glm::vec3(diagWidth, 40, width));
-//    addCylinder(trans);
+    // horizontal
+    trans = glm::translate(glm::mat4(), glm::vec3(80,0,-60)) *
+            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(0,0,1)) *
+            glm::scale(glm::mat4(), glm::vec3(diagWidth, 40, width));
+    addCylinder(trans);
 
-//    trans = glm::translate(glm::mat4(), glm::vec3(80,0,60)) *
-//            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(0,0,1)) *
-//            glm::scale(glm::mat4(), glm::vec3(diagWidth, 40, width));
-//    addCylinder(trans);
+    trans = glm::translate(glm::mat4(), glm::vec3(80,0,60)) *
+            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(0,0,1)) *
+            glm::scale(glm::mat4(), glm::vec3(diagWidth, 40, width));
+    addCylinder(trans);
 
-//    trans = glm::translate(glm::mat4(), glm::vec3(-80,0,-60)) *
-//            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(0,0,1)) *
-//            glm::scale(glm::mat4(), glm::vec3(diagWidth, 40, width));
-//    addCylinder(trans);
+    trans = glm::translate(glm::mat4(), glm::vec3(-80,0,-60)) *
+            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(0,0,1)) *
+            glm::scale(glm::mat4(), glm::vec3(diagWidth, 40, width));
+    addCylinder(trans);
 
-//    trans = glm::translate(glm::mat4(), glm::vec3(-80,0,60)) *
-//            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(0,0,1)) *
-//            glm::scale(glm::mat4(), glm::vec3(diagWidth, 40, width));
-//    addCylinder(trans);
+    trans = glm::translate(glm::mat4(), glm::vec3(-80,0,60)) *
+            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(0,0,1)) *
+            glm::scale(glm::mat4(), glm::vec3(diagWidth, 40, width));
+    addCylinder(trans);
 
-//    // vertical
-//    trans = glm::translate(glm::mat4(), glm::vec3(130,0,0)) *
-//            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(1,0,0)) *
-//            glm::scale(glm::mat4(), glm::vec3(width, 60, diagWidth));
-//    addCylinder(trans);
+    // vertical
+    trans = glm::translate(glm::mat4(), glm::vec3(130,0,0)) *
+            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(1,0,0)) *
+            glm::scale(glm::mat4(), glm::vec3(width, 60, diagWidth));
+    addCylinder(trans);
 
-//    trans = glm::translate(glm::mat4(), glm::vec3(-130,0,0)) *
-//            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(1,0,0)) *
-//            glm::scale(glm::mat4(), glm::vec3(width, 60, diagWidth));
-//    addCylinder(trans);
+    trans = glm::translate(glm::mat4(), glm::vec3(-130,0,0)) *
+            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(1,0,0)) *
+            glm::scale(glm::mat4(), glm::vec3(width, 60, diagWidth));
+    addCylinder(trans);
 
-//    // diags
-//    trans = glm::translate(glm::mat4(), glm::vec3(115,0,-45)) *
-//            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(-1,0,1)) *
-//            glm::scale(glm::mat4(), glm::vec3(diagWidth, 56.57f, diagWidth));
-//    addCylinder(trans);
+    // diags
+    trans = glm::translate(glm::mat4(), glm::vec3(115,0,-45)) *
+            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(-1,0,1)) *
+            glm::scale(glm::mat4(), glm::vec3(diagWidth, 56.57f, diagWidth));
+    addCylinder(trans);
 
-//    trans = glm::translate(glm::mat4(), glm::vec3(115,0,45)) *
-//            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(1,0,1)) *
-//            glm::scale(glm::mat4(), glm::vec3(diagWidth, 56.57f, diagWidth));
-//    addCylinder(trans);
+    trans = glm::translate(glm::mat4(), glm::vec3(115,0,45)) *
+            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(1,0,1)) *
+            glm::scale(glm::mat4(), glm::vec3(diagWidth, 56.57f, diagWidth));
+    addCylinder(trans);
 
-//    trans = glm::translate(glm::mat4(), glm::vec3(-115,0,-45)) *
-//            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(1,0,1)) *
-//            glm::scale(glm::mat4(), glm::vec3(diagWidth, 56.57f, diagWidth));
-//    addCylinder(trans);
+    trans = glm::translate(glm::mat4(), glm::vec3(-115,0,-45)) *
+            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(1,0,1)) *
+            glm::scale(glm::mat4(), glm::vec3(diagWidth, 56.57f, diagWidth));
+    addCylinder(trans);
 
-//    trans = glm::translate(glm::mat4(), glm::vec3(-115,0,45)) *
-//            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(-1,0,1)) *
-//            glm::scale(glm::mat4(), glm::vec3(diagWidth, 56.57f, diagWidth));
-//    addCylinder(trans);
+    trans = glm::translate(glm::mat4(), glm::vec3(-115,0,45)) *
+            glm::rotate(glm::mat4(), glm::half_pi<float>(), glm::vec3(-1,0,1)) *
+            glm::scale(glm::mat4(), glm::vec3(diagWidth, 56.57f, diagWidth));
+    addCylinder(trans);
 
 }
 
@@ -118,6 +118,7 @@ ObjectsInfo *Course::getObjectInfo()
 
     foreach(RenderShape *rs, m_cylinders)
     {
+        info->trans.append(rs->trans);
         info->invs.append(rs->inv);
         info->colors.append(glm::vec4(rs->color, rs->transparency));
         info->shapeType.append(rs->type);

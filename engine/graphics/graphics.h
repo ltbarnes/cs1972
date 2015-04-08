@@ -55,6 +55,7 @@ struct Light
 
 struct ObjectsInfo
 {
+    QList<glm::mat4> trans;
     QList<glm::mat4> invs;
     QList<glm::vec4> colors;
     QList<ShapeType> shapeType;

@@ -112,7 +112,7 @@ ObjectsInfo *World::getObjectInfo()
     ObjectsInfo *info;
     info = new ObjectsInfo();
 
-    glm::mat4 inv;
+    glm::mat4 inv, trans;
     glm::mat4 posMat;
     QList<RenderShape*> rses;
     foreach(MovableEntity *me, m_movableEntities)
@@ -122,7 +122,9 @@ ObjectsInfo *World::getObjectInfo()
         rses.append(me->getRenderShapes());
         foreach(RenderShape *rs, rses)
         {
-            inv = glm::inverse( posMat * rs->trans );
+            trans = posMat * rs->trans;
+            inv = glm::inverse( trans );
+            info->trans.append(trans);
             info->invs.append(inv);
             info->colors.append(glm::vec4(rs->color, rs->transparency));
             info->shapeType.append(rs->type);

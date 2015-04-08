@@ -513,6 +513,7 @@ void Graphics::rayAddObjects(ObjectsInfo *info, int start)
         os << (i + start);
         std::string indexString = "[" + os.str() + "]"; // e.g. [0], [1], etc.
 
+        glUniformMatrix4fv(glGetUniformLocation(m_rayShader, ("trans" + indexString).c_str()), 1, GL_FALSE, glm::value_ptr(info->trans[i]));
         glUniformMatrix4fv(glGetUniformLocation(m_rayShader, ("invs" + indexString).c_str()), 1, GL_FALSE, glm::value_ptr(info->invs[i]));
         glUniform4fv(glGetUniformLocation(m_rayShader, ("colors" + indexString).c_str()), 1, glm::value_ptr(info->colors[i]));
         glUniform1i(glGetUniformLocation(m_rayShader, ("types" + indexString).c_str()), info->shapeType[i]);
