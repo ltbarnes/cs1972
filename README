@@ -1,47 +1,44 @@
-Project: Platformer 3
+Project: Platformer 4
 Student: Logan Barnes (ltbarnes)
 
 
 COMPILED USING QT 5.2.0!!!
 
-
-Geometric Engine Requirements
-========================================
-[ ] Pathfinding and navigation across a loaded navigation mesh
-	[ ] Construct a graph from a navigation mesh loaded from an OBJ file
-		### buildGraph() in engine/objects/NavMeshHandler.
-	[ ] Query for the polygon in the mesh directly under a point
-		### findTriangle() in NavMeshHandler
-	[ ] Search through the graph for a path between two points (feel free to use BFS)
-		### buildGraph() and findGraph() functions in NavMeshHandler
-	[ ] Path generation using the simple stupid funnel algorithm
-		### simpleStupidFunnel() function in NavMeshHandler
-
 Game Requirements
 ========================================
-[ ] The game must follow all requirements from platformer2
-	### believe so.
-[ ] The player must be able to toggle a visualization of navigation using a key input
-	### press 'N'. handled in engine/objects/NavMeshHandler.
-	[ ] The visualization must render the navigation mesh
-		### draw() method
-	[ ] The visualization must render the shortest path from the current player position to a target point
-		### drawPath() method
-	[ ] The target point must be visualized by an ellipsoid (it does not have to collide)
-		### game/gamescreens/GameScreenTest class onRender() method
-	[ ] The player must be able to change the target point by raycasting the environment (place the center at the result)
-		### drag mouse. handled in GameScreenTest.
-	[ ] The player must be able to change the target point by raycasting the target point (place the center at the result)
-		### press shift to reset the center. Otherwise it will just raycast the environment again
+[ ] The game must have at least one type of enemy that uses path-finding over a navigation mesh
+	### the game/platformer/entities/Racer class navigates the race path using a navmesh.
+[ ] This enemy must interact with the player in some way (e.g. push the player off ledges, shoot at the player, damage the player directly)
+	### the other racers race the player forcing win/loss conditions.
+[ ] The game must have a non-arbitrary and reasonably achievable win or loss condition
+	### win the race or lose the race. handled in the game/platformer/gamescreens/Gamescreen onTick() method.
+[ ] The game must be resettable upon win or loss without restarting the program
+	### press (almost) any key after the race.
+[ ] The game can never enter an unwinnable or unloseable state
+	### even if a player refuses to race the game will end after all other racers finish.
+[ ] The game must use orthographic projection to display some form of game UI
+	### arrows pointing to the next waypoint appear if the waypoint is out of the camera frustum. This is handled in the render2D method of game/platformer/gamescreens/Gamescreen.
 
+	############## RETRY ADDITIONS ###############
+	#
+	#	- the racers can collide now allowing them to push each other off the edge of the course.
+	# 	- this also forces the computer racers to recalculate their paths when they are pushed off course.
+	# 	- the waypoint indicator is now projected directly above the current waypoint or points directly
+	# 	  where it should be if it's off screen.
+	#
+	###############################################
+
+
+Design:
+
+	I focused more on making a ray tracing option for my graphics object and less on creating a super fun game. When using 'RAY' mode the engine simply renders a full screen quad and passes all the necessary game object info to the fragment shader. Modifying the fragment shader allows for cool effects like the water shown in the "graphics card destruction mode" of the game (mostly stolen from the shadertoy example "Seascape" at https://www.shadertoy.com/view/Ms2SD1).
 
 Issues:
 
-	- The target ellipsoid position is projected up a bit so it finds the triangle under it even though its center is technically on the ground.
 	- FPS prints to the console.
 	- Compiled with Qt5.2.0
 
 
 ~Hours:
-  20
+  30
 

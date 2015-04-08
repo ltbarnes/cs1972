@@ -1,17 +1,19 @@
-Project: Platformer 3
+Project: Platformer 4
 Student: Logan Barnes (ltbarnes)
 
-Walk around and find paths.
+Hovercraft racing game. Race through the cyan colored waypoints and don't get knocked of the edge! Press 'G' to toggle GRAPHICS CARD DESTRUCTION MODE!!! dun dun dun... (no 2D ortho projections in this mode)
 
 
 Controls:
 
-	 WASD 			- 		horizontal movement
-	 space			-		jump
+	  W 			- 		move forward
+	 A/D			-		turn left/right
+
+	  8				- 		toggle camera lock
+	  						(locks camera behind player)
 
 	 +/- 			-  		change camera zoom
-  Backspace 		- 		back to menu
+	mouse			- 		move camera (when unlocked)
 
-  	  N 			- 		toggles navigation mesh
-  click/drag        - 		place arbitrary ellipse
+  Backspace 		- 		back to menu
 
