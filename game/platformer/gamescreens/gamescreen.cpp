@@ -159,9 +159,9 @@ void GameScreen::onTick(float secs  )
     if (m_outcome == 0 && (m_laps[0] > m_maxLaps ||
                            (m_laps[2] > m_maxLaps && m_laps[1] > m_maxLaps)))
     {
-        if (m_laps[1] > m_laps[0] && m_laps[2] > m_laps[0])
+        if (m_laps[1] >= m_laps[0] && m_laps[2] >= m_laps[0])
             m_outcome = 3;
-        else if (m_laps[1] > m_laps[0] || m_laps[2] > m_laps[0])
+        else if (m_laps[1] >= m_laps[0] || m_laps[2] >= m_laps[0])
             m_outcome = 2;
         else
             m_outcome = 1;

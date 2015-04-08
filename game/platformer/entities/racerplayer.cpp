@@ -148,7 +148,7 @@ void RacerPlayer::onTick(float secs)
 
     if (!m_waypoints.isEmpty())
     {
-        if (glm::distance2(getPosition(), m_waypoints[m_currWaypoint]) < m_waypointRadius * m_waypointRadius)
+        if (glm::distance2(getPosition(), m_waypoints[m_currWaypoint]) < 100.f)
         {
             if (++m_currWaypoint >= m_waypoints.size())
             {

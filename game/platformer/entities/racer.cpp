@@ -2,10 +2,6 @@
 #include "ellipsoid.h"
 #include "collisioncylinder.h"
 
-//#include <iostream>
-//using namespace std;
-//#include <glm/ext.hpp>
-
 #include <glm/gtx/vector_angle.hpp>
 
 Racer::Racer(glm::vec3 pos, glm::vec3 color)
@@ -141,15 +137,6 @@ void Racer::onTick(float secs)
     applyForce(vel * 5.f);
     MovableEntity::onTick(secs);
 
-    if (m_path.isEmpty())
-        return;
-
-//    if (m_path.size() == 2)
-//        if (++m_currWaypoint >= m_waypoints.size())
-//        {
-//            m_currWaypoint = 0;
-//            m_finishedLap = true;
-//        }
     if (!m_waypoints.isEmpty())
     {
         if (glm::distance2(getPosition(), m_waypoints[m_currWaypoint]) < 100.f)
@@ -160,7 +147,10 @@ void Racer::onTick(float secs)
                 m_finishedLap = true;
             }
         }
-    }
+        }
+
+    if (m_path.isEmpty())
+        return;
 
     glm::vec3 toWaypoint = m_path[1] - getPosition();
     float angle = glm::orientedAngle(glm::normalize(toWaypoint), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0));

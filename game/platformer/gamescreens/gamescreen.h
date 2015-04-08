@@ -58,6 +58,7 @@ private:
 
     float m_startTimer;
     int m_outcome;
+    int m_place;
 
     bool m_graphicsCardDestructionMode;
     MeshBuffer *m_mb;
